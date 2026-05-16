@@ -1520,8 +1520,33 @@ async function submitFinal() {
     motivos: payload.motivos,
     payload: payload,
     firma: payload.firma,
-    archivos_data: payload.archivosData,
+    archivos_data: null, // archivos se guardan en tabla separada
   });
+
+  // Guardar archivos en tabla separada
+  const todosArchivos = [
+    ...S.fileData.med.map(f => ({ ...f, seccion: 'medicos' })),
+    ...S.fileData.adic.map(f => ({ ...f, seccion: 'adicionales' })),
+  ];
+  for (const f of todosArchivos) {
+    try {
+      await fetch(`${SB_URL}/rest/v1/pre_evaluaciones_archivos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SB_KEY,
+          'Authorization': `Bearer ${SB_KEY}`,
+        },
+        body: JSON.stringify({
+          evaluacion_id: payload.id,
+          nombre: f.name,
+          tipo: f.type,
+          seccion: f.seccion,
+          data: f.data,
+        }),
+      });
+    } catch(e) { console.warn('Error guardando archivo:', f.name, e); }
+  }
 
   if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = 'Enviar formulario <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>'; }
 
