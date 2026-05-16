@@ -667,12 +667,56 @@ function downloadPDF(idx) {
       prospecto:'Datos del prospecto', pais:'País de residencia', fnac:'Fecha de nacimiento',
       edad:'Edad', genero:'Género', fumador:'Fumador', ocu:'Ocupación',
       plan:'Plan solicitado', motivos:'Motivo(s) de pre-evaluación', termino:'Término', cobertura:'Cobertura solicitada',
-      depTitle:'Cuestionario — Actividades deportivas', histTitle:'Cuestionario — Historial médico',
-      ocuTitle:'Cuestionario — Ocupación', pilTitle:'Cuestionario de Piloto Privado',
+      otrosDetalle:'Detalle (Otros)',
+      // Deportes
+      depTitle:'Cuestionario — Actividades deportivas',
+      depDeporte:'Deporte practicado', depDesde:'Desde cuándo', depNaturaleza:'Naturaleza de participación',
+      depFrecuencia:'Frecuencia', depCert:'Certificaciones', depLimites:'Límites máximos alcanzados',
+      depClub:'¿Miembro de club/asociación?', depClubDet:'Detalle club/asociación',
+      depLesiones:'¿Ha tenido lesiones?', depLesionesDet:'Detalle lesiones',
+      // Historial
+      histTitle:'Cuestionario — Historial médico', histDet:'Detalles del historial médico', histDocs:'Documentos adjuntos:',
+      // Ocupación
+      ocuTitle:'Cuestionario — Ocupación', ocuTipo:'Tipo de ocupación', ocuFunciones:'Funciones laborales',
+      ocuMar:'¿Trabaja en alta mar?', ocuMarDet:'Detalle alta mar',
+      ocuAltura:'¿Trabaja en altura?', ocuAlturaDet:'Detalle trabajo en altura',
+      ocuExpl:'¿Utiliza explosivos?', ocuExplDet:'Detalle explosivos',
+      ocuAcc:'¿Enfermedad/accidente laboral?', ocuAccDet:'Detalle accidente',
+      ocuHeli:'¿Viaja en helicóptero/avioneta?', ocuHeliDet:'Detalle helicóptero',
+      // Piloto
+      pilTitle:'Cuestionario de Piloto Privado',
       pilPast:'Vuelos realizados en los últimos 12 meses', pilFuture:'Vuelos a realizar en los próximos 12 meses',
-      pepTitle:'Cuestionario PEP — Persona Políticamente Expuesta', vTitle:'Cuestionario de viajes',
-      adicTitle:'Información adicional', archTitle:'Archivos adjuntos adicionales',
-      firmaTitle:'Firma del asesor', disclaimerText:'Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.',
+      pilVuelos:'Número total de vuelos', pilHoras:'Número de horas de vuelo',
+      pilAeronave:'Tipo de aeronave', pilLugares:'Lugares a donde vuela', pilLicencias:'Licencias / certificaciones',
+      pilPriv:'¿Vuela desde aeropuertos no públicos?', pilPrivDet:'Detalle',
+      pilClub:'¿Pertenece a club/asociación?', pilClubDet:'Detalle club',
+      pilMot:'¿Vuela por motivos distintos al placer?', pilMotDet:'Detalle motivo vuelo',
+      pilAcro:'¿Vuelos acrobáticos?', pilAcroDet:'Detalle acrobático',
+      pilAccPil:'¿Accidentes o suspensión de licencia?', pilAccPilDet:'Detalle accidente piloto',
+      // PEP
+      pepTitle:'Cuestionario PEP — Persona Políticamente Expuesta',
+      pepEs:'¿Es una persona PEP?', pepDet:'Cargo o función pública',
+      pepNom:'¿Ha usado otro nombre?', pepNomDet:'Otro(s) nombre(s)',
+      // Viajes
+      vTitle:'Cuestionario de viajes',
+      v1:'¿Planea viajar en los próximos 12 meses?',
+      v1Destinos:'Destinos (próximos)', v1Visa:'Tipo de visa', v1Fechas:'Fechas de viaje', v1Motivo:'Motivo de viaje',
+      v2:'¿Ha viajado en los últimos 12 meses?',
+      v2Destinos:'Destinos (últimos 12 meses)', v2Visa:'Tipo de visa', v2Fechas:'Fechas de viaje', v2Motivo:'Motivo de viaje',
+      v3:'¿Reside o piensa residir en otro país?',
+      v3Razon:'Razón principal', v3Nacimiento:'Lugar de nacimiento', v3Nac:'Nacionalidad', v3Activos:'Activos / bienes inmuebles',
+      v4:'¿Residir en el extranjero más de 21 días?',
+      v4Tipo:'Tipo de residencia', v4Dir:'Dirección', v4Instal:'Instalaciones médicas más cercanas',
+      v5:'¿El viaje es por negocios?',
+      v5NomNeg:'Nombre de negocio', v5Nat:'Naturaleza de negocio', v5Deb:'Deberes y responsabilidades',
+      v5Inicio:'Fecha de inicio', v5Rem:'Remuneración anual', v5Salud:'Atención médica / forma de viaje',
+      v5Seg:'Medidas de seguridad del empleador', v5Contrato:'¿Bajo contrato o acuerdo?',
+      // Otros
+      adicTitle:'Información adicional', adicComentarios:'Comentarios',
+      archTitle:'Archivos adjuntos adicionales',
+      firmaTitle:'Firma del asesor',
+      si:'Sí', no:'No',
+      disclaimerText:'Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.',
     },
     en: {
       title:'Pre-Evaluation Form', sent:'Submitted',
@@ -680,12 +724,56 @@ function downloadPDF(idx) {
       prospecto:'Prospect data', pais:'Country of residence', fnac:'Date of birth',
       edad:'Age', genero:'Gender', fumador:'Smoker', ocu:'Occupation',
       plan:'Requested plan', motivos:'Reason(s) for pre-evaluation', termino:'Term', cobertura:'Requested coverage',
-      depTitle:'Questionnaire — Sports activities', histTitle:'Questionnaire — Medical history',
-      ocuTitle:'Questionnaire — Occupation', pilTitle:'Private Pilot Questionnaire',
+      otrosDetalle:'Other detail',
+      // Sports
+      depTitle:'Questionnaire — Sports activities',
+      depDeporte:'Sport practiced', depDesde:'Since when', depNaturaleza:'Nature of participation',
+      depFrecuencia:'Frequency', depCert:'Certifications', depLimites:'Maximum levels reached',
+      depClub:'Club/association member?', depClubDet:'Club/association detail',
+      depLesiones:'Had sport-related injuries?', depLesionesDet:'Injury detail',
+      // Medical
+      histTitle:'Questionnaire — Medical history', histDet:'Medical history details', histDocs:'Attached documents:',
+      // Occupation
+      ocuTitle:'Questionnaire — Occupation', ocuTipo:'Type of occupation', ocuFunciones:'Work duties',
+      ocuMar:'Working offshore?', ocuMarDet:'Offshore detail',
+      ocuAltura:'Working at heights?', ocuAlturaDet:'Heights detail',
+      ocuExpl:'Working with explosives?', ocuExplDet:'Explosives detail',
+      ocuAcc:'Work-related illness or accident?', ocuAccDet:'Accident detail',
+      ocuHeli:'Travels by helicopter/light aircraft?', ocuHeliDet:'Aircraft travel detail',
+      // Pilot
+      pilTitle:'Private Pilot Questionnaire',
       pilPast:'Flights in the last 12 months', pilFuture:'Flights planned in the next 12 months',
-      pepTitle:'PEP Questionnaire — Politically Exposed Person', vTitle:'Travel questionnaire',
-      adicTitle:'Additional information', archTitle:'Additional attachments',
-      firmaTitle:'Advisor signature', disclaimerText:'This pre-evaluation is informational and preliminary in nature. Final risk acceptance is subject to formal review of the application and may require additional information or documentation as declared.',
+      pilVuelos:'Total number of flights', pilHoras:'Total flight hours',
+      pilAeronave:'Type of aircraft', pilLugares:'Destinations flown to', pilLicencias:'Licenses / certifications',
+      pilPriv:'Flies from non-public airports?', pilPrivDet:'Detail',
+      pilClub:'Member of club/association?', pilClubDet:'Club detail',
+      pilMot:'Flies for reasons other than pleasure?', pilMotDet:'Flight purpose detail',
+      pilAcro:'Aerobatic flights?', pilAcroDet:'Aerobatic detail',
+      pilAccPil:'Accidents or license suspension?', pilAccPilDet:'Accident detail',
+      // PEP
+      pepTitle:'PEP Questionnaire — Politically Exposed Person',
+      pepEs:'Is the prospect a PEP?', pepDet:'Public office or function',
+      pepNom:'Has used another name?', pepNomDet:'Other name(s)',
+      // Travel
+      vTitle:'Travel questionnaire',
+      v1:'Plans to travel in the next 12 months?',
+      v1Destinos:'Destinations (upcoming)', v1Visa:'Type of visa', v1Fechas:'Travel dates', v1Motivo:'Purpose of travel',
+      v2:'Has traveled in the last 12 months?',
+      v2Destinos:'Destinations (last 12 months)', v2Visa:'Type of visa', v2Fechas:'Travel dates', v2Motivo:'Purpose of travel',
+      v3:'Resides or plans to reside in another country?',
+      v3Razon:'Main reason', v3Nacimiento:'Place of birth', v3Nac:'Nationality', v3Activos:'Assets / real estate',
+      v4:'Reside abroad for more than 21 days?',
+      v4Tipo:'Type of residence', v4Dir:'Address', v4Instal:'Nearest medical facilities',
+      v5:'Trip is for business?',
+      v5NomNeg:'Business name', v5Nat:'Nature of business', v5Deb:'Duties and responsibilities',
+      v5Inicio:'Start date', v5Rem:'Annual remuneration', v5Salud:'Medical care / travel method',
+      v5Seg:'Employer security measures', v5Contrato:'Under contract or agreement?',
+      // Other
+      adicTitle:'Additional information', adicComentarios:'Comments',
+      archTitle:'Additional attachments',
+      firmaTitle:'Advisor signature',
+      si:'Yes', no:'No',
+      disclaimerText:'This pre-evaluation is informational and preliminary in nature. Final risk acceptance is subject to formal review of the application and may require additional information or documentation as declared.',
     }
   };
   const L = TL[lang] || TL['es'];
@@ -722,19 +810,19 @@ function downloadPDF(idx) {
 
   // ── PROSPECTO ──
   sectionHeader(L.prospecto);
-  row('Nombres y apellidos', s.prospecto?.nombre);
+  row(L.nombres, s.prospecto?.nombre);
   row(L.pais, s.prospecto?.pais);
   row(L.fnac, formatDate(s.prospecto?.fnac));
   row(L.edad, s.prospecto?.edad);
   row(L.genero, s.prospecto?.genero ? (s.prospecto.genero.charAt(0).toUpperCase()+s.prospecto.genero.slice(1)) : '—');
-  row(L.fumador, s.prospecto?.fumador === 'si' ? (lang==='en'?'Yes':'Sí') : (lang==='en'?'No':'No'));
+  row(L.fumador, s.prospecto?.fumador === 'si' ? L.si : L.no);
   row(L.ocu, s.prospecto?.ocupacion);
   y += 3;
 
   // ── PLAN ──
   sectionHeader(L.plan);
   row(L.motivos, s.motivos);
-  if (s.otrosDetalle) row('Detalle (Otros)', s.otrosDetalle);
+  if (s.otrosDetalle) row(L.otrosDetalle, s.otrosDetalle);
   row(L.termino, s.plan?.termino);
   row(L.cobertura, s.plan?.cobertura);
   y += 3;
@@ -743,16 +831,16 @@ function downloadPDF(idx) {
   const dep = s.cuestionario?.deportes;
   if (dep) {
     sectionHeader(L.depTitle);
-    row('Deporte practicado', dep.deporte);
-    row('Desde cuándo', dep.desde);
-    row('Naturaleza de participación', dep.naturaleza);
-    row('Frecuencia', dep.frecuencia);
-    row('Certificaciones', dep.certificaciones);
-    row('Límites máximos alcanzados', dep.limites);
-    yn('¿Miembro de club/asociación?', dep.clubMiembro);
-    if (dep.clubMiembro === 'si') row('Detalle club/asociación', dep.clubDetalle, true);
-    yn('¿Ha tenido lesiones?', dep.lesiones);
-    if (dep.lesiones === 'si') row('Detalle lesiones', dep.lesionesDetalle, true);
+    row(L.depDeporte, dep.deporte);
+    row(L.depDesde, dep.desde);
+    row(L.depNaturaleza, dep.naturaleza);
+    row(L.depFrecuencia, dep.frecuencia);
+    row(L.depCert, dep.certificaciones);
+    row(L.depLimites, dep.limites);
+    row(L.depClub, dep.clubMiembro === 'si' ? L.si : L.no);
+    if (dep.clubMiembro === 'si') row(L.depClubDet, dep.clubDetalle, true);
+    row(L.depLesiones, dep.lesiones === 'si' ? L.si : L.no);
+    if (dep.lesiones === 'si') row(L.depLesionesDet, dep.lesionesDetalle, true);
     y += 3;
   }
 
@@ -760,12 +848,12 @@ function downloadPDF(idx) {
   const hist = s.cuestionario?.historial;
   if (hist) {
     sectionHeader(L.histTitle);
-    row('Detalles del historial médico', hist.detalles);
+    row(L.histDet, hist.detalles);
     const archMed = s.archivosAdjuntos?.medicos || [];
     if (archMed.length) {
       checkY(6);
       doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
-      doc.text('Documentos adjuntos:', ML, y); y += 4;
+      doc.text(L.histDocs, ML, y); y += 4;
       archMed.forEach(name => {
         checkY(4);
         doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#373D54');
@@ -779,41 +867,41 @@ function downloadPDF(idx) {
   const ocu = s.cuestionario?.ocupacion;
   if (ocu) {
     sectionHeader(L.ocuTitle);
-    row('Tipo de ocupación', ocu.tipo);
-    row('Funciones laborales', ocu.funciones);
-    yn('¿Trabaja en alta mar?', ocu.altaMar);
-    if (ocu.altaMar === 'si') row('Detalle alta mar', ocu.altaMarDet, true);
-    yn('¿Trabaja en altura?', ocu.altura);
-    if (ocu.altura === 'si') row('Detalle trabajo en altura', ocu.alturaDet, true);
-    yn('¿Utiliza explosivos?', ocu.explosivos);
-    if (ocu.explosivos === 'si') row('Detalle explosivos', ocu.explosivosDet, true);
-    yn('¿Enfermedad/accidente laboral?', ocu.accidente);
-    if (ocu.accidente === 'si') row('Detalle accidente', ocu.accidenteDet, true);
-    yn('¿Viaja en helicóptero/avioneta?', ocu.helicoptero);
-    if (ocu.helicoptero === 'si') row('Detalle helicóptero', ocu.helicopteroDet, true);
+    row(L.ocuTipo, ocu.tipo);
+    row(L.ocuFunciones, ocu.funciones);
+    row(L.ocuMar, ocu.altaMar === 'si' ? L.si : L.no);
+    if (ocu.altaMar === 'si') row(L.ocuMarDet, ocu.altaMarDet, true);
+    row(L.ocuAltura, ocu.altura === 'si' ? L.si : L.no);
+    if (ocu.altura === 'si') row(L.ocuAlturaDet, ocu.alturaDet, true);
+    row(L.ocuExpl, ocu.explosivos === 'si' ? L.si : L.no);
+    if (ocu.explosivos === 'si') row(L.ocuExplDet, ocu.explosivosDet, true);
+    row(L.ocuAcc, ocu.accidente === 'si' ? L.si : L.no);
+    if (ocu.accidente === 'si') row(L.ocuAccDet, ocu.accidenteDet, true);
+    row(L.ocuHeli, ocu.helicoptero === 'si' ? L.si : L.no);
+    if (ocu.helicoptero === 'si') row(L.ocuHeliDet, ocu.helicopteroDet, true);
     const pil = ocu.piloto;
     if (pil) {
       y += 2;
       subLabel(L.pilTitle);
       subLabel(L.pilPast);
-      row('Número total de vuelos', pil.vuelosPasados);
-      row('Número de horas de vuelo', pil.horasPasadas);
+      row(L.pilVuelos, pil.vuelosPasados);
+      row(L.pilHoras, pil.horasPasadas);
       subLabel(L.pilFuture);
-      row('Número total de vuelos', pil.vuelosFuturos);
-      row('Número de horas de vuelo', pil.horasFuturas);
-      row('Tipo de aeronave', pil.aeronave);
-      row('Lugares a donde vuela', pil.lugares);
-      row('Licencias / certificaciones', pil.licencias);
-      yn('¿Vuela desde aeropuertos no públicos?', pil.aeropuertosPriv);
-      if (pil.aeropuertosPriv === 'si') row('Detalle', pil.aeropuertosPrivDet, true);
-      yn('¿Pertenece a club/asociación?', pil.club);
-      if (pil.club === 'si') row('Detalle club', pil.clubDet, true);
-      yn('¿Vuela por motivos distintos al placer?', pil.motivoVuelo);
-      if (pil.motivoVuelo === 'si') row('Detalle motivo vuelo', pil.motivoVueloDet, true);
-      yn('¿Vuelos acrobáticos?', pil.acrobatico);
-      if (pil.acrobatico === 'si') row('Detalle acrobático', pil.acrobaticoDet, true);
-      yn('¿Accidentes o suspensión de licencia?', pil.accidentePil);
-      if (pil.accidentePil === 'si') row('Detalle accidente piloto', pil.accidentePilDet, true);
+      row(L.pilVuelos, pil.vuelosFuturos);
+      row(L.pilHoras, pil.horasFuturas);
+      row(L.pilAeronave, pil.aeronave);
+      row(L.pilLugares, pil.lugares);
+      row(L.pilLicencias, pil.licencias);
+      row(L.pilPriv, pil.aeropuertosPriv === 'si' ? L.si : L.no);
+      if (pil.aeropuertosPriv === 'si') row(L.pilPrivDet, pil.aeropuertosPrivDet, true);
+      row(L.pilClub, pil.club === 'si' ? L.si : L.no);
+      if (pil.club === 'si') row(L.pilClubDet, pil.clubDet, true);
+      row(L.pilMot, pil.motivoVuelo === 'si' ? L.si : L.no);
+      if (pil.motivoVuelo === 'si') row(L.pilMotDet, pil.motivoVueloDet, true);
+      row(L.pilAcro, pil.acrobatico === 'si' ? L.si : L.no);
+      if (pil.acrobatico === 'si') row(L.pilAcroDet, pil.acrobaticoDet, true);
+      row(L.pilAccPil, pil.accidentePil === 'si' ? L.si : L.no);
+      if (pil.accidentePil === 'si') row(L.pilAccPilDet, pil.accidentePilDet, true);
     }
     y += 3;
   }
@@ -822,10 +910,10 @@ function downloadPDF(idx) {
   const pep = s.pep;
   if (pep) {
     sectionHeader(L.pepTitle);
-    yn('¿Es una persona PEP?', pep.esPep);
-    if (pep.esPep === 'si') row('Cargo o función pública', pep.pepDetalle, true);
-    yn('¿Ha usado otro nombre?', pep.otroNombre);
-    if (pep.otroNombre === 'si') row('Otro(s) nombre(s)', pep.otroNombreDet, true);
+    row(L.pepEs, pep.esPep === 'si' ? L.si : L.no);
+    if (pep.esPep === 'si') row(L.pepDet, pep.pepDetalle, true);
+    row(L.pepNom, pep.otroNombre === 'si' ? L.si : L.no);
+    if (pep.otroNombre === 'si') row(L.pepNomDet, pep.otroNombreDet, true);
     y += 3;
   }
 
@@ -833,43 +921,43 @@ function downloadPDF(idx) {
   const vj = s.viajes;
   if (vj) {
     sectionHeader(L.vTitle);
-    yn('¿Planea viajar en los próximos 12 meses?', vj.proximosViajar);
+    row(L.v1, vj.proximosViajar === 'si' ? L.si : L.no);
     if (vj.proximosViajar === 'si') {
-      row('Destinos (próximos)', vj.v1Destinos, true);
-      row('Tipo de visa', vj.v1Visa, true);
-      row('Fechas de viaje', vj.v1Fechas, true);
-      row('Motivo de viaje', vj.v1Motivo, true);
+      row(L.v1Destinos, vj.v1Destinos, true);
+      row(L.v1Visa, vj.v1Visa, true);
+      row(L.v1Fechas, vj.v1Fechas, true);
+      row(L.v1Motivo, vj.v1Motivo, true);
     }
-    yn('¿Ha viajado en los últimos 12 meses?', vj.viajoUltimos);
+    row(L.v2, vj.viajoUltimos === 'si' ? L.si : L.no);
     if (vj.viajoUltimos === 'si') {
-      row('Destinos (últimos 12 meses)', vj.v2Destinos, true);
-      row('Tipo de visa', vj.v2Visa, true);
-      row('Fechas de viaje', vj.v2Fechas, true);
-      row('Motivo de viaje', vj.v2Motivo, true);
+      row(L.v2Destinos, vj.v2Destinos, true);
+      row(L.v2Visa, vj.v2Visa, true);
+      row(L.v2Fechas, vj.v2Fechas, true);
+      row(L.v2Motivo, vj.v2Motivo, true);
     }
-    yn('¿Reside o piensa residir en otro país?', vj.residirOtroPais);
+    row(L.v3, vj.residirOtroPais === 'si' ? L.si : L.no);
     if (vj.residirOtroPais === 'si') {
-      row('Razón principal', vj.v3Razon, true);
-      row('Lugar de nacimiento', vj.v3Nacimiento, true);
-      row('Nacionalidad', vj.v3Nacionalidad, true);
-      row('Activos / bienes inmuebles', vj.v3Activos, true);
+      row(L.v3Razon, vj.v3Razon, true);
+      row(L.v3Nacimiento, vj.v3Nacimiento, true);
+      row(L.v3Nac, vj.v3Nacionalidad, true);
+      row(L.v3Activos, vj.v3Activos, true);
     }
-    yn('¿Residir en el extranjero más de 21 días?', vj.mas21Dias);
+    row(L.v4, vj.mas21Dias === 'si' ? L.si : L.no);
     if (vj.mas21Dias === 'si') {
-      row('Tipo de residencia', vj.v4TipoResidencia, true);
-      row('Dirección', vj.v4Direccion, true);
-      row('Instalaciones médicas más cercanas', vj.v4Instalaciones, true);
+      row(L.v4Tipo, vj.v4TipoResidencia, true);
+      row(L.v4Dir, vj.v4Direccion, true);
+      row(L.v4Instal, vj.v4Instalaciones, true);
     }
-    yn('¿El viaje es por negocios?', vj.porNegocios);
+    row(L.v5, vj.porNegocios === 'si' ? L.si : L.no);
     if (vj.porNegocios === 'si') {
-      row('Nombre de negocio', vj.v5NombreNeg, true);
-      row('Naturaleza de negocio', vj.v5Naturaleza, true);
-      row('Deberes y responsabilidades', vj.v5Deberes, true);
-      row('Fecha de inicio', formatDate(vj.v5Inicio), true);
-      row('Remuneración anual', vj.v5Remuneracion, true);
-      row('Atención médica / forma de viaje', vj.v5Salud, true);
-      row('Medidas de seguridad del empleador', vj.v5Seguridad, true);
-      row('¿Bajo contrato o acuerdo?', vj.v5Contrato, true);
+      row(L.v5NomNeg, vj.v5NombreNeg, true);
+      row(L.v5Nat, vj.v5Naturaleza, true);
+      row(L.v5Deb, vj.v5Deberes, true);
+      row(L.v5Inicio, formatDate(vj.v5Inicio), true);
+      row(L.v5Rem, vj.v5Remuneracion, true);
+      row(L.v5Salud, vj.v5Salud, true);
+      row(L.v5Seg, vj.v5Seguridad, true);
+      row(L.v5Contrato, vj.v5Contrato, true);
     }
     y += 3;
   }
@@ -877,7 +965,7 @@ function downloadPDF(idx) {
   // ── INFORMACIÓN ADICIONAL ──
   if (s.adicional) {
     sectionHeader(L.adicTitle);
-    row('Comentarios', s.adicional);
+    row(L.adicComentarios, s.adicional);
     y += 3;
   }
 
@@ -900,7 +988,7 @@ function downloadPDF(idx) {
     try {
       doc.addImage(s.firma, 'PNG', ML, y, 90, 28);
       y += 32;
-    } catch(e) { row('Firma', 'Incluida digitalmente en el envío'); }
+    } catch(e) { row(L.firmaTitle, lang==='en'?'Digitally included in submission':'Incluida digitalmente en el envío'); }
     y += 3;
   }
 
@@ -953,4 +1041,3 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
