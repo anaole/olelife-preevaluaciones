@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/pre-evaluacion.html" },
+    { "source": "/backoffice", "destination": "/backoffice.html" }
+  ]
+}
