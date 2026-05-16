@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pre-Evaluación — OléLife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-turquoise: #00BBDD; --color-turquoise-soft: #E6F8FC;
+      --color-green: #00D090; --color-green-hover: #11B583; --color-green-soft: #E6FAF3;
+      --color-dark-blue: #373D54; --color-shell: #F5F9FC; --color-bg-grey: #E5ECF8;
+      --color-light-grey: #C2CEE3; --color-medium-grey: #9BACCB; --color-dark-grey: #5B667A;
+      --color-white: #FFFFFF; --color-danger: #DD0000; --color-danger-soft: #FFE4E4;
+      --shadow-card: 0 2px 2px rgba(230,238,250,.10); --shadow-header: 0 4px 16px rgba(55,61,84,.12);
+      --radius-input: 8px; --radius-card: 10px; --radius-button: 20px;
+      --font: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    body { font-family: var(--font); background: var(--color-shell); color: var(--color-dark-grey); min-height: 100vh; }
+    .site-header { position: sticky; top: 0; z-index: 50; background: var(--color-dark-blue); box-shadow: 0 4px 20px rgba(0,0,0,.25); padding: 0 24px; min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    @media (min-width: 768px) { .site-header { padding: 0 40px; min-height: 80px; } }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo-mark { width: 36px; height: 36px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-name { font: 800 18px/1 var(--font); color: var(--color-white); letter-spacing: -.5px; }
+    .logo-name span { color: var(--color-turquoise); }
+    .header-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 12px; }
+    .header-title { font: 700 15px/1.2 var(--font); color: var(--color-white); }
+    .header-desc { font: 400 12px/1.4 var(--font); color: rgba(255,255,255,.55); margin-top: 3px; max-width: 480px; display: none; }
+    @media (min-width: 640px) { .header-desc { display: block; } }
+    @media (min-width: 768px) { .header-title { font-size: 17px; } .header-desc { font-size: 13px; } }
+    .header-badge { background: rgba(0,187,221,.18); border: 1px solid rgba(0,187,221,.35); border-radius: var(--radius-button); padding: 6px 14px; font: 600 11px/1 var(--font); color: var(--color-turquoise); white-space: nowrap; flex-shrink: 0; }
+    .disclaimer { background: #FFF4E4; border-top: 1px solid #F0D890; padding: 10px 24px; font: 400 11px/16px var(--font); color: #F79E1B; display: flex; align-items: flex-start; gap: 8px; }
+    @media (min-width: 768px) { .disclaimer { padding: 10px 40px; } }
+    .disclaimer svg { flex-shrink: 0; margin-top: 1px; }
+    .info-banner { background: var(--color-turquoise-soft); border-left: 3px solid var(--color-turquoise); border-radius: 0 var(--radius-input) var(--radius-input) 0; padding: 12px 16px; font: 400 12px/18px var(--font); color: var(--color-dark-blue); margin-bottom: 14px; display: flex; gap: 10px; align-items: flex-start; }
+    .info-banner svg { flex-shrink: 0; }
+    .workspace { padding: 24px 16px 64px; }
+    @media (min-width: 768px) { .workspace { padding: 32px 24px 80px; } }
+    .workspace-inner { max-width: 720px; margin: 0 auto; }
+    .progress-wrap { margin-bottom: 24px; }
+    .progress-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .progress-top span { font: 600 12px/14px var(--font); color: var(--color-medium-grey); }
+    .progress-top strong { font: 700 12px/14px var(--font); color: var(--color-turquoise); }
+    .progress-bar { height: 4px; border-radius: 999px; background: var(--color-bg-grey); overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 999px; background: var(--color-turquoise); transition: width 350ms ease-out; }
+    .card { background: var(--color-white); border-radius: var(--radius-card); border: 1px solid var(--color-light-grey); box-shadow: var(--shadow-card); padding: 20px 16px; margin-bottom: 16px; }
+    @media (min-width: 768px) { .card { padding: 32px; } }
+    @media (min-width: 1024px) { .card { padding: 40px; } }
+    .eyebrow { font: 800 11px/14px var(--font); color: var(--color-turquoise); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+    .card-title { font: 700 20px/26px var(--font); color: var(--color-dark-blue); margin-bottom: 6px; }
+    @media (min-width: 768px) { .card-title { font-size: 24px; line-height: 30px; } }
+    .card-sub { font: 400 13px/20px var(--font); color: var(--color-medium-grey); margin-bottom: 28px; }
+    .section-title { font: 700 14px/18px var(--font); color: var(--color-dark-blue); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--color-bg-grey); }
+    .subsection-label { font: 700 12px/16px var(--font); color: var(--color-turquoise); text-transform: uppercase; letter-spacing: .06em; margin: 16px 0 12px; padding: 8px 12px; background: var(--color-turquoise-soft); border-radius: var(--radius-input); }
+    .motivo-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 480px) { .motivo-grid { grid-template-columns: 1fr 1fr; } }
+    .motivo-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 18px 16px; border-radius: var(--radius-card); border: 2px solid var(--color-light-grey); background: var(--color-white); cursor: pointer; transition: border-color 150ms, background 150ms; text-align: left; min-height: 120px; position: relative; }
+    .motivo-card:hover { border-color: var(--color-turquoise); background: var(--color-turquoise-soft); }
+    .motivo-card.selected { border-color: var(--color-turquoise); background: var(--color-turquoise-soft); box-shadow: 0 0 0 3px rgba(0,187,221,.15); }
+    .check-badge { position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 50%; background: var(--color-turquoise); display: none; align-items: center; justify-content: center; }
+    .motivo-card.selected .check-badge { display: flex; }
+    .check-badge svg { width: 11px; height: 11px; }
+    .motivo-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--color-bg-grey); transition: background 150ms; }
+    .motivo-card.selected .motivo-icon, .motivo-card:hover .motivo-icon { background: rgba(0,187,221,.15); }
+    .motivo-icon svg { width: 20px; height: 20px; fill: none; stroke: var(--color-dark-grey); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .motivo-card.selected .motivo-icon svg, .motivo-card:hover .motivo-icon svg { stroke: var(--color-turquoise); }
+    .motivo-label { font: 700 13px/18px var(--font); color: var(--color-dark-blue); }
+    .motivo-desc { font: 400 11px/15px var(--font); color: var(--color-medium-grey); }
+    .field-row { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 768px) { .field-row { grid-template-columns: 1fr 1fr; column-gap: 24px; row-gap: 24px; } }
+    .field-full { grid-column: 1 / -1; }
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font: 700 13px/16px var(--font); color: var(--color-dark-grey); }
+    .required-star { color: #DD0000; }
+    .field-hint { font: 400 11px/14px var(--font); color: var(--color-medium-grey); }
+    .field-input { height: 40px; border-radius: var(--radius-input); border: 1px solid var(--color-light-grey); padding: 0 14px; font: 400 14px/16px var(--font); color: var(--color-dark-grey); width: 100%; outline: none; background: var(--color-white); transition: border-color 150ms, box-shadow 150ms; }
+    .field-input:focus { border-color: var(--color-dark-grey); box-shadow: 0 0 0 3px rgba(0,187,221,.15); }
+    textarea.field-input { height: auto; min-height: 80px; padding: 10px 14px; resize: vertical; }
+    select.field-input { appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239BACCB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+    .field-error { font: 400 11px/14px var(--font); color: var(--color-danger); display: none; }
+    .field-error.show { display: block; }
+    .input-prefix-wrap { position: relative; display: flex; align-items: center; }
+    .input-prefix { position: absolute; left: 14px; font: 700 13px/1 var(--font); color: var(--color-medium-grey); pointer-events: none; }
+    .input-prefix-wrap .field-input { padding-left: 52px; }
+    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .radio-pill { display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; height: 40px; min-height: 44px; border-radius: 999px; border: 1px solid var(--color-light-grey); font: 400 13px/16px var(--font); color: var(--color-dark-grey); cursor: pointer; transition: border-color 150ms, background 150ms; user-select: none; }
+    .radio-pill:hover { border-color: var(--color-turquoise); background: var(--color-turquoise-soft); }
+    .radio-pill input[type="radio"] { display: none; }
+    .radio-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--color-light-grey); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 150ms; }
+    .radio-dot::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--color-green); display: none; }
+    .radio-pill.selected { border-color: var(--color-green); background: var(--color-green-soft); }
+    .radio-pill.selected .radio-dot { border-color: var(--color-green); }
+    .radio-pill.selected .radio-dot::after { display: block; }
+    .conditional-block { display: none; margin-top: 14px; padding: 16px; border-radius: var(--radius-input); background: var(--color-shell); border: 1px solid var(--color-bg-grey); }
+    .conditional-block.show { display: block; }
+    .divider { height: 1px; background: var(--color-bg-grey); margin: 24px 0; }
+    .dropzone { min-height: 100px; border-radius: var(--radius-input); border: 2px dashed var(--color-light-grey); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: border-color 150ms, background 150ms; text-align: center; padding: 20px; }
+    .dropzone:hover { border-color: var(--color-turquoise); background: var(--color-turquoise-soft); }
+    .dropzone svg { stroke: var(--color-medium-grey); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .dropzone:hover svg { stroke: var(--color-turquoise); }
+    .dropzone span { font: 600 13px/16px var(--font); color: var(--color-medium-grey); }
+    .dropzone small { font: 400 11px/14px var(--font); color: var(--color-light-grey); }
+    .dropzone input[type="file"] { display: none; }
+    .file-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .file-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; background: var(--color-shell); border: 1px solid var(--color-bg-grey); font: 400 12px/16px var(--font); color: var(--color-dark-grey); }
+    .file-item .fi-icon { stroke: var(--color-green); flex-shrink: 0; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .file-remove { margin-left: auto; cursor: pointer; stroke: var(--color-medium-grey); flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .file-remove:hover { stroke: var(--color-danger); }
+    .signature-wrap { border-radius: var(--radius-input); border: 1px solid var(--color-light-grey); overflow: hidden; }
+    .signature-wrap.error { border-color: var(--color-danger); }
+    canvas#sig-canvas { display: block; width: 100%; cursor: crosshair; touch-action: none; background: var(--color-white); }
+    .sig-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--color-shell); border-top: 1px solid var(--color-bg-grey); }
+    .sig-toolbar span { font: 400 11px/14px var(--font); color: var(--color-medium-grey); }
+    .sig-clear { font: 600 12px/14px var(--font); color: var(--color-turquoise); cursor: pointer; background: none; border: none; padding: 4px 8px; border-radius: 4px; }
+    .sig-clear:hover { background: var(--color-turquoise-soft); }
+    .checkbox-label { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; padding: 14px 16px; border-radius: var(--radius-input); border: 1px solid var(--color-light-grey); transition: border-color 150ms, background 150ms; }
+    .checkbox-label:hover { border-color: var(--color-green); background: var(--color-green-soft); }
+    .checkbox-label.checked { border-color: var(--color-green); background: var(--color-green-soft); }
+    .checkbox-box { width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid var(--color-light-grey); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: background 150ms, border-color 150ms; }
+    .checkbox-box.checked { background: var(--color-green); border-color: var(--color-green); }
+    .checkbox-box svg { stroke: white; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; display: none; pointer-events: none; }
+    .checkbox-box.checked svg { display: block; }
+    .checkbox-text { font: 400 13px/20px var(--font); color: var(--color-dark-grey); pointer-events: none; }
+    .checkbox-label input[type="checkbox"] { display: none; }
+    .card-footer { display: flex; flex-direction: column-reverse; gap: 12px; margin-top: 32px; }
+    @media (min-width: 768px) { .card-footer { flex-direction: row; justify-content: space-between; align-items: center; } }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 28px; border-radius: var(--radius-button); font: 700 15px/24px var(--font); cursor: pointer; border: none; outline: none; transition: background 150ms, border-color 150ms; width: 100%; }
+    @media (min-width: 768px) { .btn { width: auto; min-width: 150px; } }
+    .btn-primary { background: var(--color-green); color: white; border: 1px solid var(--color-green); }
+    .btn-primary:hover { background: var(--color-green-hover); border-color: var(--color-green-hover); }
+    .btn-secondary { background: white; color: var(--color-green); border: 1px solid var(--color-green); }
+    .btn-secondary:hover { background: var(--color-green-soft); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .confirm-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--color-green-soft); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .confirm-icon svg { width: 32px; height: 32px; stroke: var(--color-green); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .confirm-title { font: 700 22px/28px var(--font); color: var(--color-dark-blue); text-align: center; margin-bottom: 10px; }
+    .confirm-sub { font: 400 14px/22px var(--font); color: var(--color-medium-grey); text-align: center; max-width: 440px; margin: 0 auto 28px; }
+    .yn-stack { display: flex; flex-direction: column; gap: 20px; }
+    .cond-fields { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <svg width="74" height="30" viewBox="0 0 62 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="OléLife">
+      <g clip-path="url(#clip0_1_243)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M29.4491 6.14253C31.7293 6.14253 33.6253 6.91387 35.1361 8.48465C36.6769 10.0273 37.4474 11.9536 37.4474 14.2365C37.4474 16.5194 36.6769 18.4176 35.1361 19.9883C33.6253 21.531 31.7303 22.3023 29.4491 22.3023C27.1679 22.3023 25.2729 21.531 23.732 19.9883C22.2212 18.4176 21.4538 16.5194 21.4538 14.2365C21.4538 11.9536 22.2223 10.0273 23.732 8.48465C25.2729 6.91387 27.1689 6.14253 29.4491 6.14253ZM29.4491 3.47401C26.4586 3.47401 23.9106 4.51149 21.836 6.61759C19.7645 8.69155 18.7262 11.2436 18.7262 14.2365C18.7262 17.2294 19.7645 19.7533 21.836 21.8584C23.9096 23.9635 26.4586 25 29.4491 25C32.4396 25 34.9876 23.9625 37.0622 21.8584C39.1648 19.7533 40.2001 17.2324 40.2001 14.2365C40.2001 11.2406 39.1638 8.69155 37.0622 6.61759C34.9886 4.51048 32.4416 3.47401 29.4491 3.47401Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M54.6247 11.8361C56.9942 11.8361 58.9494 13.3175 59.3928 16.1347H49.5015C49.9459 13.5264 51.869 11.8361 54.6247 11.8361ZM54.6247 9.40462C52.3445 9.40462 50.4786 10.1458 49.027 11.6292C47.5754 13.1106 46.8642 14.9777 46.8642 17.2023C46.8642 19.4269 47.6065 21.3241 49.0561 22.8065C50.5378 24.2598 52.4649 25.001 54.8043 25.001C57.7054 25.001 59.8683 23.8741 61.3198 21.6525L59.1279 20.4062C58.2371 21.8594 56.8166 22.5695 54.8624 22.5695C52.0485 22.5695 50.0051 21.0288 49.5025 18.3884H61.9117C61.9709 18.0048 62.001 17.6191 62.001 17.2334C62.001 15.0671 61.3198 13.2281 59.9274 11.7166C58.5651 10.176 56.7865 9.40462 54.6257 9.40462H54.6247Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M42.1874 0V20.8842C42.1874 23.6291 43.9349 24.6917 45.0645 25L46.8802 23.1821C45.8519 22.9773 44.8247 22.0181 44.8247 20.5438V0H42.1874Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M56.9831 3.35349C56.7976 3.35349 56.4505 3.53929 56.2639 3.80544C55.6128 4.71035 54.7491 5.64639 53.9225 6.39462C53.5393 6.74212 53.6386 7.36783 54.1101 7.57773L57.7556 5.14121C57.9953 4.90117 58.1548 4.66113 58.1548 4.52756C58.1548 4.18006 57.3282 3.35449 56.9831 3.35449V3.35349Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M6.83862 5.01567C6.30995 5.01567 5.8826 5.44352 5.8826 5.9728V11.9908L1.63316 7.73441C1.44657 7.54761 1.2018 7.4542 0.957025 7.4542C0.712252 7.4542 0.467478 7.54761 0.280888 7.73441C-0.0922918 8.10803 -0.0922918 8.71465 0.280888 9.08927L4.53032 13.3457H2.34541C1.81674 13.3457 1.38939 13.7735 1.38939 14.3028C1.38939 14.8321 1.81674 15.2599 2.34541 15.2599H4.53032L0.279885 19.5163C-0.0932949 19.8899 -0.0932949 20.4945 0.279885 20.8682C0.466475 21.055 0.711248 21.1484 0.956022 21.1484C1.2008 21.1484 1.44557 21.055 1.63216 20.8682L5.88159 16.6138V22.6318C5.88159 23.1611 6.30895 23.5889 6.83762 23.5889C7.36629 23.5889 7.79364 23.1611 7.79364 22.6318V16.6138L10.0277 18.8504C10.2143 19.0372 10.4591 19.1306 10.7038 19.1306C10.9486 19.1306 11.1934 19.0372 11.38 18.8504C11.7532 18.4768 11.7532 17.8702 11.38 17.4956L9.14591 15.2589H13.2449C13.7735 15.2589 14.2009 14.8311 14.2009 14.3018C14.2009 13.7725 13.7735 13.3446 13.2449 13.3446H9.14591L11.2837 11.2044C11.6569 10.8308 11.6569 10.2242 11.2837 9.84955C11.0971 9.66274 10.8523 9.56934 10.6085 9.56934C10.3648 9.56934 10.12 9.66274 9.9334 9.84955L7.79364 11.9898V5.9718C7.79364 5.44251 7.36629 5.01466 6.83762 5.01466L6.83862 5.01567Z" fill="white"/>
+      </g>
+      <defs><clipPath id="clip0_1_243"><rect width="62" height="25" fill="white"/></clipPath></defs>
+    </svg>
+  </div>
+  <div class="header-center">
+    <div class="header-title">Formulario de Pre-Evaluación</div>
+    <div class="header-desc">Completa la información de tu prospecto para recibir una respuesta inicial sobre su elegibilidad y asegurabilidad.</div>
+  </div>
+  <div class="header-badge">Asesores</div>
+</header>
+
+<div class="disclaimer">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F79E1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <span><strong>Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.</strong></span>
+</div>
+
+<main class="workspace">
+<div class="workspace-inner">
+
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span id="prog-label">Paso 1 de 6 — Motivo y asesor</span>
+      <strong id="prog-pct">17%</strong>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:17%"></div></div>
+  </div>
+
+  <!-- ════ S1: MOTIVO + ASESOR ════ -->
+  <div class="screen active" id="s1">
+    <div class="card">
+      <div class="eyebrow">Paso 1 de 6</div>
+      <h2 class="card-title">Motivo de la pre-evaluación</h2>
+      <p class="card-sub">¿Por qué estás solicitando la pre-evaluación para tu prospecto? Puedes seleccionar más de una opción.</p>
+      <div class="motivo-grid">
+        <button class="motivo-card" data-value="deportes" type="button" onclick="toggleMotivo(this)">
+          <div class="check-badge"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="motivo-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/></svg></div>
+          <div><div class="motivo-label">Actividades deportivas</div><div class="motivo-desc">Deportes de riesgo, extremos o competitivos.</div></div>
+        </button>
+        <button class="motivo-card" data-value="historial" type="button" onclick="toggleMotivo(this)">
+          <div class="check-badge"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="motivo-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <div><div class="motivo-label">Historial médico</div><div class="motivo-desc">Condiciones de salud o diagnósticos previos.</div></div>
+        </button>
+        <button class="motivo-card" data-value="ocupacion" type="button" onclick="toggleMotivo(this)">
+          <div class="check-badge"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="motivo-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+          <div><div class="motivo-label">Ocupación</div><div class="motivo-desc">Actividad laboral de alto riesgo o especializada.</div></div>
+        </button>
+        <button class="motivo-card" data-value="otros" type="button" onclick="toggleMotivo(this)">
+          <div class="check-badge"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="motivo-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          <div><div class="motivo-label">Otros</div><div class="motivo-desc">Cualquier otro motivo no listado arriba.</div></div>
+        </button>
+      </div>
+      <div class="conditional-block" id="cond-otros" style="margin-top:16px;">
+        <div class="field-group">
+          <label class="field-label" for="otros-detalle">Especifica el motivo <span class="required-star">*</span></label>
+          <input class="field-input" type="text" id="otros-detalle" placeholder="Describe el motivo de la solicitud">
+          <div class="field-error" id="err-otros-detalle">Este campo es obligatorio.</div>
+        </div>
+      </div>
+      <div class="field-error" id="err-motivo" style="margin-top:12px;">Debes seleccionar al menos un motivo.</div>
+    </div>
+    <div class="card">
+      <div class="section-title">Información del asesor</div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="asesor-nombre">Nombres y apellidos del asesor <span class="required-star">*</span></label>
+          <input class="field-input" type="text" id="asesor-nombre" placeholder="Ej. Carlos Ramírez">
+          <div class="field-error" id="err-asesor-nombre">Este campo es obligatorio.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="asesor-email">E-mail del asesor <span class="required-star">*</span></label>
+          <input class="field-input" type="email" id="asesor-email" placeholder="correo@ejemplo.com">
+          <div class="field-error" id="err-asesor-email">Ingresa un correo electrónico válido.</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span></span>
+      <button class="btn btn-primary" type="button" onclick="goNext(1)">Continuar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </div>
+  </div>
+
+  <!-- ════ S2: PROSPECTO + PLAN ════ -->
+  <div class="screen" id="s2">
+    <div class="card">
+      <div class="eyebrow">Paso 2 de 6</div>
+      <h2 class="card-title">Información del prospecto</h2>
+      <p class="card-sub">Datos personales del prospecto y plan solicitado.</p>
+      <div class="section-title">Datos personales</div>
+      <div class="field-row">
+        <div class="field-group field-full">
+          <label class="field-label" for="prosp-nombre">Nombres y apellidos del prospecto <span class="required-star">*</span></label>
+          <input class="field-input" type="text" id="prosp-nombre" placeholder="Nombre completo">
+          <div class="field-error" id="err-prosp-nombre">Este campo es obligatorio.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="prosp-pais">País de residencia <span class="required-star">*</span></label>
+          <select class="field-input" id="prosp-pais">
+            <option value="" disabled selected>Selecciona un país</option>
+            <option>Antigua y Barbuda</option><option>Argentina</option><option>Aruba</option><option>Bahamas</option><option>Barbados</option><option>Belice</option><option>Bermudas</option><option>Bolivia</option><option>Chile</option><option>Colombia</option><option>Costa Rica</option><option>Curaçao</option><option>Dominica</option><option>Ecuador</option><option>El Salvador</option><option>Granada</option><option>Guatemala</option><option>Honduras</option><option>Islas Caimán</option><option>Islas Turcas y Caicos</option><option>Islas Vírgenes Británicas</option><option>Jamaica</option><option>Martinica</option><option>México</option><option>Nicaragua</option><option>Panamá</option><option>Paraguay</option><option>Perú</option><option>República Dominicana</option><option>San Cristóbal y Nieves</option><option>San Martín</option><option>San Vicente y las Granadinas</option><option>Santa Lucía</option><option>Trinidad y Tobago</option><option>Uruguay</option><option>Venezuela</option>
+          </select>
+          <div class="field-error" id="err-prosp-pais">Selecciona un país.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="prosp-fnac">Fecha de nacimiento <span class="required-star">*</span></label>
+          <input class="field-input" type="date" id="prosp-fnac">
+          <div class="field-hint">Edad permitida: 18 a 75 años.</div>
+          <div class="field-error" id="err-prosp-fnac">La edad mínima es 18 y la máxima 75 años.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Género <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-genero">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-genero')"><input type="radio" name="genero" value="femenino"><span class="radio-dot"></span>Femenino</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-genero')"><input type="radio" name="genero" value="masculino"><span class="radio-dot"></span>Masculino</label>
+          </div>
+          <div class="field-error" id="err-genero">Selecciona una opción.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Es fumador? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-fumador">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-fumador')"><input type="radio" name="fumador" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-fumador')"><input type="radio" name="fumador" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="field-error" id="err-fumador">Selecciona una opción.</div>
+        </div>
+        <div class="field-group field-full">
+          <label class="field-label" for="prosp-ocupacion">Ocupación <span class="required-star">*</span></label>
+          <input class="field-input" type="text" id="prosp-ocupacion" placeholder="Ej. Ingeniero civil, médico, comerciante">
+          <div class="field-error" id="err-prosp-ocupacion">Este campo es obligatorio.</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-title">Información del plan</div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="plan-termino">Término <span class="required-star">*</span></label>
+          <select class="field-input" id="plan-termino">
+            <option value="" disabled selected>Selecciona un término</option>
+            <option>10 años</option><option>15 años</option><option>20 años</option><option>30 años</option>
+          </select>
+          <div class="field-error" id="err-plan-termino">Selecciona un término.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="plan-cobertura">Cobertura <span class="required-star">*</span></label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">USD</span>
+            <input class="field-input" type="text" id="plan-cobertura" placeholder="100,000" inputmode="numeric">
+          </div>
+          <div class="field-hint">Entre USD 100,000 y USD 10,000,000.</div>
+          <div class="field-error" id="err-plan-cobertura">Ingresa un valor entre USD 100,000 y USD 10,000,000.</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-secondary" type="button" onclick="goPrev(2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Volver</button>
+        <button class="btn btn-primary" type="button" onclick="goNext(2)">Continuar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ S3: CUESTIONARIOS DINÁMICOS ════ -->
+  <div class="screen" id="s3">
+
+    <!-- Deportes -->
+    <div id="q-deportes" class="card" style="display:none;">
+      <div class="eyebrow">Cuestionario</div>
+      <h2 class="card-title">Actividades deportivas</h2>
+      <div class="field-row">
+        <div class="field-group field-full"><label class="field-label" for="dep-cual">¿Qué deporte practica el prospecto? <span class="required-star">*</span></label><input class="field-input" type="text" id="dep-cual" placeholder="Ej. Escalada, ciclismo de montaña"><div class="field-error" id="err-dep-cual">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label" for="dep-desde">¿Desde cuándo lo practica? <span class="required-star">*</span></label><input class="field-input" type="text" id="dep-desde" placeholder="Ej. Desde 2015"><div class="field-error" id="err-dep-desde">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label" for="dep-naturaleza">Naturaleza de participación <span class="required-star">*</span></label><select class="field-input" id="dep-naturaleza"><option value="" disabled selected>Selecciona</option><option>Amateur</option><option>Competitivo</option><option>Profesional</option><option>Recreacional</option></select><div class="field-error" id="err-dep-naturaleza">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label" for="dep-frecuencia">¿Con qué frecuencia lo practica? <span class="required-star">*</span></label><input class="field-input" type="text" id="dep-frecuencia" placeholder="Ej. 3 veces por semana"><div class="field-error" id="err-dep-frecuencia">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label" for="dep-cert">Calificaciones/certificaciones obtenidas <span class="required-star">*</span></label><input class="field-input" type="text" id="dep-cert" placeholder="Ej. Instructor IFSC"><div class="field-error" id="err-dep-cert">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label" for="dep-limites">Límites máximos alcanzados <span class="required-star">*</span></label><input class="field-input" type="text" id="dep-limites" placeholder="Ej. Altura máxima 6,000 m"><div class="field-error" id="err-dep-limites">Obligatorio.</div></div>
+        <div class="field-group field-full">
+          <label class="field-label">¿Es miembro de un club o asociación? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-dep-club">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-dep-club');toggleCond('rg-dep-club','cond-dep-club')"><input type="radio" name="dep-club" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-dep-club');toggleCond('rg-dep-club','cond-dep-club')"><input type="radio" name="dep-club" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="conditional-block" id="cond-dep-club">
+            <div class="field-group"><label class="field-label" for="dep-club-det">Proporciona más información <span class="required-star">*</span></label><textarea class="field-input" id="dep-club-det" placeholder="Nombre del club, asociación, categoría..."></textarea><div class="field-error" id="err-dep-club-det">Obligatorio.</div></div>
+          </div>
+          <div class="field-error" id="err-dep-club">Obligatorio.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Ha tenido lesiones derivadas del deporte? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-dep-lesiones">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-dep-lesiones');toggleCond('rg-dep-lesiones','cond-dep-lesiones')"><input type="radio" name="dep-lesiones" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-dep-lesiones');toggleCond('rg-dep-lesiones','cond-dep-lesiones')"><input type="radio" name="dep-lesiones" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="conditional-block" id="cond-dep-lesiones"><div class="field-group"><label class="field-label" for="dep-lesiones-det">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="dep-lesiones-det" placeholder="Describe las lesiones..."></textarea></div></div>
+          <div class="field-error" id="err-dep-lesiones">Obligatorio.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial médico -->
+    <div id="q-historial" class="card" style="display:none;">
+      <div class="eyebrow">Cuestionario</div>
+      <h2 class="card-title">Historial médico</h2>
+      <div class="field-row">
+        <div class="field-group field-full"><label class="field-label" for="med-detalles">Detalles del historial médico <span class="required-star">*</span></label><textarea class="field-input" id="med-detalles" rows="4" placeholder="Describe diagnósticos, tratamientos, cirugías u otras condiciones relevantes..."></textarea><div class="field-error" id="err-med-detalles">Obligatorio.</div></div>
+        <div class="field-group field-full">
+          <label class="field-label">Adjuntar documentos médicos <span class="required-star">*</span> <span style="font-weight:400;color:var(--color-medium-grey)">(mínimo 1 archivo)</span></label>
+          <div class="dropzone" onclick="document.getElementById('fi-med').click()">
+            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Haz clic o arrastra archivos aquí</span><small>PDF, JPG, PNG · Máx. 10 MB por archivo</small>
+            <input type="file" id="fi-med" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="addFiles('fi-med','fl-med','med')">
+          </div>
+          <div class="file-list" id="fl-med"></div>
+          <div class="field-error" id="err-med-docs">Adjunta al menos un documento médico.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ocupación -->
+    <div id="q-ocupacion" class="card" style="display:none;">
+      <div class="eyebrow">Cuestionario</div>
+      <h2 class="card-title">Ocupación</h2>
+      <div class="field-row">
+        <div class="field-group field-full"><label class="field-label" for="ocu-tipo">¿Cuál describe mejor su ocupación? <span class="required-star">*</span></label><select class="field-input" id="ocu-tipo" onchange="checkPiloto()"><option value="" disabled selected>Selecciona</option><option>Abastecimiento</option><option>Administrativo (en oficina)</option><option>Andamiero</option><option>Buzo comercial</option><option>Capataz</option><option>Científico/técnico</option><option>Electricista</option><option>Gerencia (en oficina)</option><option>Ingeniero</option><option>Mecánico/mantenimiento</option><option>Peón de obra</option><option value="Piloto">Piloto</option><option>Profesional de la salud</option><option>Topógrafo</option><option>Trabajador de producción</option><option>Ninguna de las anteriores</option></select><div class="field-error" id="err-ocu-tipo">Obligatorio.</div></div>
+        <div class="field-group field-full"><label class="field-label" for="ocu-funciones">Describe tus funciones laborales <span class="required-star">*</span></label><textarea class="field-input" id="ocu-funciones" rows="3" placeholder="Describe brevemente tus tareas y responsabilidades..."></textarea><div class="field-error" id="err-ocu-funciones">Obligatorio.</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="yn-stack">
+        <div class="field-group"><label class="field-label">¿Trabaja actualmente en alta mar? <span class="required-star">*</span></label><div class="radio-group" id="rg-ocu-mar"><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-mar');toggleCond('rg-ocu-mar','cond-ocu-mar')"><input type="radio" name="ocu-mar" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-mar');toggleCond('rg-ocu-mar','cond-ocu-mar')"><input type="radio" name="ocu-mar" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-ocu-mar"><div class="field-group"><label class="field-label" for="det-ocu-mar">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-ocu-mar" placeholder="Describe la actividad..."></textarea></div></div><div class="field-error" id="err-ocu-mar">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label">¿Trabaja en altura? <span class="required-star">*</span></label><div class="radio-group" id="rg-ocu-altura"><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-altura');toggleCond('rg-ocu-altura','cond-ocu-altura')"><input type="radio" name="ocu-altura" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-altura');toggleCond('rg-ocu-altura','cond-ocu-altura')"><input type="radio" name="ocu-altura" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-ocu-altura"><div class="field-group"><label class="field-label" for="det-ocu-altura">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-ocu-altura" placeholder="Describe la actividad..."></textarea></div></div><div class="field-error" id="err-ocu-altura">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label">¿Utiliza explosivos? <span class="required-star">*</span></label><div class="radio-group" id="rg-ocu-expl"><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-expl');toggleCond('rg-ocu-expl','cond-ocu-expl')"><input type="radio" name="ocu-expl" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-expl');toggleCond('rg-ocu-expl','cond-ocu-expl')"><input type="radio" name="ocu-expl" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-ocu-expl"><div class="field-group"><label class="field-label" for="det-ocu-expl">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-ocu-expl" placeholder="Tipo de uso..."></textarea></div></div><div class="field-error" id="err-ocu-expl">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label">¿Ha sufrido enfermedad o accidente laboral? <span class="required-star">*</span></label><div class="radio-group" id="rg-ocu-acc"><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-acc');toggleCond('rg-ocu-acc','cond-ocu-acc')"><input type="radio" name="ocu-acc" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-acc');toggleCond('rg-ocu-acc','cond-ocu-acc')"><input type="radio" name="ocu-acc" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-ocu-acc"><div class="field-group"><label class="field-label" for="det-ocu-acc">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-ocu-acc" placeholder="Describe el incidente..."></textarea></div></div><div class="field-error" id="err-ocu-acc">Obligatorio.</div></div>
+        <div class="field-group"><label class="field-label">¿Viaja en helicóptero o avioneta? <span class="required-star">*</span></label><div class="radio-group" id="rg-ocu-heli"><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-heli');toggleCond('rg-ocu-heli','cond-ocu-heli')"><input type="radio" name="ocu-heli" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-ocu-heli');toggleCond('rg-ocu-heli','cond-ocu-heli')"><input type="radio" name="ocu-heli" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-ocu-heli"><div class="field-group"><label class="field-label" for="det-ocu-heli">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-ocu-heli" placeholder="Frecuencia y destinos..."></textarea></div></div><div class="field-error" id="err-ocu-heli">Obligatorio.</div></div>
+      </div>
+      <!-- Piloto Privado -->
+      <div id="q-piloto" style="display:none;">
+        <div class="divider"></div>
+        <div class="section-title" style="color:var(--color-turquoise);">Cuestionario de Piloto Privado</div>
+        <div class="subsection-label">Vuelos como piloto realizados en los últimos 12 meses</div>
+        <div class="field-row">
+          <div class="field-group"><label class="field-label" for="pil-vp">Número total de vuelos <span class="required-star">*</span></label><input class="field-input" type="number" id="pil-vp" min="0" placeholder="0"><div class="field-error" id="err-pil-vp">Obligatorio.</div></div>
+          <div class="field-group"><label class="field-label" for="pil-hp">Número de horas de vuelo <span class="required-star">*</span></label><input class="field-input" type="number" id="pil-hp" min="0" placeholder="0"><div class="field-error" id="err-pil-hp">Obligatorio.</div></div>
+        </div>
+        <div class="subsection-label">Vuelos como piloto a realizar en los próximos 12 meses</div>
+        <div class="field-row">
+          <div class="field-group"><label class="field-label" for="pil-vf">Número total de vuelos <span class="required-star">*</span></label><input class="field-input" type="number" id="pil-vf" min="0" placeholder="0"><div class="field-error" id="err-pil-vf">Obligatorio.</div></div>
+          <div class="field-group"><label class="field-label" for="pil-hf">Número de horas de vuelo <span class="required-star">*</span></label><input class="field-input" type="number" id="pil-hf" min="0" placeholder="0"><div class="field-error" id="err-pil-hf">Obligatorio.</div></div>
+        </div>
+        <div class="field-row" style="margin-top:16px;">
+          <div class="field-group"><label class="field-label" for="pil-aeronave">Tipo de aeronave <span class="required-star">*</span></label><input class="field-input" type="text" id="pil-aeronave" placeholder="Ej. Cessna 172"><div class="field-error" id="err-pil-aeronave">Obligatorio.</div></div>
+          <div class="field-group"><label class="field-label" for="pil-lugares">Lugares a donde vuela <span class="required-star">*</span></label><input class="field-input" type="text" id="pil-lugares" placeholder="Ej. LATAM, EE.UU."><div class="field-error" id="err-pil-lugares">Obligatorio.</div></div>
+          <div class="field-group field-full"><label class="field-label" for="pil-licencias">Licencias/certificaciones <span class="required-star">*</span></label><input class="field-input" type="text" id="pil-licencias" placeholder="Ej. PPL, IFR"><div class="field-error" id="err-pil-licencias">Obligatorio.</div></div>
+        </div>
+        <div class="yn-stack" style="margin-top:20px;">
+          <div class="field-group"><label class="field-label">¿Vuela desde aeropuertos no públicos? <span class="required-star">*</span></label><div class="radio-group" id="rg-pil-priv"><label class="radio-pill" onclick="pickRadio(this,'rg-pil-priv');toggleCond('rg-pil-priv','cond-pil-priv')"><input type="radio" name="pil-priv" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-pil-priv');toggleCond('rg-pil-priv','cond-pil-priv')"><input type="radio" name="pil-priv" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-pil-priv"><div class="field-group"><label class="field-label" for="det-pil-priv">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-pil-priv"></textarea></div></div><div class="field-error" id="err-pil-priv">Obligatorio.</div></div>
+          <div class="field-group"><label class="field-label">¿Pertenece a club o asociación? <span class="required-star">*</span></label><div class="radio-group" id="rg-pil-club"><label class="radio-pill" onclick="pickRadio(this,'rg-pil-club');toggleCond('rg-pil-club','cond-pil-club')"><input type="radio" name="pil-club" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-pil-club');toggleCond('rg-pil-club','cond-pil-club')"><input type="radio" name="pil-club" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-pil-club"><div class="field-group"><label class="field-label" for="det-pil-club">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-pil-club"></textarea></div></div><div class="field-error" id="err-pil-club">Obligatorio.</div></div>
+          <div class="field-group"><label class="field-label">¿Vuela por motivos distintos al placer? <span class="required-star">*</span></label><div class="radio-group" id="rg-pil-mot"><label class="radio-pill" onclick="pickRadio(this,'rg-pil-mot');toggleCond('rg-pil-mot','cond-pil-mot')"><input type="radio" name="pil-mot" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-pil-mot');toggleCond('rg-pil-mot','cond-pil-mot')"><input type="radio" name="pil-mot" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-pil-mot"><div class="field-group"><label class="field-label" for="det-pil-mot">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-pil-mot"></textarea></div></div><div class="field-error" id="err-pil-mot">Obligatorio.</div></div>
+          <div class="field-group"><label class="field-label">¿Participa en vuelos acrobáticos? <span class="required-star">*</span></label><div class="radio-group" id="rg-pil-acro"><label class="radio-pill" onclick="pickRadio(this,'rg-pil-acro');toggleCond('rg-pil-acro','cond-pil-acro')"><input type="radio" name="pil-acro" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-pil-acro');toggleCond('rg-pil-acro','cond-pil-acro')"><input type="radio" name="pil-acro" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-pil-acro"><div class="field-group"><label class="field-label" for="det-pil-acro">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-pil-acro"></textarea></div></div><div class="field-error" id="err-pil-acro">Obligatorio.</div></div>
+          <div class="field-group"><label class="field-label">¿Ha tenido accidentes o suspensión de licencia? <span class="required-star">*</span></label><div class="radio-group" id="rg-pil-acc"><label class="radio-pill" onclick="pickRadio(this,'rg-pil-acc');toggleCond('rg-pil-acc','cond-pil-acc')"><input type="radio" name="pil-acc" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-pil-acc');toggleCond('rg-pil-acc','cond-pil-acc')"><input type="radio" name="pil-acc" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-pil-acc"><div class="field-group"><label class="field-label" for="det-pil-acc">Proporciona más detalles <span class="required-star">*</span></label><textarea class="field-input" id="det-pil-acc"></textarea></div></div><div class="field-error" id="err-pil-acc">Obligatorio.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button class="btn btn-secondary" type="button" onclick="goPrev(3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Volver</button>
+      <button class="btn btn-primary" type="button" onclick="goNext(3)">Continuar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </div>
+  </div>
+
+  <!-- ════ S4: PEP ════ -->
+  <div class="screen" id="s4">
+    <div class="card">
+      <div class="eyebrow">Obligatorio — Paso 4 de 6</div>
+      <h2 class="card-title">Cuestionario PEP</h2>
+      <p class="card-sub">Persona Políticamente Expuesta. Obligatorio para todos los prospectos.</p>
+      <div class="yn-stack">
+        <div class="field-group"><label class="field-label">¿El prospecto es una persona PEP? <span class="required-star">*</span></label><div class="radio-group" id="rg-pep"><label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-pep"><div class="field-group"><label class="field-label" for="pep-det">Cargo o función pública <span class="required-star">*</span></label><textarea class="field-input" id="pep-det" placeholder="Describe cargo, institución y período..."></textarea></div></div><div class="field-error" id="err-pep">Selecciona una opción.</div></div>
+        <div class="field-group"><label class="field-label">¿Ha usado otro nombre? <span class="required-star">*</span></label><div class="radio-group" id="rg-pep-nom"><label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="si"><span class="radio-dot"></span>Sí</label><label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="no"><span class="radio-dot"></span>No</label></div><div class="conditional-block" id="cond-pep-nom"><div class="field-group"><label class="field-label" for="pep-nom-det">Nombre o nombres utilizados <span class="required-star">*</span></label><input class="field-input" type="text" id="pep-nom-det" placeholder="Nombre(s) alternativo(s)"></div></div><div class="field-error" id="err-pep-nom">Selecciona una opción.</div></div>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-secondary" type="button" onclick="goPrev(4)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Volver</button>
+        <button class="btn btn-primary" type="button" onclick="goNext(4)">Continuar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ S5: VIAJES (expanded) ════ -->
+  <div class="screen" id="s5">
+    <div class="card">
+      <div class="eyebrow">Obligatorio — Paso 5 de 6</div>
+      <h2 class="card-title">Cuestionario de viajes</h2>
+      <p class="card-sub">Información sobre planes de viaje y residencia del prospecto.</p>
+      <div class="yn-stack">
+
+        <!-- V1: próximos 12 meses -->
+        <div class="field-group">
+          <label class="field-label">¿Planea viajar en los próximos 12 meses? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-v1">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v1');toggleCond('rg-v1','cond-v1')"><input type="radio" name="v1" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v1');toggleCond('rg-v1','cond-v1')"><input type="radio" name="v1" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="conditional-block" id="cond-v1">
+            <div class="cond-fields">
+              <div class="field-group"><label class="field-label" for="v1-destinos">Países, ciudades o pueblos a visitar <span class="required-star">*</span></label><input class="field-input" type="text" id="v1-destinos" placeholder="Ej. París, Francia; Nueva York, EE.UU."><div class="field-error" id="err-v1-destinos">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v1-visa">Tipo de visa <span class="required-star">*</span></label><input class="field-input" type="text" id="v1-visa" placeholder="Ej. Turista, Estudiantil, Trabajo"><div class="field-error" id="err-v1-visa">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v1-fechas">¿En qué fechas planeas viajar? <span class="required-star">*</span></label><input class="field-input" type="text" id="v1-fechas" placeholder="Ej. 15 de marzo – 30 de abril 2026"><div class="field-error" id="err-v1-fechas">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v1-motivo">Motivo de viaje <span class="required-star">*</span></label><select class="field-input" id="v1-motivo"><option value="" disabled selected>Selecciona</option><option>Estudios</option><option>Vacaciones / Ocio</option><option>Trabajo</option></select><div class="field-error" id="err-v1-motivo">Obligatorio.</div></div>
+            </div>
+          </div>
+          <div class="field-error" id="err-v1">Selecciona una opción.</div>
+        </div>
+
+        <!-- V2: últimos 12 meses -->
+        <div class="field-group">
+          <label class="field-label">¿Ha viajado en los últimos 12 meses? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-v2">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v2');toggleCond('rg-v2','cond-v2')"><input type="radio" name="v2" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v2');toggleCond('rg-v2','cond-v2')"><input type="radio" name="v2" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="conditional-block" id="cond-v2">
+            <div class="cond-fields">
+              <div class="field-group"><label class="field-label" for="v2-destinos">Países, ciudades o pueblos visitados <span class="required-star">*</span></label><input class="field-input" type="text" id="v2-destinos" placeholder="Ej. Lima, Perú; Bogotá, Colombia"><div class="field-error" id="err-v2-destinos">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v2-visa">Tipo de visa <span class="required-star">*</span></label><input class="field-input" type="text" id="v2-visa" placeholder="Ej. Turista, Residencia"><div class="field-error" id="err-v2-visa">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v2-fechas">Fechas en que viajó <span class="required-star">*</span></label><input class="field-input" type="text" id="v2-fechas" placeholder="Ej. Enero – marzo 2025"><div class="field-error" id="err-v2-fechas">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v2-motivo">Motivo de viaje <span class="required-star">*</span></label><select class="field-input" id="v2-motivo"><option value="" disabled selected>Selecciona</option><option>Estudios</option><option>Vacaciones / Ocio</option><option>Trabajo</option></select><div class="field-error" id="err-v2-motivo">Obligatorio.</div></div>
+            </div>
+          </div>
+          <div class="field-error" id="err-v2">Selecciona una opción.</div>
+        </div>
+
+        <!-- V3: reside / piensa residir -->
+        <div class="field-group">
+          <label class="field-label">¿Reside o piensa residir en otro país? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-v3">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v3');toggleCond('rg-v3','cond-v3')"><input type="radio" name="v3" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v3');toggleCond('rg-v3','cond-v3')"><input type="radio" name="v3" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="conditional-block" id="cond-v3">
+            <div class="cond-fields">
+              <div class="field-group"><label class="field-label" for="v3-razon">¿Cuál es la razón principal por la cual viaja o reside en el extranjero? <span class="required-star">*</span></label><input class="field-input" type="text" id="v3-razon" placeholder="Ej. Trabajo, estudios, jubilación"><div class="field-error" id="err-v3-razon">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v3-nacimiento">Lugar de nacimiento <span class="required-star">*</span></label><input class="field-input" type="text" id="v3-nacimiento" placeholder="Ciudad y país de nacimiento"><div class="field-error" id="err-v3-nacimiento">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v3-nacionalidad">Nacionalidad <span class="required-star">*</span></label><input class="field-input" type="text" id="v3-nacionalidad" placeholder="Ej. Colombiana, Peruana"><div class="field-error" id="err-v3-nacionalidad">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v3-activos">Información sobre activos o bienes inmuebles en los países que planea visitar o residir <span class="required-star">*</span></label><textarea class="field-input" id="v3-activos" rows="3" placeholder="Describe propiedades, cuentas bancarias u otros activos de su propiedad o controlados por usted..."></textarea><div class="field-error" id="err-v3-activos">Obligatorio.</div></div>
+            </div>
+          </div>
+          <div class="field-error" id="err-v3">Selecciona una opción.</div>
+        </div>
+
+        <!-- V4: más de 21 días -->
+        <div class="field-group">
+          <label class="field-label">¿Planea residir en algún país del extranjero por más de 21 días? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-v4">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v4');toggleCond('rg-v4','cond-v4')"><input type="radio" name="v4" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v4');toggleCond('rg-v4','cond-v4')"><input type="radio" name="v4" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="conditional-block" id="cond-v4">
+            <div class="cond-fields">
+              <div class="field-group"><label class="field-label" for="v4-tipo-residencia">Tipo de residencia <span class="required-star">*</span></label><input class="field-input" type="text" id="v4-tipo-residencia" placeholder="Ej. Temporal, permanente, visa de estudiante"><div class="field-error" id="err-v4-tipo-residencia">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v4-direccion">Dirección <span class="required-star">*</span></label><input class="field-input" type="text" id="v4-direccion" placeholder="Dirección completa en el país de residencia"><div class="field-error" id="err-v4-direccion">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v4-instalaciones">Instalaciones médicas más cercanas <span class="required-star">*</span></label><input class="field-input" type="text" id="v4-instalaciones" placeholder="Nombre del hospital o clínica más cercana"><div class="field-error" id="err-v4-instalaciones">Obligatorio.</div></div>
+            </div>
+          </div>
+          <div class="field-error" id="err-v4">Selecciona una opción.</div>
+        </div>
+
+        <!-- V5: negocios -->
+        <div class="field-group">
+          <label class="field-label">¿El viaje es por negocios? <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-v5">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v5');toggleCond('rg-v5','cond-v5')"><input type="radio" name="v5" value="si"><span class="radio-dot"></span>Sí</label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-v5');toggleCond('rg-v5','cond-v5')"><input type="radio" name="v5" value="no"><span class="radio-dot"></span>No</label>
+          </div>
+          <div class="conditional-block" id="cond-v5">
+            <div class="cond-fields">
+              <div class="field-group"><label class="field-label" for="v5-nombre-negocio">Nombre de negocio <span class="required-star">*</span></label><input class="field-input" type="text" id="v5-nombre-negocio" placeholder="Nombre de la empresa u organización"><div class="field-error" id="err-v5-nombre-negocio">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v5-naturaleza">Naturaleza de negocio <span class="required-star">*</span></label><input class="field-input" type="text" id="v5-naturaleza" placeholder="Ej. Tecnología, consultoría, comercio"><div class="field-error" id="err-v5-naturaleza">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v5-deberes">Deberes y responsabilidades <span class="required-star">*</span></label><input class="field-input" type="text" id="v5-deberes" placeholder="Describe tu rol y funciones"><div class="field-error" id="err-v5-deberes">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v5-inicio">Fecha de inicio <span class="required-star">*</span></label><input class="field-input" type="date" id="v5-inicio"><div class="field-error" id="err-v5-inicio">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v5-remuneracion">Remuneración anual <span class="required-star">*</span></label><input class="field-input" type="text" id="v5-remuneracion" placeholder="Ej. USD 60,000"><div class="field-error" id="err-v5-remuneracion">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v5-salud">Arreglos de atención médica y procedimientos en caso de enfermedad o lesión grave <span class="required-star">*</span></label><textarea class="field-input" id="v5-salud" rows="2" placeholder="Describe los planes de atención médica y forma de viaje dentro del país..."></textarea><div class="field-error" id="err-v5-salud">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v5-seguridad">Medidas de seguridad tomadas por el empleador <span class="required-star">*</span></label><textarea class="field-input" id="v5-seguridad" rows="2" placeholder="Describe las medidas de seguridad implementadas..."></textarea><div class="field-error" id="err-v5-seguridad">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="v5-contrato">¿Está contratado bajo los términos de un contrato o acuerdo? <span class="required-star">*</span></label><input class="field-input" type="text" id="v5-contrato" placeholder="Sí / No — proporciona detalles del contrato"><div class="field-error" id="err-v5-contrato">Obligatorio.</div></div>
+            </div>
+          </div>
+          <div class="field-error" id="err-v5">Selecciona una opción.</div>
+        </div>
+
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-secondary" type="button" onclick="goPrev(5)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Volver</button>
+        <button class="btn btn-primary" type="button" onclick="goNext(5)">Continuar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ S6: ADICIONAL + FIRMA ════ -->
+  <div class="screen" id="s6">
+    <div class="card">
+      <div class="eyebrow">Paso 6 de 6</div>
+      <h2 class="card-title">Información adicional y envío</h2>
+      <div class="field-row">
+        <div class="field-group field-full">
+          <label class="field-label" for="adicional">Información adicional <span style="font-weight:400;color:var(--color-medium-grey)">(opcional)</span></label>
+          <textarea class="field-input" id="adicional" rows="3" placeholder="Cualquier información adicional relevante para el equipo evaluador..."></textarea>
+        </div>
+        <div class="field-group field-full">
+          <label class="field-label">Adjuntar archivos adicionales <span style="font-weight:400;color:var(--color-medium-grey)">(opcional)</span></label>
+          <div class="dropzone" onclick="document.getElementById('fi-adic').click()">
+            <svg width="24" height="24" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Haz clic o arrastra archivos aquí</span><small>PDF, JPG, PNG · Máx. 10 MB por archivo</small>
+            <input type="file" id="fi-adic" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="addFiles('fi-adic','fl-adic','adic')">
+          </div>
+          <div class="file-list" id="fl-adic"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-title">Firma del asesor <span class="required-star">*</span></div>
+      <p style="font:400 12px/18px var(--font);color:var(--color-medium-grey);margin-bottom:12px;">Dibuja tu firma en el recuadro a continuación con el dedo o el cursor.</p>
+      <div class="signature-wrap" id="sig-wrap">
+        <canvas id="sig-canvas" width="640" height="130"></canvas>
+        <div class="sig-toolbar">
+          <span>Firma aquí</span>
+          <button class="sig-clear" type="button" onclick="clearSig()">Limpiar firma</button>
+        </div>
+      </div>
+      <div class="field-error" id="err-firma" style="margin-top:6px;">La firma del asesor es obligatoria.</div>
+      <div class="divider"></div>
+      <div class="checkbox-label" id="chk-label" onclick="toggleDecl(event)" style="cursor:pointer;">
+        <span class="checkbox-box" id="chk-box">
+          <svg width="12" height="12" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        <span class="checkbox-text">Confirmo que he ingresado toda la información disponible del prospecto para la preevaluación y acepto que esta preevaluación tiene carácter preliminar y está basada en la información proporcionada.</span>
+      </div>
+      <div class="field-error" id="err-decl">Debes aceptar la declaración para continuar.</div>
+      <div class="card-footer">
+        <button class="btn btn-secondary" type="button" onclick="goPrev(6)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Volver</button>
+        <button class="btn btn-primary" type="button" onclick="submitFinal()">Enviar formulario <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ CONFIRMACIÓN ════ -->
+  <div class="screen" id="s-confirm">
+    <div class="card" style="text-align:center;">
+      <div class="confirm-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="confirm-title">¡Formulario enviado con éxito!</div>
+      <p class="confirm-sub">El formulario de pre-evaluación se ha enviado con éxito. Pronto nuestro equipo se comunicará contigo a tu correo electrónico.</p>
+      <div style="background:var(--color-shell);border-radius:var(--radius-card);padding:20px;text-align:left;margin-bottom:28px;">
+        <div style="font:700 11px/14px var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Resumen del envío</div>
+        <div id="confirm-data" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+      <button class="btn btn-primary" type="button" onclick="resetAll()" style="margin:0 auto;display:inline-flex;max-width:260px;">Nueva pre-evaluación</button>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script>
+const S = {
+  motivos: new Set(), sigDrawn: false, declChecked: false,
+  files: { med: [], adic: [] },
+  fileData: { med: [], adic: [] }, // base64 for PDF embedding
+  draftId: null,
+};
+const TOTAL_STEPS = 6;
+const LABELS = {1:'Paso 1 de 6 — Motivo y asesor',2:'Paso 2 de 6 — Datos del prospecto',3:'Paso 3 de 6 — Cuestionarios dinámicos',4:'Paso 4 de 6 — Cuestionario PEP',5:'Paso 5 de 6 — Cuestionario de viajes',6:'Paso 6 de 6 — Información adicional y firma'};
+const MOTIVO_NAMES = {deportes:'Actividades deportivas',historial:'Historial médico',ocupacion:'Ocupación',otros:'Otros'};
+
+// ─── Supabase config ───
+const SB_URL = 'https://hpjvljotjzzrnkpsewzy.supabase.co';
+const SB_KEY = 'sb_publishable_D658YrHARFo_m-XSYVzgtA_95g2TR2J';
+
+async function sbUpsert(record) {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/pre_evaluaciones`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Prefer': 'resolution=merge-duplicates',
+      },
+      body: JSON.stringify(record),
+    });
+    if (!res.ok) console.warn('Supabase upsert error:', await res.text());
+  } catch(e) { console.warn('Supabase network error:', e); }
+}
+
+// ─── Guardar progreso en Supabase ───
+async function saveProgress(currentStep) {
+  const nombre = document.getElementById('asesor-nombre')?.value?.trim();
+  const email = document.getElementById('asesor-email')?.value?.trim();
+  if (!nombre || !email) return;
+
+  const pct = Math.min(100, Math.round((currentStep / 6) * 100));
+  const id = S.draftId || ('PRE-DRAFT-' + Date.now());
+  S.draftId = id;
+
+  await sbUpsert({
+    id,
+    fecha_envio: new Date().toLocaleString('es-PE'),
+    estado: 'En progreso',
+    avance: pct,
+    is_draft: true,
+    asesor_nombre: nombre,
+    asesor_email: email,
+    prospecto_nombre: document.getElementById('prosp-nombre')?.value?.trim() || '',
+    motivos: [...S.motivos].map(m => MOTIVO_NAMES[m]).join(', '),
+    payload: null,
+    firma: null,
+    archivos_data: null,
+  });
+}
+
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(n === 'confirm' ? 's-confirm' : `s${n}`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const pct = n === 'confirm' ? 100 : Math.round((n / 6) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-label').textContent = n === 'confirm' ? 'Completado' : (LABELS[n] || '');
+}
+// S3 tiene contenido real solo si hay cuestionarios distintos de "otros"
+function s3HasContent() {
+  return S.motivos.has('deportes') || S.motivos.has('historial') || S.motivos.has('ocupacion');
+}
+function goNext(from) {
+  if (!validate(from)) return;
+  if (from === 1) buildS3();
+  // Si S3 no tiene cuestionarios (solo "otros"), saltarlo
+  if (from === 1 && !s3HasContent()) { saveProgress(2); showScreen(2); return; }
+  if (from === 2 && !s3HasContent()) { saveProgress(4); showScreen(4); return; }
+  saveProgress(from + 1);
+  showScreen(from + 1);
+}
+function goPrev(from) {
+  if (from === 4 && !s3HasContent()) { showScreen(2); return; }
+  showScreen(from - 1);
+}
+
+function toggleMotivo(card) {
+  card.classList.toggle('selected');
+  const v = card.dataset.value;
+  S.motivos.has(v) ? S.motivos.delete(v) : S.motivos.add(v);
+  document.getElementById('cond-otros').classList.toggle('show', S.motivos.has('otros'));
+}
+function buildS3() {
+  ['deportes','historial','ocupacion'].forEach(m =>
+    document.getElementById(`q-${m}`).style.display = S.motivos.has(m) ? 'block' : 'none'
+  );
+}
+function checkPiloto() {
+  document.getElementById('q-piloto').style.display =
+    document.getElementById('ocu-tipo').value === 'Piloto' ? 'block' : 'none';
+}
+function pickRadio(pill, gid) {
+  document.querySelectorAll(`#${gid} .radio-pill`).forEach(p => p.classList.remove('selected'));
+  pill.classList.add('selected');
+}
+function hasR(gid) { return !!document.querySelector(`#${gid} .radio-pill.selected`); }
+function rVal(gid) { const s = document.querySelector(`#${gid} .radio-pill.selected`); return s ? s.querySelector('input').value : null; }
+function toggleCond(gid, cid) { const cond = document.getElementById(cid); if (cond) cond.classList.toggle('show', rVal(gid) === 'si'); }
+
+function toggleDecl(event) {
+  if (event) event.stopPropagation();
+  S.declChecked = !S.declChecked;
+  document.getElementById('chk-box').classList.toggle('checked', S.declChecked);
+  document.getElementById('chk-label').classList.toggle('checked', S.declChecked);
+  if (S.declChecked) document.getElementById('err-decl').classList.remove('show');
+}
+
+function addFiles(inputId, listId, key) {
+  const files = Array.from(document.getElementById(inputId).files);
+  files.forEach(f => {
+    if (!S.files[key].find(x => x.name === f.name)) {
+      S.files[key].push(f);
+      const reader = new FileReader();
+      reader.onload = e => { S.fileData[key].push({ name: f.name, type: f.type, data: e.target.result }); };
+      reader.readAsDataURL(f);
+    }
+  });
+  renderFiles(listId, key);
+}
+function renderFiles(listId, key) {
+  document.getElementById(listId).innerHTML = S.files[key].map((f, i) => `
+    <div class="file-item">
+      <svg class="fi-icon" width="14" height="14" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</span>
+      <svg class="file-remove" width="14" height="14" viewBox="0 0 24 24" onclick="removeFile('${listId}','${key}',${i})"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>`).join('');
+}
+function removeFile(listId, key, i) { S.files[key].splice(i, 1); S.fileData[key].splice(i, 1); renderFiles(listId, key); }
+
+window.addEventListener('load', () => {
+  const canvas = document.getElementById('sig-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#373D54'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  let drawing = false, lx, ly;
+  const pos = e => { const r = canvas.getBoundingClientRect(), sc = canvas.width / r.width; const src = e.touches ? e.touches[0] : e; return [(src.clientX - r.left) * sc, (src.clientY - r.top) * sc]; };
+  const start = e => { e.preventDefault(); drawing = true; [lx, ly] = pos(e); };
+  const move = e => { if (!drawing) return; e.preventDefault(); const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(x, y); ctx.stroke(); [lx, ly] = [x, y]; S.sigDrawn = true; };
+  const end = () => { drawing = false; };
+  canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); canvas.addEventListener('touchend', end);
+});
+window.clearSig = function() { const c = document.getElementById('sig-canvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); S.sigDrawn = false; };
+
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('plan-cobertura');
+  if (el) el.addEventListener('blur', () => { const n = parseInt(el.value.replace(/,/g,''),10); if (!isNaN(n)) el.value = n.toLocaleString('en-US'); });
+});
+
+const $ = id => document.getElementById(id);
+const v = id => ($( id)?.value || '').trim();
+const showErr = (id, show) => { const el = $(id); if (el) el.classList.toggle('show', show); return show; };
+const calcAge = s => { const h = new Date(), n = new Date(s); let a = h.getFullYear()-n.getFullYear(); if (h.getMonth()<n.getMonth()||(h.getMonth()===n.getMonth()&&h.getDate()<n.getDate())) a--; return a; };
+
+function validate(n) {
+  let bad = false;
+  const fail = (id, cond) => { bad = showErr(id, cond) || bad; };
+
+  if (n===1) {
+    fail('err-motivo', S.motivos.size===0);
+    if (S.motivos.has('otros')) fail('err-otros-detalle', !v('otros-detalle'));
+    fail('err-asesor-nombre', !v('asesor-nombre'));
+    const em = v('asesor-email');
+    fail('err-asesor-email', !em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em));
+  }
+  if (n===2) {
+    fail('err-prosp-nombre', !v('prosp-nombre'));
+    fail('err-prosp-pais', !v('prosp-pais'));
+    const fn = v('prosp-fnac');
+    fail('err-prosp-fnac', !fn || calcAge(fn)<18 || calcAge(fn)>75);
+    fail('err-genero', !hasR('rg-genero'));
+    fail('err-fumador', !hasR('rg-fumador'));
+    fail('err-prosp-ocupacion', !v('prosp-ocupacion'));
+    fail('err-plan-termino', !v('plan-termino'));
+    const cob = parseInt(v('plan-cobertura').replace(/,/g,''),10);
+    fail('err-plan-cobertura', isNaN(cob)||cob<100000||cob>10000000);
+  }
+  if (n===3) {
+    if (S.motivos.has('deportes')) {
+      ['dep-cual','dep-desde','dep-frecuencia','dep-cert','dep-limites'].forEach(id => fail(`err-${id}`,!v(id)));
+      fail('err-dep-naturaleza',!v('dep-naturaleza'));
+      fail('err-dep-club',!hasR('rg-dep-club'));
+      if (rVal('rg-dep-club')==='si') fail('err-dep-club-det',!v('dep-club-det'));
+      fail('err-dep-lesiones',!hasR('rg-dep-lesiones'));
+    }
+    if (S.motivos.has('historial')) { fail('err-med-detalles',!v('med-detalles')); fail('err-med-docs',S.files.med.length===0); }
+    if (S.motivos.has('ocupacion')) {
+      fail('err-ocu-tipo',!v('ocu-tipo')); fail('err-ocu-funciones',!v('ocu-funciones'));
+      ['ocu-mar','ocu-altura','ocu-expl','ocu-acc','ocu-heli'].forEach(id => fail(`err-${id}`,!hasR(`rg-${id}`)));
+      if (v('ocu-tipo')==='Piloto') {
+        ['pil-vp','pil-hp','pil-vf','pil-hf','pil-aeronave','pil-lugares','pil-licencias'].forEach(id => fail(`err-${id}`,!v(id)));
+        ['pil-priv','pil-club','pil-mot','pil-acro','pil-acc'].forEach(id => fail(`err-${id}`,!hasR(`rg-${id}`)));
+      }
+    }
+  }
+  if (n===4) { fail('err-pep',!hasR('rg-pep')); fail('err-pep-nom',!hasR('rg-pep-nom')); }
+  if (n===5) {
+    ['v1','v2','v3','v4','v5'].forEach(id => fail(`err-${id}`,!hasR(`rg-${id}`)));
+    if (rVal('rg-v1')==='si') { ['v1-destinos','v1-visa','v1-fechas'].forEach(id=>fail(`err-${id}`,!v(id))); fail('err-v1-motivo',!v('v1-motivo')); }
+    if (rVal('rg-v2')==='si') { ['v2-destinos','v2-visa','v2-fechas'].forEach(id=>fail(`err-${id}`,!v(id))); fail('err-v2-motivo',!v('v2-motivo')); }
+    if (rVal('rg-v3')==='si') { ['v3-razon','v3-nacimiento','v3-nacionalidad','v3-activos'].forEach(id=>fail(`err-${id}`,!v(id))); }
+    if (rVal('rg-v4')==='si') { ['v4-tipo-residencia','v4-direccion','v4-instalaciones'].forEach(id=>fail(`err-${id}`,!v(id))); }
+    if (rVal('rg-v5')==='si') { ['v5-nombre-negocio','v5-naturaleza','v5-deberes','v5-inicio','v5-remuneracion','v5-salud','v5-seguridad','v5-contrato'].forEach(id=>fail(`err-${id}`,!v(id))); }
+  }
+  if (bad) { const fe = document.querySelector('.field-error.show'); if (fe) fe.scrollIntoView({behavior:'smooth',block:'center'}); }
+  return !bad;
+}
+
+function buildPayload() {
+  const fn = v('prosp-fnac');
+  return {
+    id: S.draftId || ('PRE-' + Date.now()),
+    fechaEnvio: new Date().toLocaleString('es-PE'),
+    estado: 'Enviado', avance: 100, isDraft: false,
+    asesor: { nombre: v('asesor-nombre'), email: v('asesor-email') },
+    motivos: [...S.motivos].map(m => MOTIVO_NAMES[m]).join(', '),
+    motivosRaw: [...S.motivos],
+    otrosDetalle: v('otros-detalle'),
+    prospecto: {
+      nombre: v('prosp-nombre'), pais: v('prosp-pais'),
+      edad: fn ? calcAge(fn) + ' años' : '—', fnac: fn,
+      genero: rVal('rg-genero'), fumador: rVal('rg-fumador'),
+      ocupacion: v('prosp-ocupacion'),
+    },
+    plan: { termino: v('plan-termino'), cobertura: 'USD ' + v('plan-cobertura') },
+    cuestionario: {
+      deportes: S.motivos.has('deportes') ? {
+        deporte: v('dep-cual'), desde: v('dep-desde'), naturaleza: v('dep-naturaleza'),
+        frecuencia: v('dep-frecuencia'), certificaciones: v('dep-cert'), limites: v('dep-limites'),
+        clubMiembro: rVal('rg-dep-club'), clubDetalle: v('dep-club-det'),
+        lesiones: rVal('rg-dep-lesiones'), lesionesDetalle: v('dep-lesiones-det'),
+      } : null,
+      historial: S.motivos.has('historial') ? { detalles: v('med-detalles') } : null,
+      ocupacion: S.motivos.has('ocupacion') ? {
+        tipo: v('ocu-tipo'), funciones: v('ocu-funciones'),
+        altaMar: rVal('rg-ocu-mar'), altaMarDet: v('det-ocu-mar'),
+        altura: rVal('rg-ocu-altura'), alturaDet: v('det-ocu-altura'),
+        explosivos: rVal('rg-ocu-expl'), explosivosDet: v('det-ocu-expl'),
+        accidente: rVal('rg-ocu-acc'), accidenteDet: v('det-ocu-acc'),
+        helicoptero: rVal('rg-ocu-heli'), helicopteroDet: v('det-ocu-heli'),
+        piloto: v('ocu-tipo')==='Piloto' ? {
+          vuelosPasados: v('pil-vp'), horasPasadas: v('pil-hp'),
+          vuelosFuturos: v('pil-vf'), horasFuturas: v('pil-hf'),
+          aeronave: v('pil-aeronave'), lugares: v('pil-lugares'), licencias: v('pil-licencias'),
+          aeropuertosPriv: rVal('rg-pil-priv'), aeropuertosPrivDet: v('det-pil-priv'),
+          club: rVal('rg-pil-club'), clubDet: v('det-pil-club'),
+          motivoVuelo: rVal('rg-pil-mot'), motivoVueloDet: v('det-pil-mot'),
+          acrobatico: rVal('rg-pil-acro'), acrobaticoDet: v('det-pil-acro'),
+          accidentePil: rVal('rg-pil-acc'), accidentePilDet: v('det-pil-acc'),
+        } : null,
+      } : null,
+    },
+    pep: {
+      esPep: rVal('rg-pep'), pepDetalle: v('pep-det'),
+      otroNombre: rVal('rg-pep-nom'), otroNombreDet: v('pep-nom-det'),
+    },
+    viajes: {
+      proximosViajar: rVal('rg-v1'),
+      v1Destinos: v('v1-destinos'), v1Visa: v('v1-visa'), v1Fechas: v('v1-fechas'), v1Motivo: v('v1-motivo'),
+      viajoUltimos: rVal('rg-v2'),
+      v2Destinos: v('v2-destinos'), v2Visa: v('v2-visa'), v2Fechas: v('v2-fechas'), v2Motivo: v('v2-motivo'),
+      residirOtroPais: rVal('rg-v3'),
+      v3Razon: v('v3-razon'), v3Nacimiento: v('v3-nacimiento'), v3Nacionalidad: v('v3-nacionalidad'), v3Activos: v('v3-activos'),
+      mas21Dias: rVal('rg-v4'),
+      v4TipoResidencia: v('v4-tipo-residencia'), v4Direccion: v('v4-direccion'), v4Instalaciones: v('v4-instalaciones'),
+      porNegocios: rVal('rg-v5'),
+      v5NombreNeg: v('v5-nombre-negocio'), v5Naturaleza: v('v5-naturaleza'), v5Deberes: v('v5-deberes'),
+      v5Inicio: v('v5-inicio'), v5Remuneracion: v('v5-remuneracion'), v5Salud: v('v5-salud'),
+      v5Seguridad: v('v5-seguridad'), v5Contrato: v('v5-contrato'),
+    },
+    adicional: v('adicional'),
+    archivosAdjuntos: { medicos: S.files.med.map(f=>f.name), adicionales: S.files.adic.map(f=>f.name) },
+    archivosData: { medicos: [...S.fileData.med], adicionales: [...S.fileData.adic] },
+    firma: document.getElementById('sig-canvas').toDataURL('image/png'),
+  };
+}
+
+async function submitFinal() {
+  let bad = false;
+  bad = showErr('err-firma', !S.sigDrawn) || bad;
+  bad = showErr('err-decl', !S.declChecked) || bad;
+  if (bad) { document.querySelector('.field-error.show')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+  // Disable button to prevent double submit
+  const submitBtn = document.querySelector('#s6 .btn-primary');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Enviando...'; }
+
+  const payload = buildPayload();
+
+  await sbUpsert({
+    id: payload.id,
+    fecha_envio: payload.fechaEnvio,
+    estado: 'Enviado',
+    avance: 100,
+    is_draft: false,
+    asesor_nombre: payload.asesor.nombre,
+    asesor_email: payload.asesor.email,
+    prospecto_nombre: payload.prospecto.nombre,
+    motivos: payload.motivos,
+    payload: payload,
+    firma: payload.firma,
+    archivos_data: payload.archivosData,
+  });
+
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = 'Enviar formulario <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>'; }
+
+  const rows = [
+    {k:'ID',val:payload.id},{k:'Asesor',val:payload.asesor.nombre},{k:'E-mail',val:payload.asesor.email},
+    {k:'Motivo(s)',val:payload.motivos},{k:'Prospecto',val:payload.prospecto.nombre},
+    {k:'País',val:payload.prospecto.pais},{k:'Edad',val:payload.prospecto.edad},
+    {k:'Cobertura',val:payload.plan.cobertura},{k:'Término',val:payload.plan.termino},
+  ];
+  $('confirm-data').innerHTML = rows.map((r,i)=>`${i>0?'<div style="height:1px;background:var(--color-light-grey);"></div>':''}<div style="display:flex;justify-content:space-between;gap:12px;"><span style="font:700 11px/14px var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.06em;">${r.k}</span><span style="font:600 13px/18px var(--font);color:var(--color-dark-blue);text-align:right;">${r.val}</span></div>`).join('');
+  showScreen('confirm');
+}
+
+function resetAll() {
+  S.motivos.clear(); S.sigDrawn=false; S.declChecked=false; S.files={med:[],adic:[]}; S.fileData={med:[],adic:[]}; S.draftId=null;
+  document.querySelectorAll('.motivo-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.field-input').forEach(el=>{el.value='';el.classList.remove('error');});
+  document.querySelectorAll('.radio-pill').forEach(p=>p.classList.remove('selected'));
+  document.querySelectorAll('.conditional-block').forEach(b=>b.classList.remove('show'));
+  document.querySelectorAll('.field-error').forEach(e=>e.classList.remove('show'));
+  $('chk-box').classList.remove('checked'); $('chk-label').classList.remove('checked');
+  ['fl-med','fl-adic'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});
+  clearSig(); showScreen(1);
+}
+</script>
+</body>
+</html>

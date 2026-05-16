@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backoffice — Pre-Evaluaciones · OléLife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --color-turquoise:#00BBDD;--color-turquoise-soft:#E6F8FC;
+      --color-green:#00D090;--color-green-hover:#11B583;--color-green-soft:#E6FAF3;
+      --color-dark-blue:#373D54;--color-shell:#F5F9FC;--color-bg-grey:#E5ECF8;
+      --color-light-grey:#C2CEE3;--color-medium-grey:#9BACCB;--color-dark-grey:#5B667A;
+      --color-white:#FFFFFF;--color-danger:#DD0000;--color-danger-soft:#FFE4E4;
+      --color-warning:#F79E1B;--color-warning-soft:#FFF4E4;
+      --shadow-card:0 2px 2px rgba(230,238,250,.10);--shadow-header:0 4px 8px rgba(55,61,84,.10);
+      --shadow-rail:6px 0 18px rgba(0,0,0,.06);
+      --radius-input:8px;--radius-card:10px;--radius-button:20px;
+      --font:"Montserrat","Helvetica Neue",Helvetica,Arial,sans-serif;
+    }
+    body{font-family:var(--font);background:var(--color-shell);color:var(--color-dark-grey);min-height:100vh;display:flex;flex-direction:column;}
+
+    /* ── LOGIN SCREEN ── */
+    .login-screen{position:fixed;inset:0;z-index:500;background:var(--color-dark-blue);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+    .login-screen.hidden{display:none;}
+    .login-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:40px 36px;width:100%;max-width:380px;display:flex;flex-direction:column;align-items:center;gap:0;}
+    .login-logo{margin-bottom:32px;}
+    .login-title{font:700 18px/24px var(--font);color:var(--color-white);margin-bottom:6px;text-align:center;}
+    .login-sub{font:400 13px/20px var(--font);color:rgba(255,255,255,.45);margin-bottom:28px;text-align:center;}
+    .login-field{width:100%;display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+    .login-label{font:700 12px/1 var(--font);color:rgba(255,255,255,.55);letter-spacing:.04em;text-transform:uppercase;}
+    .login-input{height:44px;border-radius:var(--radius-input);border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);padding:0 14px;font:400 14px/1 var(--font);color:var(--color-white);outline:none;width:100%;transition:border-color 150ms,box-shadow 150ms;}
+    .login-input::placeholder{color:rgba(255,255,255,.25);}
+    .login-input:focus{border-color:var(--color-turquoise);box-shadow:0 0 0 3px rgba(0,187,221,.2);}
+    .login-input.error{border-color:var(--color-danger);box-shadow:0 0 0 3px rgba(221,0,0,.2);}
+    .login-error{font:400 12px/1 var(--font);color:#FF6B6B;margin-top:-8px;margin-bottom:8px;display:none;}
+    .login-error.show{display:block;}
+    .login-btn{width:100%;height:48px;border-radius:var(--radius-button);background:var(--color-green);color:white;border:none;font:700 15px/1 var(--font);cursor:pointer;transition:background 150ms;margin-top:4px;}
+    .login-btn:hover{background:var(--color-green-hover);}
+
+    /* ── TOP BAR (dark) ── */
+    .top-bar{position:sticky;top:0;z-index:50;background:var(--color-dark-blue);box-shadow:0 4px 20px rgba(0,0,0,.25);height:64px;display:flex;align-items:center;padding:0 28px;gap:16px;}
+    .top-bar-divider{width:1px;height:24px;background:rgba(255,255,255,.15);}
+    .top-bar-section{font:700 13px/1 var(--font);color:rgba(255,255,255,.55);}
+    .top-bar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .badge-count{background:rgba(0,187,221,.18);border:1px solid rgba(0,187,221,.35);border-radius:999px;padding:4px 12px;font:700 12px/1 var(--font);color:var(--color-turquoise);}
+    .logout-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:var(--radius-button);font:600 12px/1 var(--font);cursor:pointer;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.6);transition:background 150ms,color 150ms;}
+    .logout-btn:hover{background:rgba(255,255,255,.08);color:white;}
+    .logout-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+    .app-body{display:flex;flex:1;min-height:0;}
+    .workspace{flex:1;overflow-y:auto;padding:28px 28px 48px;}
+    @media(max-width:639px){.workspace{padding:16px;}}
+
+    /* Page header */
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+    .page-title{font:700 22px/28px var(--font);color:var(--color-dark-blue);}
+    .page-subtitle{font:400 13px/18px var(--font);color:var(--color-medium-grey);margin-top:4px;}
+
+    /* Search bar */
+    .search-bar{background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-input);display:flex;align-items:center;gap:10px;padding:0 14px;height:40px;width:100%;max-width:400px;transition:border-color 150ms,box-shadow 150ms;}
+    .search-bar:focus-within{border-color:var(--color-dark-grey);box-shadow:0 0 0 3px rgba(0,187,221,.15);}
+    .search-bar svg{stroke:var(--color-medium-grey);flex-shrink:0;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .search-bar input{border:none;outline:none;font:400 13px/1 var(--font);color:var(--color-dark-grey);background:transparent;width:100%;}
+    .search-bar input::placeholder{color:var(--color-medium-grey);}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 20px;border-radius:var(--radius-button);font:700 13px/1 var(--font);cursor:pointer;border:none;outline:none;transition:background 150ms;white-space:nowrap;}
+    .btn-primary{background:var(--color-green);color:white;border:1px solid var(--color-green);}
+    .btn-primary:hover{background:var(--color-green-hover);}
+    .btn-secondary{background:white;color:var(--color-green);border:1px solid var(--color-green);}
+    .btn-secondary:hover{background:var(--color-green-soft);}
+    .btn-ghost{background:transparent;color:var(--color-dark-grey);border:1px solid var(--color-light-grey);}
+    .btn-ghost:hover{background:var(--color-shell);}
+    .btn-danger{background:white;color:var(--color-danger);border:1px solid var(--color-danger);}
+    .btn-danger:hover{background:var(--color-danger-soft);}
+    .btn-sm{height:32px;padding:0 12px;font-size:12px;}
+    .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .btn-icon{width:32px;height:32px;padding:0;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;}
+
+    /* ── TABLE (responsive) ── */
+    .table-wrap{background:var(--color-white);border-radius:var(--radius-card);border:1px solid var(--color-light-grey);box-shadow:var(--shadow-card);overflow:hidden;}
+    .table-scroll{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;min-width:780px;}
+    thead tr{background:rgba(194,206,227,.3);}
+    thead th{font:700 11px/14px var(--font);color:var(--color-dark-grey);text-transform:uppercase;letter-spacing:.06em;padding:12px 16px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--color-light-grey);}
+    tbody tr{border-bottom:1px solid var(--color-bg-grey);transition:background 120ms;}
+    tbody tr:hover{background:var(--color-shell);}
+    tbody tr:last-child{border-bottom:none;}
+    td{padding:12px 16px;font:400 13px/18px var(--font);color:var(--color-dark-grey);vertical-align:middle;}
+    td.td-bold{font-weight:700;color:var(--color-dark-blue);}
+    .td-actions{display:flex;gap:6px;align-items:center;}
+
+    /* Mobile cards — shown below 768px instead of table */
+    .sub-cards{display:none;flex-direction:column;gap:10px;}
+    .sub-mobile-card{background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;}
+    .sub-mc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
+    .sub-mc-id{font:700 10px/1 var(--font);color:var(--color-turquoise);background:var(--color-turquoise-soft);border-radius:999px;padding:3px 9px;white-space:nowrap;}
+    .sub-mc-name{font:700 14px/18px var(--font);color:var(--color-dark-blue);margin-top:2px;}
+    .sub-mc-email{font:400 12px/16px var(--font);color:var(--color-medium-grey);}
+    .sub-mc-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--color-bg-grey);}
+    .sub-mc-label{font:700 10px/1 var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.05em;}
+    .sub-mc-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--color-bg-grey);}
+    .sub-mc-actions .btn{flex:1;height:36px;font-size:12px;}
+
+    @media(max-width:767px){
+      .table-scroll{display:none;}
+      .sub-cards{display:flex;}
+    }
+
+    /* Progress bar inline */
+    .prog-bar-wrap{display:flex;align-items:center;gap:8px;}
+    .prog-bar-mini{height:4px;border-radius:999px;background:var(--color-bg-grey);overflow:hidden;width:80px;flex-shrink:0;}
+    .prog-bar-fill{height:100%;border-radius:999px;background:var(--color-turquoise);}
+    .prog-pct{font:700 11px/1 var(--font);color:var(--color-dark-grey);}
+
+    /* Status badge */
+    .status-dot{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--font);}
+    .status-dot::before{content:"";width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .status-enviado::before{background:var(--color-green);}
+    .status-progreso::before{background:var(--color-warning);}
+    .status-pendiente::before{background:var(--color-turquoise);}
+
+    /* Empty state */
+    .empty-state{text-align:center;padding:56px 24px;background:var(--color-white);border-radius:var(--radius-card);border:1px solid var(--color-light-grey);}
+    .empty-icon{width:56px;height:56px;background:var(--color-bg-grey);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+    .empty-icon svg{width:26px;height:26px;stroke:var(--color-medium-grey);fill:none;stroke-width:1.6;}
+    .empty-title{font:700 16px/22px var(--font);color:var(--color-dark-blue);margin-bottom:6px;}
+    .empty-sub{font:400 13px/20px var(--font);color:var(--color-medium-grey);max-width:320px;margin:0 auto;}
+
+    /* Confirm delete dialog */
+    .overlay{position:fixed;inset:0;background:rgba(55,61,84,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+    .overlay.open{display:flex;}
+    .dialog{background:var(--color-white);border-radius:var(--radius-card);padding:28px;max-width:380px;width:100%;}
+    .dialog-title{font:700 16px/22px var(--font);color:var(--color-dark-blue);margin-bottom:8px;}
+    .dialog-sub{font:400 13px/20px var(--font);color:var(--color-medium-grey);margin-bottom:20px;}
+    .dialog-actions{display:flex;gap:10px;justify-content:flex-end;}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--color-dark-blue);color:white;padding:12px 20px;border-radius:var(--radius-input);font:600 13px/1 var(--font);display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transform:translateY(8px);transition:opacity 200ms,transform 200ms;pointer-events:none;}
+    .toast.show{opacity:1;transform:translateY(0);}
+    .toast svg{width:16px;height:16px;stroke:var(--color-green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+    /* ── FILES DRAWER ── */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(55,61,84,.5);z-index:300;display:none;align-items:flex-end;justify-content:center;}
+    .drawer-overlay.open{display:flex;}
+    @media(min-width:640px){.drawer-overlay{align-items:center;}}
+    .drawer{background:var(--color-white);border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,.18);}
+    @media(min-width:640px){.drawer{border-radius:var(--radius-card);max-height:80vh;}}
+    .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--color-bg-grey);flex-shrink:0;}
+    .drawer-title{font:700 16px/22px var(--font);color:var(--color-dark-blue);}
+    .drawer-sub{font:400 12px/16px var(--font);color:var(--color-medium-grey);margin-top:2px;}
+    .drawer-close{width:32px;height:32px;border-radius:8px;border:none;background:var(--color-shell);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-medium-grey);transition:background 150ms;}
+    .drawer-close:hover{background:var(--color-bg-grey);color:var(--color-dark-grey);}
+    .drawer-close svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .drawer-body{overflow-y:auto;padding:16px 24px 24px;flex:1;}
+    .drawer-group{margin-bottom:20px;}
+    .drawer-group-label{font:700 10px/1 var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+    .drawer-group-label::after{content:"";flex:1;height:1px;background:var(--color-bg-grey);}
+    .file-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-input);border:1px solid var(--color-light-grey);background:var(--color-white);margin-bottom:8px;transition:border-color 150ms,background 150ms;}
+    .file-row:hover{border-color:var(--color-turquoise);background:var(--color-turquoise-soft);}
+    .file-row-icon{width:32px;height:32px;border-radius:6px;background:var(--color-bg-grey);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .file-row-icon svg{width:15px;height:15px;stroke:var(--color-dark-grey);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+    .file-row-info{flex:1;min-width:0;}
+    .file-row-name{font:600 13px/18px var(--font);color:var(--color-dark-blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .file-row-meta{font:400 11px/14px var(--font);color:var(--color-medium-grey);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .file-row-btn{flex-shrink:0;width:32px;height:32px;border-radius:8px;border:1px solid var(--color-light-grey);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 150ms,border-color 150ms;}
+    .file-row-btn:hover{background:var(--color-green-soft);border-color:var(--color-green);}
+    .file-row-btn svg{width:14px;height:14px;stroke:var(--color-green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .drawer-empty{text-align:center;padding:32px 16px;color:var(--color-medium-grey);font:400 13px/20px var(--font);}
+
+    /* Tooltip on icon buttons */
+    [title]{cursor:pointer;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="93" height="37" viewBox="0 0 62 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#lclip)">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M29.4491 6.14253C31.7293 6.14253 33.6253 6.91387 35.1361 8.48465C36.6769 10.0273 37.4474 11.9536 37.4474 14.2365C37.4474 16.5194 36.6769 18.4176 35.1361 19.9883C33.6253 21.531 31.7303 22.3023 29.4491 22.3023C27.1679 22.3023 25.2729 21.531 23.732 19.9883C22.2212 18.4176 21.4538 16.5194 21.4538 14.2365C21.4538 11.9536 22.2223 10.0273 23.732 8.48465C25.2729 6.91387 27.1689 6.14253 29.4491 6.14253ZM29.4491 3.47401C26.4586 3.47401 23.9106 4.51149 21.836 6.61759C19.7645 8.69155 18.7262 11.2436 18.7262 14.2365C18.7262 17.2294 19.7645 19.7533 21.836 21.8584C23.9096 23.9635 26.4586 25 29.4491 25C32.4396 25 34.9876 23.9625 37.0622 21.8584C39.1648 19.7533 40.2001 17.2324 40.2001 14.2365C40.2001 11.2406 39.1638 8.69155 37.0622 6.61759C34.9886 4.51048 32.4416 3.47401 29.4491 3.47401Z" fill="white"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M54.6247 11.8361C56.9942 11.8361 58.9494 13.3175 59.3928 16.1347H49.5015C49.9459 13.5264 51.869 11.8361 54.6247 11.8361ZM54.6247 9.40462C52.3445 9.40462 50.4786 10.1458 49.027 11.6292C47.5754 13.1106 46.8642 14.9777 46.8642 17.2023C46.8642 19.4269 47.6065 21.3241 49.0561 22.8065C50.5378 24.2598 52.4649 25.001 54.8043 25.001C57.7054 25.001 59.8683 23.8741 61.3198 21.6525L59.1279 20.4062C58.2371 21.8594 56.8166 22.5695 54.8624 22.5695C52.0485 22.5695 50.0051 21.0288 49.5025 18.3884H61.9117C61.9709 18.0048 62.001 17.6191 62.001 17.2334C62.001 15.0671 61.3198 13.2281 59.9274 11.7166C58.5651 10.176 56.7865 9.40462 54.6257 9.40462H54.6247Z" fill="white"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M42.1874 0V20.8842C42.1874 23.6291 43.9349 24.6917 45.0645 25L46.8802 23.1821C45.8519 22.9773 44.8247 22.0181 44.8247 20.5438V0H42.1874Z" fill="white"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M56.9831 3.35349C56.7976 3.35349 56.4505 3.53929 56.2639 3.80544C55.6128 4.71035 54.7491 5.64639 53.9225 6.39462C53.5393 6.74212 53.6386 7.36783 54.1101 7.57773L57.7556 5.14121C57.9953 4.90117 58.1548 4.66113 58.1548 4.52756C58.1548 4.18006 57.3282 3.35449 56.9831 3.35449V3.35349Z" fill="white"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M6.83862 5.01567C6.30995 5.01567 5.8826 5.44352 5.8826 5.9728V11.9908L1.63316 7.73441C1.44657 7.54761 1.2018 7.4542 0.957025 7.4542C0.712252 7.4542 0.467478 7.54761 0.280888 7.73441C-0.0922918 8.10803 -0.0922918 8.71465 0.280888 9.08927L4.53032 13.3457H2.34541C1.81674 13.3457 1.38939 13.7735 1.38939 14.3028C1.38939 14.8321 1.81674 15.2599 2.34541 15.2599H4.53032L0.279885 19.5163C-0.0932949 19.8899 -0.0932949 20.4945 0.279885 20.8682C0.466475 21.055 0.711248 21.1484 0.956022 21.1484C1.2008 21.1484 1.44557 21.055 1.63216 20.8682L5.88159 16.6138V22.6318C5.88159 23.1611 6.30895 23.5889 6.83762 23.5889C7.36629 23.5889 7.79364 23.1611 7.79364 22.6318V16.6138L10.0277 18.8504C10.2143 19.0372 10.4591 19.1306 10.7038 19.1306C10.9486 19.1306 11.1934 19.0372 11.38 18.8504C11.7532 18.4768 11.7532 17.8702 11.38 17.4956L9.14591 15.2589H13.2449C13.7735 15.2589 14.2009 14.8311 14.2009 14.3018C14.2009 13.7725 13.7735 13.3446 13.2449 13.3446H9.14591L11.2837 11.2044C11.6569 10.8308 11.6569 10.2242 11.2837 9.84955C11.0971 9.66274 10.8523 9.56934 10.6085 9.56934C10.3648 9.56934 10.12 9.66274 9.9334 9.84955L7.79364 11.9898V5.9718C7.79364 5.44251 7.36629 5.01466 6.83762 5.01466L6.83862 5.01567Z" fill="white"/>
+        </g>
+        <defs><clipPath id="lclip"><rect width="62" height="25" fill="white"/></clipPath></defs>
+      </svg>
+    </div>
+    <div class="login-title">Acceso al backoffice</div>
+    <div class="login-sub">Ingresa la clave de administrador para continuar.</div>
+    <div class="login-field">
+      <label class="login-label" for="login-pass">Clave de administrador</label>
+      <input class="login-input" type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="login-error">Clave incorrecta. Intenta de nuevo.</div>
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+  </div>
+</div>
+
+<!-- ── APP (hidden until login) ── -->
+<div id="app-root" style="display:none;flex-direction:column;min-height:100vh;">
+
+<header class="top-bar">
+  <svg width="74" height="30" viewBox="0 0 62 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="OléLife">
+    <g clip-path="url(#clip_tb)">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M29.4491 6.14253C31.7293 6.14253 33.6253 6.91387 35.1361 8.48465C36.6769 10.0273 37.4474 11.9536 37.4474 14.2365C37.4474 16.5194 36.6769 18.4176 35.1361 19.9883C33.6253 21.531 31.7303 22.3023 29.4491 22.3023C27.1679 22.3023 25.2729 21.531 23.732 19.9883C22.2212 18.4176 21.4538 16.5194 21.4538 14.2365C21.4538 11.9536 22.2223 10.0273 23.732 8.48465C25.2729 6.91387 27.1689 6.14253 29.4491 6.14253ZM29.4491 3.47401C26.4586 3.47401 23.9106 4.51149 21.836 6.61759C19.7645 8.69155 18.7262 11.2436 18.7262 14.2365C18.7262 17.2294 19.7645 19.7533 21.836 21.8584C23.9096 23.9635 26.4586 25 29.4491 25C32.4396 25 34.9876 23.9625 37.0622 21.8584C39.1648 19.7533 40.2001 17.2324 40.2001 14.2365C40.2001 11.2406 39.1638 8.69155 37.0622 6.61759C34.9886 4.51048 32.4416 3.47401 29.4491 3.47401Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M54.6247 11.8361C56.9942 11.8361 58.9494 13.3175 59.3928 16.1347H49.5015C49.9459 13.5264 51.869 11.8361 54.6247 11.8361ZM54.6247 9.40462C52.3445 9.40462 50.4786 10.1458 49.027 11.6292C47.5754 13.1106 46.8642 14.9777 46.8642 17.2023C46.8642 19.4269 47.6065 21.3241 49.0561 22.8065C50.5378 24.2598 52.4649 25.001 54.8043 25.001C57.7054 25.001 59.8683 23.8741 61.3198 21.6525L59.1279 20.4062C58.2371 21.8594 56.8166 22.5695 54.8624 22.5695C52.0485 22.5695 50.0051 21.0288 49.5025 18.3884H61.9117C61.9709 18.0048 62.001 17.6191 62.001 17.2334C62.001 15.0671 61.3198 13.2281 59.9274 11.7166C58.5651 10.176 56.7865 9.40462 54.6257 9.40462H54.6247Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M42.1874 0V20.8842C42.1874 23.6291 43.9349 24.6917 45.0645 25L46.8802 23.1821C45.8519 22.9773 44.8247 22.0181 44.8247 20.5438V0H42.1874Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M56.9831 3.35349C56.7976 3.35349 56.4505 3.53929 56.2639 3.80544C55.6128 4.71035 54.7491 5.64639 53.9225 6.39462C53.5393 6.74212 53.6386 7.36783 54.1101 7.57773L57.7556 5.14121C57.9953 4.90117 58.1548 4.66113 58.1548 4.52756C58.1548 4.18006 57.3282 3.35449 56.9831 3.35449V3.35349Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M6.83862 5.01567C6.30995 5.01567 5.8826 5.44352 5.8826 5.9728V11.9908L1.63316 7.73441C1.44657 7.54761 1.2018 7.4542 0.957025 7.4542C0.712252 7.4542 0.467478 7.54761 0.280888 7.73441C-0.0922918 8.10803 -0.0922918 8.71465 0.280888 9.08927L4.53032 13.3457H2.34541C1.81674 13.3457 1.38939 13.7735 1.38939 14.3028C1.38939 14.8321 1.81674 15.2599 2.34541 15.2599H4.53032L0.279885 19.5163C-0.0932949 19.8899 -0.0932949 20.4945 0.279885 20.8682C0.466475 21.055 0.711248 21.1484 0.956022 21.1484C1.2008 21.1484 1.44557 21.055 1.63216 20.8682L5.88159 16.6138V22.6318C5.88159 23.1611 6.30895 23.5889 6.83762 23.5889C7.36629 23.5889 7.79364 23.1611 7.79364 22.6318V16.6138L10.0277 18.8504C10.2143 19.0372 10.4591 19.1306 10.7038 19.1306C10.9486 19.1306 11.1934 19.0372 11.38 18.8504C11.7532 18.4768 11.7532 17.8702 11.38 17.4956L9.14591 15.2589H13.2449C13.7735 15.2589 14.2009 14.8311 14.2009 14.3018C14.2009 13.7725 13.7735 13.3446 13.2449 13.3446H9.14591L11.2837 11.2044C11.6569 10.8308 11.6569 10.2242 11.2837 9.84955C11.0971 9.66274 10.8523 9.56934 10.6085 9.56934C10.3648 9.56934 10.12 9.66274 9.9334 9.84955L7.79364 11.9898V5.9718C7.79364 5.44251 7.36629 5.01466 6.83762 5.01466L6.83862 5.01567Z" fill="white"/>
+    </g>
+    <defs><clipPath id="clip_tb"><rect width="62" height="25" fill="white"/></clipPath></defs>
+  </svg>
+  <div class="top-bar-divider"></div>
+  <span class="top-bar-section">Pre-Evaluaciones</span>
+  <div class="top-bar-right">
+    <span class="badge-count" id="count-badge">0 enviadas</span>
+    <button class="logout-btn" onclick="doLogout()">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Salir
+    </button>
+  </div>
+</header>
+
+<div class="app-body">
+  <main class="workspace">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Pre-evaluaciones recibidas</div>
+        <div class="page-subtitle">Busca, descarga el PDF completo, archivos adjuntos o elimina registros.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-input" placeholder="Buscar por asesor, prospecto o ID..." oninput="filterTable()">
+        </div>
+        <button class="btn btn-primary" onclick="loadSubmissions()">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Cargar envíos
+        </button>
+      </div>
+    </div>
+
+    <div id="table-container"></div>
+  </main>
+</div>
+
+</div><!-- /app-root -->
+
+<!-- Files drawer -->
+<div class="drawer-overlay" id="files-overlay" onclick="closeFilesDrawer(event)">
+  <div class="drawer" id="files-drawer">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title" id="drawer-title">Archivos adjuntos</div>
+        <div class="drawer-sub" id="drawer-sub"></div>
+      </div>
+      <button class="drawer-close" onclick="closeFilesDrawer()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+  </div>
+</div>
+
+<!-- Delete confirm dialog -->
+<div class="overlay" id="delete-overlay">
+  <div class="dialog">
+    <div class="dialog-title">Eliminar registro</div>
+    <div class="dialog-sub" id="delete-msg">¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede deshacer.</div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeDeleteDialog()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg">Acción completada.</span>
+</div>
+
+<script>
+const { jsPDF } = window.jspdf;
+let allSubs = [];
+let deleteIndex = null;
+
+// ── Auth ───────────────────────────────────────────────────
+const ADMIN_KEY = 'Ole2026';
+
+function doLogin() {
+  const val = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  const inputEl = document.getElementById('login-pass');
+  if (val === ADMIN_KEY) {
+    errEl.classList.remove('show');
+    inputEl.classList.remove('error');
+    sessionStorage.setItem('bo_auth', '1');
+    document.getElementById('login-screen').classList.add('hidden');
+    const app = document.getElementById('app-root');
+    app.style.display = 'flex';
+    loadSubmissions();
+  } else {
+    errEl.classList.add('show');
+    inputEl.classList.add('error');
+    inputEl.focus();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('bo_auth');
+  document.getElementById('app-root').style.display = 'none';
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('login-pass').classList.remove('error');
+}
+
+// ── Supabase config ────────────────────────────────────────
+const SB_URL = 'https://hpjvljotjzzrnkpsewzy.supabase.co';
+const SB_KEY = 'sb_publishable_D658YrHARFo_m-XSYVzgtA_95g2TR2J';
+
+async function sbFetch() {
+  const res = await fetch(`${SB_URL}/rest/v1/pre_evaluaciones?order=created_at.desc`, {
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function sbDelete(id) {
+  const res = await fetch(`${SB_URL}/rest/v1/pre_evaluaciones?id=eq.${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+  });
+  if (!res.ok) throw new Error(await res.text());
+}
+
+// ── Load & render ──────────────────────────────────────────
+async function loadSubmissions() {
+  const container = document.getElementById('table-container');
+  container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00BBDD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div><div class="empty-title">Cargando...</div></div>`;
+  try {
+    const rows = await sbFetch();
+    allSubs = rows.map(r => ({
+      id: r.id,
+      fechaEnvio: r.fecha_envio,
+      estado: r.estado,
+      avance: r.avance,
+      isDraft: r.is_draft,
+      asesor: { nombre: r.asesor_nombre, email: r.asesor_email },
+      prospecto: { nombre: r.prospecto_nombre, ...(r.payload?.prospecto || {}) },
+      motivos: r.motivos,
+      plan: r.payload?.plan || {},
+      cuestionario: r.payload?.cuestionario || {},
+      pep: r.payload?.pep || {},
+      viajes: r.payload?.viajes || {},
+      adicional: r.payload?.adicional || '',
+      otrosDetalle: r.payload?.otrosDetalle || '',
+      archivosAdjuntos: r.payload?.archivosAdjuntos || { medicos: [], adicionales: [] },
+      archivosData: r.archivos_data || { medicos: [], adicionales: [] },
+      firma: r.firma,
+    }));
+  } catch(e) {
+    allSubs = [];
+    showToast('Error al cargar datos. Revisa la consola.');
+    console.error('Supabase error:', e);
+  }
+  document.getElementById('count-badge').textContent = allSubs.length + (allSubs.length===1?' enviada':' enviadas');
+  renderTable(allSubs);
+}
+
+function filterTable() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  if (!q) { renderTable(allSubs); return; }
+  const filtered = allSubs.filter(s =>
+    (s.id||'').toLowerCase().includes(q) ||
+    (s.asesor?.nombre||'').toLowerCase().includes(q) ||
+    (s.asesor?.email||'').toLowerCase().includes(q) ||
+    (s.prospecto?.nombre||'').toLowerCase().includes(q)
+  );
+  renderTable(filtered);
+}
+
+function renderTable(subs) {
+  const container = document.getElementById('table-container');
+  if (!subs.length) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9BACCB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="empty-title">Sin registros</div>
+      <div class="empty-sub">No se encontraron pre-evaluaciones. Los formularios aparecerán aquí una vez que sean enviados.</div>
+    </div>`;
+    return;
+  }
+
+  const tableRows = subs.map(s => {
+    const realIdx = allSubs.indexOf(s);
+    const pct = s.avance ?? 100;
+    const isDraft = s.isDraft === true;
+    const estado = s.estado || 'Enviado';
+    const statusClass = estado === 'Enviado' ? 'status-enviado' : estado === 'En progreso' ? 'status-progreso' : 'status-pendiente';
+    const archivos = (s.archivosAdjuntos?.medicos?.length||0) + (s.archivosAdjuntos?.adicionales?.length||0);
+    const pdfDisabled = isDraft ? 'style="opacity:.35;cursor:not-allowed;" title="Disponible al completar el formulario"' : `title="Descargar PDF completo" onclick="downloadPDF(${realIdx})"`;
+    const filesDisabled = (archivos===0||isDraft) ? 'style="opacity:.35;cursor:not-allowed;" onclick=""' : `onclick="openFilesDrawer(${realIdx})"`;
+    return `<tr>
+      <td class="td-bold" style="font-size:12px;color:var(--color-turquoise);">${s.id||'—'}</td>
+      <td class="td-bold">${s.asesor?.nombre||'—'}</td>
+      <td style="font-size:12px;">${s.asesor?.email||'—'}</td>
+      <td class="td-bold">${s.prospecto?.nombre||'—'}</td>
+      <td><span class="status-dot ${statusClass}">${estado}</span></td>
+      <td>
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-mini"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
+          <span class="prog-pct">${pct}%</span>
+        </div>
+      </td>
+      <td style="font-size:12px;color:var(--color-medium-grey);">${s.fechaEnvio||'—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-primary btn-sm btn-icon" ${pdfDisabled}>
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button class="btn btn-secondary btn-sm btn-icon" title="Ver archivos adjuntos (${archivos})" ${filesDisabled}>
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteDialog(${realIdx})" title="Eliminar registro">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const mobileCards = subs.map(s => {
+    const realIdx = allSubs.indexOf(s);
+    const pct = s.avance ?? 100;
+    const isDraft = s.isDraft === true;
+    const estado = s.estado || 'Enviado';
+    const statusClass = estado === 'Enviado' ? 'status-enviado' : estado === 'En progreso' ? 'status-progreso' : 'status-pendiente';
+    const archivos = (s.archivosAdjuntos?.medicos?.length||0) + (s.archivosAdjuntos?.adicionales?.length||0);
+    return `<div class="sub-mobile-card">
+      <div class="sub-mc-top">
+        <div>
+          <div class="sub-mc-name">${s.prospecto?.nombre||'—'}</div>
+          <div class="sub-mc-email">${s.asesor?.nombre||'—'} · ${s.asesor?.email||'—'}</div>
+        </div>
+        <span class="sub-mc-id">${s.id||'—'}</span>
+      </div>
+      <div class="sub-mc-row">
+        <span class="sub-mc-label">Estado</span>
+        <span class="status-dot ${statusClass}">${estado}</span>
+      </div>
+      <div class="sub-mc-row">
+        <span class="sub-mc-label">Avance</span>
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-mini"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
+          <span class="prog-pct">${pct}%</span>
+        </div>
+      </div>
+      <div class="sub-mc-row">
+        <span class="sub-mc-label">Última actividad</span>
+        <span style="font:400 12px/1 var(--font);color:var(--color-medium-grey);">${s.fechaEnvio||'—'}</span>
+      </div>
+      <div class="sub-mc-actions">
+        <button class="btn btn-primary btn-sm" ${isDraft ? 'style="opacity:.35;cursor:not-allowed;"' : `onclick="downloadPDF(${realIdx})"`}>
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF
+        </button>
+        <button class="btn btn-secondary btn-sm" ${(archivos===0||isDraft) ? 'style="opacity:.35;cursor:not-allowed;"' : `onclick="openFilesDrawer(${realIdx})"`}>
+          <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          Archivos${archivos ? ` (${archivos})` : ''}
+        </button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteDialog(${realIdx})">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="table-scroll"><div class="table-wrap"><table>
+      <thead><tr>
+        <th>ID</th><th>Asesor</th><th>E-mail</th><th>Prospecto</th>
+        <th>Estado</th><th>% Avance</th><th>Última actividad</th><th>Acciones</th>
+      </tr></thead>
+      <tbody>${tableRows}</tbody>
+    </table></div></div>
+    <div class="sub-cards">${mobileCards}</div>
+  `;
+}
+
+// ── Delete ─────────────────────────────────────────────────
+function openDeleteDialog(idx) {
+  deleteIndex = idx;
+  const s = allSubs[idx];
+  document.getElementById('delete-msg').textContent = `¿Eliminar la pre-evaluación de "${s.prospecto?.nombre||'este prospecto'}" (${s.id||''})? Esta acción no se puede deshacer.`;
+  document.getElementById('delete-overlay').classList.add('open');
+}
+function closeDeleteDialog() { document.getElementById('delete-overlay').classList.remove('open'); deleteIndex = null; }
+async function confirmDelete() {
+  if (deleteIndex === null) return;
+  const id = allSubs[deleteIndex].id;
+  try {
+    await sbDelete(id);
+    allSubs.splice(deleteIndex, 1);
+  } catch(e) {
+    showToast('Error al eliminar. Intenta de nuevo.');
+    console.error(e);
+    closeDeleteDialog();
+    return;
+  }
+  closeDeleteDialog();
+  document.getElementById('count-badge').textContent = allSubs.length + (allSubs.length===1?' enviada':' enviadas');
+  filterTable();
+  showToast('Registro eliminado correctamente.');
+}
+
+// ── Files drawer ───────────────────────────────────────────
+function openFilesDrawer(idx) {
+  const s = allSubs[idx];
+  const prospecto = (s.prospecto?.nombre || 'prospecto').trim();
+  const slug = prospecto.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+  // Build grouped file list with labels
+  const groups = [];
+  const medicos = s.archivosData?.medicos || [];
+  const adicionales = s.archivosData?.adicionales || [];
+  if (medicos.length) groups.push({ label: 'Documentos médicos', pregunta: 'Historial médico — Adjuntar documentos médicos', files: medicos });
+  if (adicionales.length) groups.push({ label: 'Archivos adicionales', pregunta: 'Información adicional — Archivos adjuntos', files: adicionales });
+
+  const totalFiles = medicos.length + adicionales.length;
+
+  // Header
+  document.getElementById('drawer-title').textContent = `Archivos adjuntos — ${prospecto}`;
+  document.getElementById('drawer-sub').textContent = `${totalFiles} archivo${totalFiles !== 1 ? 's' : ''} · ${s.id || ''}`;
+
+  // Body
+  const body = document.getElementById('drawer-body');
+  if (!totalFiles) {
+    body.innerHTML = `<div class="drawer-empty">No hay archivos adjuntos en este registro.</div>`;
+  } else {
+    body.innerHTML = groups.map(g => `
+      <div class="drawer-group">
+        <div class="drawer-group-label">${g.label} (${g.files.length})</div>
+        ${g.files.map((f, fi) => {
+          const ext = (f.name || '').split('.').pop().toUpperCase();
+          const prefixedName = `pre-evaluacion-${slug}-${f.name}`;
+          const encodedData = f.data ? encodeURIComponent(f.data) : '';
+          return `<div class="file-row">
+            <div class="file-row-icon">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="file-row-info">
+              <div class="file-row-name" title="${prefixedName}">${prefixedName}</div>
+              <div class="file-row-meta">${g.pregunta}</div>
+            </div>
+            ${f.data ? `<button class="file-row-btn" onclick="downloadSingleFile('${encodedData}','${prefixedName}')" title="Descargar">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>` : `<span style="font:400 10px/1 var(--font);color:var(--color-medium-grey);padding:0 8px;">sin datos</span>`}
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+  }
+
+  document.getElementById('files-overlay').classList.add('open');
+}
+
+function closeFilesDrawer(event) {
+  if (event && event.target !== document.getElementById('files-overlay')) return;
+  document.getElementById('files-overlay').classList.remove('open');
+}
+
+function downloadSingleFile(encodedData, filename) {
+  const data = decodeURIComponent(encodedData);
+  const a = document.createElement('a');
+  a.href = data;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast(`Descargando ${filename}`);
+}
+
+// ── Generate PDF ────────────────────────────────────────────
+function downloadPDF(idx) {
+  const s = allSubs[idx];
+  if (!s) return;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, ML = 16, MR = 16, CW = W - ML - MR;
+  let y = 0;
+
+  // Helpers
+  function newPage() { doc.addPage(); y = 20; }
+  function checkY(needed) { if (y + needed > 278) newPage(); }
+  function hRule(col) {
+    doc.setDrawColor(col || '#E5ECF8'); doc.setLineWidth(0.2);
+    doc.line(ML, y, W - MR, y); y += 4;
+  }
+  function sectionHeader(title) {
+    checkY(12);
+    doc.setFillColor('#E6F8FC');
+    doc.roundedRect(ML, y - 1, CW, 8, 1.5, 1.5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor('#00699A');
+    doc.text(title.toUpperCase(), ML + 4, y + 4.5);
+    y += 11;
+  }
+  function row(label, value, indent) {
+    const x0 = ML + (indent ? 6 : 0);
+    const labelW = 68;
+    checkY(6);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
+    doc.text(String(label), x0, y);
+    doc.setFont('helvetica','normal'); doc.setTextColor('#373D54');
+    const lines = doc.splitTextToSize(String(value || '—'), CW - labelW - (indent?6:0));
+    doc.text(lines, x0 + labelW, y);
+    y += 5 * lines.length + 1;
+  }
+  function subLabel(text) {
+    checkY(8);
+    doc.setFillColor('#F5F9FC');
+    doc.rect(ML, y - 1, CW, 7, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor('#00BBDD');
+    doc.text(text.toUpperCase(), ML + 3, y + 4);
+    y += 9;
+  }
+  function yn(label, val) { row(label, val === 'si' ? 'Sí' : val === 'no' ? 'No' : (val || '—')); }
+
+  // ── Date helper: ISO → dd/mm/aaaa (dd/mm/aaaa) ──
+  function formatDate(val) {
+    if (!val) return '—';
+    // val can be ISO "1991-03-31" or already formatted
+    const m = String(val).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return `${m[3]}/${m[2]}/${m[1]} (dd/mm/aaaa)`;
+    return val; // already a freetext date, return as-is
+  }
+
+  // ── HEADER ──
+  doc.setFillColor('#373D54');
+  doc.rect(0, 0, W, 20, 'F');
+  doc.setFillColor('#00BBDD');
+  doc.rect(0, 20, W, 2, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor('#FFFFFF');
+  doc.text('OléLife', ML, 12);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#9BACCB');
+  doc.text('Formulario de Pre-Evaluación', ML + 28, 12);
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor('#00BBDD');
+  doc.text(`ID: ${s.id||'—'}`, W - MR, 9, { align:'right' });
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
+  doc.text(`Enviado: ${s.fechaEnvio||'—'}`, W - MR, 15, { align:'right' });
+  y = 28;
+
+  // ── ASESOR ──
+  sectionHeader('Información del asesor');
+  row('Nombres y apellidos', s.asesor?.nombre);
+  row('Correo electrónico', s.asesor?.email);
+  y += 3;
+
+  // ── PROSPECTO ──
+  sectionHeader('Datos del prospecto');
+  row('Nombres y apellidos', s.prospecto?.nombre);
+  row('País de residencia', s.prospecto?.pais);
+  row('Fecha de nacimiento', formatDate(s.prospecto?.fnac));
+  row('Edad', s.prospecto?.edad);
+  row('Género', s.prospecto?.genero ? (s.prospecto.genero.charAt(0).toUpperCase()+s.prospecto.genero.slice(1)) : '—');
+  row('Fumador', s.prospecto?.fumador === 'si' ? 'Sí' : 'No');
+  row('Ocupación', s.prospecto?.ocupacion);
+  y += 3;
+
+  // ── PLAN ──
+  sectionHeader('Plan solicitado');
+  row('Motivo(s) de pre-evaluación', s.motivos);
+  if (s.otrosDetalle) row('Detalle (Otros)', s.otrosDetalle);
+  row('Término', s.plan?.termino);
+  row('Cobertura solicitada', s.plan?.cobertura);
+  y += 3;
+
+  // ── CUESTIONARIO DEPORTES ──
+  const dep = s.cuestionario?.deportes;
+  if (dep) {
+    sectionHeader('Cuestionario — Actividades deportivas');
+    row('Deporte practicado', dep.deporte);
+    row('Desde cuándo', dep.desde);
+    row('Naturaleza de participación', dep.naturaleza);
+    row('Frecuencia', dep.frecuencia);
+    row('Certificaciones', dep.certificaciones);
+    row('Límites máximos alcanzados', dep.limites);
+    yn('¿Miembro de club/asociación?', dep.clubMiembro);
+    if (dep.clubMiembro === 'si') row('Detalle club/asociación', dep.clubDetalle, true);
+    yn('¿Ha tenido lesiones?', dep.lesiones);
+    if (dep.lesiones === 'si') row('Detalle lesiones', dep.lesionesDetalle, true);
+    y += 3;
+  }
+
+  // ── CUESTIONARIO HISTORIAL MÉDICO ──
+  const hist = s.cuestionario?.historial;
+  if (hist) {
+    sectionHeader('Cuestionario — Historial médico');
+    row('Detalles del historial médico', hist.detalles);
+    const archMed = s.archivosAdjuntos?.medicos || [];
+    if (archMed.length) {
+      checkY(6);
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
+      doc.text('Documentos adjuntos:', ML, y); y += 4;
+      archMed.forEach(name => {
+        checkY(4);
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#373D54');
+        doc.text('• ' + name, ML + 5, y); y += 4;
+      });
+    }
+    y += 3;
+  }
+
+  // ── CUESTIONARIO OCUPACIÓN ──
+  const ocu = s.cuestionario?.ocupacion;
+  if (ocu) {
+    sectionHeader('Cuestionario — Ocupación');
+    row('Tipo de ocupación', ocu.tipo);
+    row('Funciones laborales', ocu.funciones);
+    yn('¿Trabaja en alta mar?', ocu.altaMar);
+    if (ocu.altaMar === 'si') row('Detalle alta mar', ocu.altaMarDet, true);
+    yn('¿Trabaja en altura?', ocu.altura);
+    if (ocu.altura === 'si') row('Detalle trabajo en altura', ocu.alturaDet, true);
+    yn('¿Utiliza explosivos?', ocu.explosivos);
+    if (ocu.explosivos === 'si') row('Detalle explosivos', ocu.explosivosDet, true);
+    yn('¿Enfermedad/accidente laboral?', ocu.accidente);
+    if (ocu.accidente === 'si') row('Detalle accidente', ocu.accidenteDet, true);
+    yn('¿Viaja en helicóptero/avioneta?', ocu.helicoptero);
+    if (ocu.helicoptero === 'si') row('Detalle helicóptero', ocu.helicopteroDet, true);
+    const pil = ocu.piloto;
+    if (pil) {
+      y += 2;
+      subLabel('Cuestionario de piloto privado');
+      subLabel('Vuelos realizados en los últimos 12 meses');
+      row('Número total de vuelos', pil.vuelosPasados);
+      row('Número de horas de vuelo', pil.horasPasadas);
+      subLabel('Vuelos a realizar en los próximos 12 meses');
+      row('Número total de vuelos', pil.vuelosFuturos);
+      row('Número de horas de vuelo', pil.horasFuturas);
+      row('Tipo de aeronave', pil.aeronave);
+      row('Lugares a donde vuela', pil.lugares);
+      row('Licencias / certificaciones', pil.licencias);
+      yn('¿Vuela desde aeropuertos no públicos?', pil.aeropuertosPriv);
+      if (pil.aeropuertosPriv === 'si') row('Detalle', pil.aeropuertosPrivDet, true);
+      yn('¿Pertenece a club/asociación?', pil.club);
+      if (pil.club === 'si') row('Detalle club', pil.clubDet, true);
+      yn('¿Vuela por motivos distintos al placer?', pil.motivoVuelo);
+      if (pil.motivoVuelo === 'si') row('Detalle motivo vuelo', pil.motivoVueloDet, true);
+      yn('¿Vuelos acrobáticos?', pil.acrobatico);
+      if (pil.acrobatico === 'si') row('Detalle acrobático', pil.acrobaticoDet, true);
+      yn('¿Accidentes o suspensión de licencia?', pil.accidentePil);
+      if (pil.accidentePil === 'si') row('Detalle accidente piloto', pil.accidentePilDet, true);
+    }
+    y += 3;
+  }
+
+  // ── PEP ──
+  const pep = s.pep;
+  if (pep) {
+    sectionHeader('Cuestionario PEP — Persona Políticamente Expuesta');
+    yn('¿Es una persona PEP?', pep.esPep);
+    if (pep.esPep === 'si') row('Cargo o función pública', pep.pepDetalle, true);
+    yn('¿Ha usado otro nombre?', pep.otroNombre);
+    if (pep.otroNombre === 'si') row('Otro(s) nombre(s)', pep.otroNombreDet, true);
+    y += 3;
+  }
+
+  // ── VIAJES ──
+  const vj = s.viajes;
+  if (vj) {
+    sectionHeader('Cuestionario de viajes');
+    yn('¿Planea viajar en los próximos 12 meses?', vj.proximosViajar);
+    if (vj.proximosViajar === 'si') {
+      row('Destinos (próximos)', vj.v1Destinos, true);
+      row('Tipo de visa', vj.v1Visa, true);
+      row('Fechas de viaje', vj.v1Fechas, true);
+      row('Motivo de viaje', vj.v1Motivo, true);
+    }
+    yn('¿Ha viajado en los últimos 12 meses?', vj.viajoUltimos);
+    if (vj.viajoUltimos === 'si') {
+      row('Destinos (últimos 12 meses)', vj.v2Destinos, true);
+      row('Tipo de visa', vj.v2Visa, true);
+      row('Fechas de viaje', vj.v2Fechas, true);
+      row('Motivo de viaje', vj.v2Motivo, true);
+    }
+    yn('¿Reside o piensa residir en otro país?', vj.residirOtroPais);
+    if (vj.residirOtroPais === 'si') {
+      row('Razón principal', vj.v3Razon, true);
+      row('Lugar de nacimiento', vj.v3Nacimiento, true);
+      row('Nacionalidad', vj.v3Nacionalidad, true);
+      row('Activos / bienes inmuebles', vj.v3Activos, true);
+    }
+    yn('¿Residir en el extranjero más de 21 días?', vj.mas21Dias);
+    if (vj.mas21Dias === 'si') {
+      row('Tipo de residencia', vj.v4TipoResidencia, true);
+      row('Dirección', vj.v4Direccion, true);
+      row('Instalaciones médicas más cercanas', vj.v4Instalaciones, true);
+    }
+    yn('¿El viaje es por negocios?', vj.porNegocios);
+    if (vj.porNegocios === 'si') {
+      row('Nombre de negocio', vj.v5NombreNeg, true);
+      row('Naturaleza de negocio', vj.v5Naturaleza, true);
+      row('Deberes y responsabilidades', vj.v5Deberes, true);
+      row('Fecha de inicio', formatDate(vj.v5Inicio), true);
+      row('Remuneración anual', vj.v5Remuneracion, true);
+      row('Atención médica / forma de viaje', vj.v5Salud, true);
+      row('Medidas de seguridad del empleador', vj.v5Seguridad, true);
+      row('¿Bajo contrato o acuerdo?', vj.v5Contrato, true);
+    }
+    y += 3;
+  }
+
+  // ── INFORMACIÓN ADICIONAL ──
+  if (s.adicional) {
+    sectionHeader('Información adicional');
+    row('Comentarios', s.adicional);
+    y += 3;
+  }
+
+  // ── ARCHIVOS ADICIONALES ──
+  const archAdic = s.archivosAdjuntos?.adicionales || [];
+  if (archAdic.length) {
+    sectionHeader('Archivos adjuntos adicionales');
+    archAdic.forEach(name => {
+      checkY(4);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#373D54');
+      doc.text('• ' + name, ML + 2, y); y += 4;
+    });
+    y += 3;
+  }
+
+  // ── FIRMA ──
+  if (s.firma) {
+    checkY(36);
+    sectionHeader('Firma del asesor');
+    try {
+      doc.addImage(s.firma, 'PNG', ML, y, 90, 28);
+      y += 32;
+    } catch(e) { row('Firma', 'Incluida digitalmente en el envío'); }
+    y += 3;
+  }
+
+  // ── DISCLAIMER ──
+  checkY(18);
+  doc.setFillColor('#FFF8E8');
+  doc.setDrawColor('#F0D890'); doc.setLineWidth(0.3);
+  doc.roundedRect(ML, y, CW, 14, 1.5, 1.5, 'FD');
+  doc.setFont('helvetica','italic'); doc.setFontSize(6.5); doc.setTextColor('#7A6020');
+  const discl = 'Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.';
+  const dLines = doc.splitTextToSize(discl, CW - 8);
+  doc.text(dLines, ML + 4, y + 5);
+  y += 17;
+
+  // ── FOOTER ──
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    doc.setFillColor('#F5F9FC');
+    doc.rect(0, 285, W, 12, 'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor('#9BACCB');
+    doc.text(`OléLife · Pre-Evaluación ${s.id||''} · Página ${p} de ${pageCount}`, W/2, 291, { align:'center' });
+  }
+
+  const fname = `pre-evaluacion-${(s.prospecto?.nombre||'prospecto').replace(/\s+/g,'-').toLowerCase()}-${s.id||Date.now()}.pdf`;
+  doc.save(fname);
+  showToast('PDF descargado correctamente.');
+}
+
+// ── Toast ──────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ── Init ───────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('bo_auth') === '1') {
+    document.getElementById('login-screen').classList.add('hidden');
+    const app = document.getElementById('app-root');
+    app.style.display = 'flex';
+    loadSubmissions();
+  } else {
+    // Focus the password field for fast entry
+    setTimeout(() => document.getElementById('login-pass').focus(), 100);
+  }
+});
+</script>
+</body>
+</html>
