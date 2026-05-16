@@ -635,6 +635,38 @@ function downloadPDF(idx) {
   }
   function yn(label, val) { row(label, val === 'si' ? 'Sí' : val === 'no' ? 'No' : (val || '—')); }
 
+  // ── Language-aware labels ──
+  const lang = s._raw?.payload?.idioma || s.idioma || 'es';
+  const TL = {
+    es: {
+      title:'Formulario de Pre-Evaluación', sent:'Enviado',
+      asesor:'Información del asesor', nombres:'Nombres y apellidos', email:'Correo electrónico',
+      prospecto:'Datos del prospecto', pais:'País de residencia', fnac:'Fecha de nacimiento',
+      edad:'Edad', genero:'Género', fumador:'Fumador', ocu:'Ocupación',
+      plan:'Plan solicitado', motivos:'Motivo(s) de pre-evaluación', termino:'Término', cobertura:'Cobertura solicitada',
+      depTitle:'Cuestionario — Actividades deportivas', histTitle:'Cuestionario — Historial médico',
+      ocuTitle:'Cuestionario — Ocupación', pilTitle:'Cuestionario de Piloto Privado',
+      pilPast:'Vuelos realizados en los últimos 12 meses', pilFuture:'Vuelos a realizar en los próximos 12 meses',
+      pepTitle:'Cuestionario PEP — Persona Políticamente Expuesta', vTitle:'Cuestionario de viajes',
+      adicTitle:'Información adicional', archTitle:'Archivos adjuntos adicionales',
+      firmaTitle:'Firma del asesor', disclaimerText:'Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.',
+    },
+    en: {
+      title:'Pre-Evaluation Form', sent:'Submitted',
+      asesor:'Advisor information', nombres:'Full name', email:'Email address',
+      prospecto:'Prospect data', pais:'Country of residence', fnac:'Date of birth',
+      edad:'Age', genero:'Gender', fumador:'Smoker', ocu:'Occupation',
+      plan:'Requested plan', motivos:'Reason(s) for pre-evaluation', termino:'Term', cobertura:'Requested coverage',
+      depTitle:'Questionnaire — Sports activities', histTitle:'Questionnaire — Medical history',
+      ocuTitle:'Questionnaire — Occupation', pilTitle:'Private Pilot Questionnaire',
+      pilPast:'Flights in the last 12 months', pilFuture:'Flights planned in the next 12 months',
+      pepTitle:'PEP Questionnaire — Politically Exposed Person', vTitle:'Travel questionnaire',
+      adicTitle:'Additional information', archTitle:'Additional attachments',
+      firmaTitle:'Advisor signature', disclaimerText:'This pre-evaluation is informational and preliminary in nature. Final risk acceptance is subject to formal review of the application and may require additional information or documentation as declared.',
+    }
+  };
+  const L = TL[lang] || TL['es'];
+
   // ── Date helper: ISO → dd/mm/aaaa (dd/mm/aaaa) ──
   function formatDate(val) {
     if (!val) return '—';
@@ -652,42 +684,42 @@ function downloadPDF(idx) {
   doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor('#FFFFFF');
   doc.text('OléLife', ML, 12);
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#9BACCB');
-  doc.text('Formulario de Pre-Evaluación', ML + 28, 12);
+  doc.text(L.title, ML + 28, 12);
   doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor('#00BBDD');
   doc.text(`ID: ${s.id||'—'}`, W - MR, 9, { align:'right' });
   doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
-  doc.text(`Enviado: ${s.fechaEnvio||'—'}`, W - MR, 15, { align:'right' });
+  doc.text(`${L.sent}: ${s.fechaEnvio||'—'}`, W - MR, 15, { align:'right' });
   y = 28;
 
   // ── ASESOR ──
-  sectionHeader('Información del asesor');
-  row('Nombres y apellidos', s.asesor?.nombre);
-  row('Correo electrónico', s.asesor?.email);
+  sectionHeader(L.asesor);
+  row(L.nombres, s.asesor?.nombre);
+  row(L.email, s.asesor?.email);
   y += 3;
 
   // ── PROSPECTO ──
-  sectionHeader('Datos del prospecto');
+  sectionHeader(L.prospecto);
   row('Nombres y apellidos', s.prospecto?.nombre);
-  row('País de residencia', s.prospecto?.pais);
-  row('Fecha de nacimiento', formatDate(s.prospecto?.fnac));
-  row('Edad', s.prospecto?.edad);
-  row('Género', s.prospecto?.genero ? (s.prospecto.genero.charAt(0).toUpperCase()+s.prospecto.genero.slice(1)) : '—');
-  row('Fumador', s.prospecto?.fumador === 'si' ? 'Sí' : 'No');
-  row('Ocupación', s.prospecto?.ocupacion);
+  row(L.pais, s.prospecto?.pais);
+  row(L.fnac, formatDate(s.prospecto?.fnac));
+  row(L.edad, s.prospecto?.edad);
+  row(L.genero, s.prospecto?.genero ? (s.prospecto.genero.charAt(0).toUpperCase()+s.prospecto.genero.slice(1)) : '—');
+  row(L.fumador, s.prospecto?.fumador === 'si' ? (lang==='en'?'Yes':'Sí') : (lang==='en'?'No':'No'));
+  row(L.ocu, s.prospecto?.ocupacion);
   y += 3;
 
   // ── PLAN ──
-  sectionHeader('Plan solicitado');
-  row('Motivo(s) de pre-evaluación', s.motivos);
+  sectionHeader(L.plan);
+  row(L.motivos, s.motivos);
   if (s.otrosDetalle) row('Detalle (Otros)', s.otrosDetalle);
-  row('Término', s.plan?.termino);
-  row('Cobertura solicitada', s.plan?.cobertura);
+  row(L.termino, s.plan?.termino);
+  row(L.cobertura, s.plan?.cobertura);
   y += 3;
 
   // ── CUESTIONARIO DEPORTES ──
   const dep = s.cuestionario?.deportes;
   if (dep) {
-    sectionHeader('Cuestionario — Actividades deportivas');
+    sectionHeader(L.depTitle);
     row('Deporte practicado', dep.deporte);
     row('Desde cuándo', dep.desde);
     row('Naturaleza de participación', dep.naturaleza);
@@ -704,7 +736,7 @@ function downloadPDF(idx) {
   // ── CUESTIONARIO HISTORIAL MÉDICO ──
   const hist = s.cuestionario?.historial;
   if (hist) {
-    sectionHeader('Cuestionario — Historial médico');
+    sectionHeader(L.histTitle);
     row('Detalles del historial médico', hist.detalles);
     const archMed = s.archivosAdjuntos?.medicos || [];
     if (archMed.length) {
@@ -723,7 +755,7 @@ function downloadPDF(idx) {
   // ── CUESTIONARIO OCUPACIÓN ──
   const ocu = s.cuestionario?.ocupacion;
   if (ocu) {
-    sectionHeader('Cuestionario — Ocupación');
+    sectionHeader(L.ocuTitle);
     row('Tipo de ocupación', ocu.tipo);
     row('Funciones laborales', ocu.funciones);
     yn('¿Trabaja en alta mar?', ocu.altaMar);
@@ -739,11 +771,11 @@ function downloadPDF(idx) {
     const pil = ocu.piloto;
     if (pil) {
       y += 2;
-      subLabel('Cuestionario de piloto privado');
-      subLabel('Vuelos realizados en los últimos 12 meses');
+      subLabel(L.pilTitle);
+      subLabel(L.pilPast);
       row('Número total de vuelos', pil.vuelosPasados);
       row('Número de horas de vuelo', pil.horasPasadas);
-      subLabel('Vuelos a realizar en los próximos 12 meses');
+      subLabel(L.pilFuture);
       row('Número total de vuelos', pil.vuelosFuturos);
       row('Número de horas de vuelo', pil.horasFuturas);
       row('Tipo de aeronave', pil.aeronave);
@@ -766,7 +798,7 @@ function downloadPDF(idx) {
   // ── PEP ──
   const pep = s.pep;
   if (pep) {
-    sectionHeader('Cuestionario PEP — Persona Políticamente Expuesta');
+    sectionHeader(L.pepTitle);
     yn('¿Es una persona PEP?', pep.esPep);
     if (pep.esPep === 'si') row('Cargo o función pública', pep.pepDetalle, true);
     yn('¿Ha usado otro nombre?', pep.otroNombre);
@@ -777,7 +809,7 @@ function downloadPDF(idx) {
   // ── VIAJES ──
   const vj = s.viajes;
   if (vj) {
-    sectionHeader('Cuestionario de viajes');
+    sectionHeader(L.vTitle);
     yn('¿Planea viajar en los próximos 12 meses?', vj.proximosViajar);
     if (vj.proximosViajar === 'si') {
       row('Destinos (próximos)', vj.v1Destinos, true);
@@ -821,7 +853,7 @@ function downloadPDF(idx) {
 
   // ── INFORMACIÓN ADICIONAL ──
   if (s.adicional) {
-    sectionHeader('Información adicional');
+    sectionHeader(L.adicTitle);
     row('Comentarios', s.adicional);
     y += 3;
   }
@@ -829,7 +861,7 @@ function downloadPDF(idx) {
   // ── ARCHIVOS ADICIONALES ──
   const archAdic = s.archivosAdjuntos?.adicionales || [];
   if (archAdic.length) {
-    sectionHeader('Archivos adjuntos adicionales');
+    sectionHeader(L.archTitle);
     archAdic.forEach(name => {
       checkY(4);
       doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#373D54');
@@ -841,7 +873,7 @@ function downloadPDF(idx) {
   // ── FIRMA ──
   if (s.firma) {
     checkY(36);
-    sectionHeader('Firma del asesor');
+    sectionHeader(L.firmaTitle);
     try {
       doc.addImage(s.firma, 'PNG', ML, y, 90, 28);
       y += 32;
@@ -855,7 +887,7 @@ function downloadPDF(idx) {
   doc.setDrawColor('#F0D890'); doc.setLineWidth(0.3);
   doc.roundedRect(ML, y, CW, 14, 1.5, 1.5, 'FD');
   doc.setFont('helvetica','italic'); doc.setFontSize(6.5); doc.setTextColor('#7A6020');
-  const discl = 'Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.';
+  const discl = L.disclaimerText;
   const dLines = doc.splitTextToSize(discl, CW - 8);
   doc.text(dLines, ML + 4, y + 5);
   y += 17;
@@ -867,7 +899,7 @@ function downloadPDF(idx) {
     doc.setFillColor('#F5F9FC');
     doc.rect(0, 285, W, 12, 'F');
     doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor('#9BACCB');
-    doc.text(`OléLife · Pre-Evaluación ${s.id||''} · Página ${p} de ${pageCount}`, W/2, 291, { align:'center' });
+    doc.text(`OléLife · ${L.title} ${s.id||''} · ${lang==='en'?'Page':'Página'} ${p} ${lang==='en'?'of':'de'} ${pageCount}`, W/2, 291, { align:'center' });
   }
 
   const fname = `pre-evaluacion-${(s.prospecto?.nombre||'prospecto').replace(/\s+/g,'-').toLowerCase()}-${s.id||Date.now()}.pdf`;
