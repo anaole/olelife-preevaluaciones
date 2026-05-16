@@ -618,45 +618,92 @@ function downloadSingleFile(encodedData, filename) {
 function downloadPDF(idx) {
   const s = allSubs[idx];
   if (!s) return;
+
+  // Load Montserrat from CDN into jsPDF via VFS
+  // jsPDF ships with helvetica; we use it as fallback but override with callAddFont
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const W = 210, ML = 16, MR = 16, CW = W - ML - MR;
   let y = 0;
 
+  // Font aliases — jsPDF bundles helvetica which is metrically close to Montserrat.
+  // For true Montserrat, the font file would need to be embedded; helvetica is used here.
+  const F_REGULAR = 'helvetica';
+  const F_BOLD    = 'helvetica';
+
+  // Size constants (pt → mm conversion handled by jsPDF internally; sizes in pt)
+  const SZ_TITLE   = 12;   // section titles  (~16px visual)
+  const SZ_LABEL   = 9;    // question labels (~14px visual)
+  const SZ_VALUE   = 9;    // answer values   (~14px visual)
+  const SZ_SUB     = 8;    // sub-section labels
+  const SZ_HEADER  = 13;   // page header title
+  const SZ_TINY    = 7;    // footer / disclaimer
+
+  const C_TITLE   = '#00BBDD';   // turquoise for section headers
+  const C_LABEL   = '#9BACCB';   // grey for question labels
+  const C_VALUE   = '#373D54';   // dark for answers
+  const C_HEADER  = '#FFFFFF';
+  const C_SUBHEAD = '#00BBDD';
+
   // Helpers
   function newPage() { doc.addPage(); y = 20; }
   function checkY(needed) { if (y + needed > 278) newPage(); }
-  function hRule(col) {
-    doc.setDrawColor(col || '#E5ECF8'); doc.setLineWidth(0.2);
-    doc.line(ML, y, W - MR, y); y += 4;
-  }
+
   function sectionHeader(title) {
-    checkY(12);
+    checkY(13);
     doc.setFillColor('#E6F8FC');
-    doc.roundedRect(ML, y - 1, CW, 8, 1.5, 1.5, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor('#00699A');
-    doc.text(title.toUpperCase(), ML + 4, y + 4.5);
-    y += 11;
+    doc.roundedRect(ML, y - 1, CW, 9, 1.5, 1.5, 'F');
+    doc.setFont(F_BOLD, 'bold');
+    doc.setFontSize(SZ_TITLE);
+    doc.setTextColor(C_TITLE);
+    doc.text(title.toUpperCase(), ML + 4, y + 5.5);
+    y += 13;
   }
+
   function row(label, value, indent) {
-    const x0 = ML + (indent ? 6 : 0);
-    const labelW = 68;
-    checkY(6);
-    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
+    const x0 = ML + (indent ? 8 : 0);
+    const labelW = 72;
+    const valW = CW - labelW - (indent ? 8 : 0);
+    // Calculate lines needed for value
+    doc.setFont(F_REGULAR, 'normal');
+    doc.setFontSize(SZ_VALUE);
+    const valLines = doc.splitTextToSize(String(value || '—'), valW);
+    const rowH = 5.5 * valLines.length + 2;
+    checkY(rowH);
+    // Label
+    doc.setFont(F_BOLD, 'bold');
+    doc.setFontSize(SZ_LABEL);
+    doc.setTextColor(C_LABEL);
     doc.text(String(label), x0, y);
-    doc.setFont('helvetica','normal'); doc.setTextColor('#373D54');
-    const lines = doc.splitTextToSize(String(value || '—'), CW - labelW - (indent?6:0));
-    doc.text(lines, x0 + labelW, y);
-    y += 5 * lines.length + 1;
+    // Value
+    doc.setFont(F_REGULAR, 'normal');
+    doc.setFontSize(SZ_VALUE);
+    doc.setTextColor(C_VALUE);
+    doc.text(valLines, x0 + labelW, y);
+    y += rowH;
   }
+
   function subLabel(text) {
-    checkY(8);
-    doc.setFillColor('#F5F9FC');
-    doc.rect(ML, y - 1, CW, 7, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor('#00BBDD');
-    doc.text(text.toUpperCase(), ML + 3, y + 4);
-    y += 9;
+    checkY(9);
+    doc.setFillColor('#F0FBFD');
+    doc.rect(ML, y - 1, CW, 8, 'F');
+    doc.setFont(F_BOLD, 'bold');
+    doc.setFontSize(SZ_SUB);
+    doc.setTextColor(C_SUBHEAD);
+    doc.text(text.toUpperCase(), ML + 3, y + 4.5);
+    y += 10;
   }
-  function yn(label, val) { row(label, val === 'si' ? 'Sí' : val === 'no' ? 'No' : (val || '—')); }
+
+  // ── Date helper: always render as dd/mm/aaaa (dd/mm/aaaa) ──
+  function formatDate(val) {
+    if (!val) return '—';
+    // Already in dd/mm/aaaa format
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(val))) return `${val} (dd/mm/aaaa)`;
+    // ISO yyyy-mm-dd
+    const m = String(val).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return `${m[3]}/${m[2]}/${m[1]} (dd/mm/aaaa)`;
+    // Free text date — return as-is
+    return val;
+  }
 
   // ── Language-aware labels ──
   const lang = s._raw?.payload?.idioma || s.idioma || 'es';
@@ -778,29 +825,20 @@ function downloadPDF(idx) {
   };
   const L = TL[lang] || TL['es'];
 
-  // ── Date helper: ISO → dd/mm/aaaa (dd/mm/aaaa) ──
-  function formatDate(val) {
-    if (!val) return '—';
-    // val can be ISO "1991-03-31" or already formatted
-    const m = String(val).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (m) return `${m[3]}/${m[2]}/${m[1]} (dd/mm/aaaa)`;
-    return val; // already a freetext date, return as-is
-  }
-
   // ── HEADER ──
   doc.setFillColor('#373D54');
-  doc.rect(0, 0, W, 20, 'F');
+  doc.rect(0, 0, W, 22, 'F');
   doc.setFillColor('#00BBDD');
-  doc.rect(0, 20, W, 2, 'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor('#FFFFFF');
-  doc.text('OléLife', ML, 12);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor('#9BACCB');
-  doc.text(L.title, ML + 28, 12);
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor('#00BBDD');
-  doc.text(`ID: ${s.id||'—'}`, W - MR, 9, { align:'right' });
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
-  doc.text(`${L.sent}: ${s.fechaEnvio||'—'}`, W - MR, 15, { align:'right' });
-  y = 28;
+  doc.rect(0, 22, W, 2, 'F');
+  doc.setFont(F_BOLD, 'bold'); doc.setFontSize(SZ_HEADER); doc.setTextColor(C_HEADER);
+  doc.text('OléLife', ML, 13);
+  doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(10); doc.setTextColor('#9BACCB');
+  doc.text(L.title, ML + 30, 13);
+  doc.setFont(F_BOLD, 'bold'); doc.setFontSize(8); doc.setTextColor('#00BBDD');
+  doc.text(`ID: ${s.id||'—'}`, W - MR, 10, { align:'right' });
+  doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(8); doc.setTextColor('#9BACCB');
+  doc.text(`${L.sent}: ${s.fechaEnvio||'—'}`, W - MR, 17, { align:'right' });
+  y = 30;
 
   // ── ASESOR ──
   sectionHeader(L.asesor);
@@ -996,12 +1034,12 @@ function downloadPDF(idx) {
   checkY(18);
   doc.setFillColor('#FFF8E8');
   doc.setDrawColor('#F0D890'); doc.setLineWidth(0.3);
-  doc.roundedRect(ML, y, CW, 14, 1.5, 1.5, 'FD');
-  doc.setFont('helvetica','italic'); doc.setFontSize(6.5); doc.setTextColor('#7A6020');
+  doc.roundedRect(ML, y, CW, 16, 1.5, 1.5, 'FD');
+  doc.setFont(F_REGULAR, 'italic'); doc.setFontSize(SZ_TINY); doc.setTextColor('#7A6020');
   const discl = L.disclaimerText;
   const dLines = doc.splitTextToSize(discl, CW - 8);
   doc.text(dLines, ML + 4, y + 5);
-  y += 17;
+  y += 19;
 
   // ── FOOTER ──
   const pageCount = doc.internal.getNumberOfPages();
@@ -1009,7 +1047,7 @@ function downloadPDF(idx) {
     doc.setPage(p);
     doc.setFillColor('#F5F9FC');
     doc.rect(0, 285, W, 12, 'F');
-    doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor('#9BACCB');
+    doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(SZ_TINY); doc.setTextColor('#9BACCB');
     doc.text(`OléLife · ${L.title} ${s.id||''} · ${lang==='en'?'Page':'Página'} ${p} ${lang==='en'?'of':'de'} ${pageCount}`, W/2, 291, { align:'center' });
   }
 
@@ -1041,3 +1079,4 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
