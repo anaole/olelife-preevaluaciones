@@ -57,12 +57,13 @@
     @media(max-width:639px){.workspace{padding:16px;}}
 
     /* Page header */
-    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+    .page-header{margin-bottom:20px;}
     .page-title{font:700 22px/28px var(--font);color:var(--color-dark-blue);}
-    .page-subtitle{font:400 13px/18px var(--font);color:var(--color-medium-grey);margin-top:4px;}
+    .page-subtitle{font:400 13px/18px var(--font);color:var(--color-medium-grey);margin-top:4px;margin-bottom:16px;}
 
-    /* Search bar */
-    .search-bar{background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-input);display:flex;align-items:center;gap:10px;padding:0 14px;height:40px;width:100%;max-width:400px;transition:border-color 150ms,box-shadow 150ms;}
+    /* Search row */
+    .search-row{display:flex;align-items:center;gap:10px;}
+    .search-bar{background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-input);display:flex;align-items:center;gap:10px;padding:0 14px;height:40px;flex:1;min-width:0;transition:border-color 150ms,box-shadow 150ms;}
     .search-bar:focus-within{border-color:var(--color-dark-grey);box-shadow:0 0 0 3px rgba(0,187,221,.15);}
     .search-bar svg{stroke:var(--color-medium-grey);flex-shrink:0;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
     .search-bar input{border:none;outline:none;font:400 13px/1 var(--font);color:var(--color-dark-grey);background:transparent;width:100%;}
@@ -234,18 +235,16 @@
 <div class="app-body">
   <main class="workspace">
     <div class="page-header">
-      <div>
-        <div class="page-title">Pre-evaluaciones recibidas</div>
-        <div class="page-subtitle">Busca, descarga el PDF completo, archivos adjuntos o elimina registros.</div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div class="page-title">Pre-evaluaciones recibidas</div>
+      <div class="page-subtitle">Busca, descarga el PDF completo, archivos adjuntos o elimina registros.</div>
+      <div class="search-row">
         <div class="search-bar">
           <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" id="search-input" placeholder="Buscar por asesor, prospecto o ID..." oninput="filterTable()">
         </div>
-        <button class="btn btn-primary" onclick="loadSubmissions()">
+        <button class="btn" onclick="loadSubmissions()" style="flex-shrink:0;background:#373D54;color:#fff;border:none;">
           <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Cargar envíos
+          Actualizar
         </button>
       </div>
     </div>
