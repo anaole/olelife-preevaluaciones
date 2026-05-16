@@ -948,5 +948,16 @@ function resetAll() {
   clearSig(); showScreen(1);
 }
 </script>
+  <script>
+  // Comunica la altura real al padre (WordPress) cada vez que cambia
+  function sendHeight() {
+    const h = document.documentElement.scrollHeight;
+    window.parent.postMessage({ iframeHeight: h }, '*');
+  }
+  // Observa cambios de tamaño en el contenido
+  const ro = new ResizeObserver(sendHeight);
+  ro.observe(document.body);
+  window.addEventListener('load', sendHeight);
+</script>
 </body>
 </html>
