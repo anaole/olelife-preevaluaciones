@@ -551,7 +551,8 @@ async function confirmDelete() {
 function openFilesDrawer(idx) {
   const s = allSubs[idx];
   const prospecto = (s.prospecto?.nombre || 'prospecto').trim();
-  const slug = prospecto.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const idSlug = s.id || 'PREV';
+  const prospSlug = prospecto.replace(/\s+/g, '-');
 
   // Build grouped file list with labels
   const groups = [];
@@ -576,7 +577,7 @@ function openFilesDrawer(idx) {
         <div class="drawer-group-label">${g.label} (${g.files.length})</div>
         ${g.files.map((f, fi) => {
           const ext = (f.name || '').split('.').pop().toUpperCase();
-          const prefixedName = `pre-evaluacion-${slug}-${f.name}`;
+          const prefixedName = `${idSlug}-${prospSlug}-${f.name}`;
           const encodedData = f.data ? encodeURIComponent(f.data) : '';
           return `<div class="file-row">
             <div class="file-row-icon">
@@ -924,7 +925,7 @@ function downloadPDF(idx) {
     doc.text(`OléLife · ${L.title} ${s.id||''} · ${lang==='en'?'Page':'Página'} ${p} ${lang==='en'?'of':'de'} ${pageCount}`, W/2, 291, { align:'center' });
   }
 
-  const fname = `pre-evaluacion-${(s.prospecto?.nombre||'prospecto').replace(/\s+/g,'-').toLowerCase()}-${s.id||Date.now()}.pdf`;
+  const fname = `${s.id}-${(s.prospecto?.nombre||'prospecto').replace(/\s+/g,'-')}-SolicitudDePreEvaluacion.pdf`;
   doc.save(fname);
   showToast('PDF descargado correctamente.');
 }
@@ -952,3 +953,4 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
