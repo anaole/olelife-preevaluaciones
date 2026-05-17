@@ -21,60 +21,132 @@
     }
     body { font-family: var(--font); background: var(--color-shell); color: var(--color-dark-grey); min-height: 100vh; }
 
-    /* ── HEADER ── */
+    /* ── HEADER BANNER ── */
     .site-header {
       position: sticky; top: 0; z-index: 50;
-      background: linear-gradient(135deg, #2A3048 0%, #373D54 60%, #2C3A5C 100%);
-      box-shadow: 0 4px 20px rgba(0,0,0,.3);
-      padding: 20px 24px;
+      background: linear-gradient(120deg, #1E2540 0%, #2A3254 40%, #1E3060 100%);
+      box-shadow: 0 4px 24px rgba(0,0,0,.35);
+      padding: 0 24px;
       display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 16px;
+      grid-template-rows: auto 1fr;
     }
-    @media (min-width: 768px) { .site-header { padding: 24px 40px; } }
+    @media (min-width: 768px) { .site-header { padding: 0 40px; } }
 
-    .header-left { display: flex; align-items: center; }
+    /* Top bar: logo + lang */
+    .header-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 14px; padding-bottom: 2px;
+    }
 
-    .header-center {
+    /* Content area: centered title + subtitle + disclaimer */
+    .header-content {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      text-align: center; padding: 8px 0;
+      text-align: center;
+      padding-bottom: 18px;
     }
-    .header-title { font: 700 16px/1.2 var(--font); color: var(--color-white); }
+    @media (min-width: 768px) { .header-content { padding-bottom: 22px; } }
+
+    .header-title {
+      font: 800 18px/1.2 var(--font);
+      color: var(--color-white);
+      letter-spacing: -.2px;
+      margin-bottom: 4px;
+    }
+    @media (min-width: 768px) { .header-title { font-size: 22px; margin-bottom: 5px; } }
+
     .header-desc {
-      font: 400 12px/1.5 var(--font); color: rgba(255,255,255,.55);
-      margin-top: 6px; max-width: 480px; display: none;
+      font: 400 12px/1.5 var(--font);
+      color: rgba(255,255,255,.65);
+      max-width: 480px;
+      margin-bottom: 8px;
     }
-    @media (min-width: 640px) { .header-desc { display: block; } }
-    @media (min-width: 768px) { .header-title { font-size: 18px; } .header-desc { font-size: 13px; margin-top: 8px; } }
+    @media (min-width: 768px) { .header-desc { font-size: 13px; margin-bottom: 10px; } }
+
+    .header-disclaimer-pill {
+      display: none; /* hidden on mobile */
+      align-items: center; gap: 7px;
+      border: 1.5px solid rgba(0,187,221,.5);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font: 600 11px/1.3 var(--font);
+      color: var(--color-turquoise);
+    }
+    @media (min-width: 640px) { .header-disclaimer-pill { display: inline-flex; } }
 
     /* ── LANGUAGE SELECTOR ── */
     .lang-selector { display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 999px; padding: 4px; flex-shrink: 0; }
-    .lang-btn { height: 30px; padding: 0 12px; border-radius: 999px; border: none; background: transparent; font: 700 12px/1 var(--font); color: rgba(255,255,255,.55); cursor: pointer; transition: background 150ms, color 150ms; display: flex; align-items: center; gap: 5px; }
+    .lang-btn { height: 28px; padding: 0 10px; border-radius: 999px; border: none; background: transparent; font: 700 11px/1 var(--font); color: rgba(255,255,255,.55); cursor: pointer; transition: background 150ms, color 150ms; display: flex; align-items: center; gap: 5px; }
     .lang-btn:hover { color: white; }
     .lang-btn.active { background: rgba(255,255,255,.15); color: white; }
-    .lang-flag { font-size: 14px; line-height: 1; }
+    .lang-flag { font-size: 13px; line-height: 1; }
 
-    /* ── DISCLAIMER ── */
-    .disclaimer { background: #FFF4E4; border-top: 1px solid #F0D890; padding: 10px 24px; font: 400 11px/16px var(--font); color: #F79E1B; display: flex; align-items: flex-start; gap: 8px; }
-    @media (min-width: 768px) { .disclaimer { padding: 10px 40px; } }
-    .disclaimer svg { flex-shrink: 0; margin-top: 1px; }
+    /* ── INFO BUTTON ── */
+    .info-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 32px; padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.75);
+      font: 600 11px/1 var(--font);
+      cursor: pointer;
+      transition: background 150ms, color 150ms, border-color 150ms;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .info-btn:hover { background: rgba(255,255,255,.14); color: white; border-color: rgba(255,255,255,.35); }
+    .info-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .info-btn-label { display: none; }
+    @media (min-width: 540px) { .info-btn-label { display: inline; } }
+
+    /* ── INFO MODAL ── */
+    .info-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(30,37,64,.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
+    .info-overlay.open { display: flex; }
+    .info-modal {
+      background: var(--color-white); border-radius: 16px;
+      padding: 32px 28px 28px; max-width: 460px; width: 100%;
+      box-shadow: 0 24px 64px rgba(0,0,0,.25);
+      position: relative; animation: modalIn 200ms ease-out;
+    }
+    @keyframes modalIn { from { opacity:0; transform:scale(.96) translateY(8px); } to { opacity:1; transform:none; } }
+    .info-modal-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--color-turquoise-soft);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .info-modal-icon svg { width: 22px; height: 22px; stroke: var(--color-turquoise); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .info-modal-title { font: 700 17px/1.3 var(--font); color: var(--color-dark-blue); margin-bottom: 14px; }
+    .info-modal-body { font: 400 13px/1.7 var(--font); color: var(--color-dark-grey); }
+    .info-modal-body p + p { margin-top: 12px; }
+    .info-modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 32px; height: 32px; border-radius: 8px;
+      border: none; background: var(--color-shell);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--color-medium-grey); transition: background 150ms;
+    }
+    .info-modal-close:hover { background: var(--color-bg-grey); color: var(--color-dark-grey); }
+    .info-modal-close svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .info-modal-footer { margin-top: 22px; }
+    .info-modal-footer button { width: 100%; height: 42px; border-radius: var(--radius-button); background: var(--color-turquoise); color: white; border: none; font: 700 13px/1 var(--font); cursor: pointer; transition: background 150ms; }
+    .info-modal-footer button:hover { background: #00A5C4; }
     .info-banner { background: var(--color-turquoise-soft); border-left: 3px solid var(--color-turquoise); border-radius: 0 var(--radius-input) var(--radius-input) 0; padding: 12px 16px; font: 400 12px/18px var(--font); color: var(--color-dark-blue); margin-bottom: 14px; display: flex; gap: 10px; align-items: flex-start; }
     .info-banner svg { flex-shrink: 0; }
-    .workspace { padding: 24px 16px 64px; }
+    .workspace { padding: 28px 16px 64px; }
     @media (min-width: 768px) { .workspace { padding: 32px 24px 80px; } }
     .workspace-inner { max-width: 720px; margin: 0 auto; }
     .progress-wrap { margin-bottom: 24px; }
     .progress-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
     .progress-top span { font: 600 12px/14px var(--font); color: var(--color-medium-grey); }
-    .progress-top strong { font: 700 12px/14px var(--font); color: var(--color-turquoise); }
-    .progress-bar { height: 4px; border-radius: 999px; background: var(--color-bg-grey); overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 999px; background: var(--color-turquoise); transition: width 350ms ease-out; }
+    .progress-top strong { font: 700 12px/14px var(--font); color: var(--color-green); }
+    .progress-bar { height: 8px; border-radius: 999px; background: var(--color-bg-grey); overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 999px; background: var(--color-green); transition: width 350ms ease-out; }
     .card { background: var(--color-white); border-radius: var(--radius-card); border: 1px solid var(--color-light-grey); box-shadow: var(--shadow-card); padding: 20px 16px; margin-bottom: 16px; }
     @media (min-width: 768px) { .card { padding: 32px; } }
     @media (min-width: 1024px) { .card { padding: 40px; } }
-    .eyebrow { font: 800 11px/14px var(--font); color: var(--color-turquoise); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+    .eyebrow { font: 800 11px/14px var(--font); color: var(--color-green); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
     .card-title { font: 700 20px/26px var(--font); color: var(--color-dark-blue); margin-bottom: 6px; }
     @media (min-width: 768px) { .card-title { font-size: 24px; line-height: 30px; } }
     .card-sub { font: 400 13px/20px var(--font); color: var(--color-medium-grey); margin-bottom: 28px; }
@@ -172,7 +244,8 @@
 <body>
 
 <header class="site-header">
-  <div class="header-left">
+  <!-- Top bar: logo left, info btn + lang right -->
+  <div class="header-topbar">
     <svg width="74" height="30" viewBox="0 0 62 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="OléLife">
       <g clip-path="url(#hclip)">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M29.4491 6.14253C31.7293 6.14253 33.6253 6.91387 35.1361 8.48465C36.6769 10.0273 37.4474 11.9536 37.4474 14.2365C37.4474 16.5194 36.6769 18.4176 35.1361 19.9883C33.6253 21.531 31.7303 22.3023 29.4491 22.3023C27.1679 22.3023 25.2729 21.531 23.732 19.9883C22.2212 18.4176 21.4538 16.5194 21.4538 14.2365C21.4538 11.9536 22.2223 10.0273 23.732 8.48465C25.2729 6.91387 27.1689 6.14253 29.4491 6.14253ZM29.4491 3.47401C26.4586 3.47401 23.9106 4.51149 21.836 6.61759C19.7645 8.69155 18.7262 11.2436 18.7262 14.2365C18.7262 17.2294 19.7645 19.7533 21.836 21.8584C23.9096 23.9635 26.4586 25 29.4491 25C32.4396 25 34.9876 23.9625 37.0622 21.8584C39.1648 19.7533 40.2001 17.2324 40.2001 14.2365C40.2001 11.2406 39.1638 8.69155 37.0622 6.61759C34.9886 4.51048 32.4416 3.47401 29.4491 3.47401Z" fill="white"/>
@@ -183,37 +256,63 @@
       </g>
       <defs><clipPath id="hclip"><rect width="62" height="25" fill="white"/></clipPath></defs>
     </svg>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="info-btn" onclick="openInfoModal()" id="info-btn">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="info-btn-label" id="info-btn-label">¿Qué es una pre-evaluación?</span>
+      </button>
+      <div class="lang-selector">
+        <button class="lang-btn active" id="lang-es" onclick="setLang('es')"><span class="lang-flag">🇪🇸</span> ES</button>
+        <button class="lang-btn" id="lang-en" onclick="setLang('en')"><span class="lang-flag">🇺🇸</span> EN</button>
+      </div>
+    </div>
   </div>
-  <div class="header-center">
+
+  <!-- Content: title, subtitle, disclaimer pill -->
+  <div class="header-content">
     <div class="header-title" id="hdr-title">Formulario de Pre-Evaluación</div>
-    <div class="header-desc" id="hdr-desc">Completa la información de tu prospecto para recibir una respuesta inicial sobre su elegibilidad y asegurabilidad.</div>
-  </div>
-  <div class="lang-selector">
-    <button class="lang-btn active" id="lang-es" onclick="setLang('es')"><span class="lang-flag">🇪🇸</span> ES</button>
-    <button class="lang-btn" id="lang-en" onclick="setLang('en')"><span class="lang-flag">🇺🇸</span> EN</button>
+    <div class="header-desc" id="hdr-desc">Completa la información de tu prospecto para recibir una evaluación preliminar sobre su asegurabilidad.</div>
+    <div class="header-disclaimer-pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="disclaimer-text">Recuerda que la aprobación final estará sujeta al análisis formal de la solicitud</span>
+    </div>
   </div>
 </header>
 
-<div class="disclaimer">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F79E1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-  <span id="disclaimer-text"><strong>Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.</strong></span>
+<!-- ── INFO MODAL ── -->
+<div class="info-overlay" id="info-overlay" onclick="handleOverlayClick(event)">
+  <div class="info-modal" id="info-modal">
+    <button class="info-modal-close" onclick="closeInfoModal()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="info-modal-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div class="info-modal-title" id="info-modal-title">¿Qué es una pre-evaluación?</div>
+    <div class="info-modal-body" id="info-modal-body">
+      <p>La pre-evaluación es una revisión inicial y referencial del perfil de tu prospecto. Con la información proporcionada nuestro equipo puede analizar su asegurabilidad y brindarte una respuesta preliminar.</p>
+      <p>Sin embargo, es importante comprender que la pre-evaluación no garantiza la aprobación de la póliza. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.</p>
+    </div>
+    <div class="info-modal-footer">
+      <button onclick="closeInfoModal()" id="info-modal-close-btn">Entendido</button>
+    </div>
+  </div>
 </div>
 
-<main class="workspace">
+<div class="workspace" id="main-workspace">
 <div class="workspace-inner">
 
   <div class="progress-wrap">
     <div class="progress-top">
-      <span id="prog-label">Paso 1 de 6 — Motivo y asesor</span>
-      <strong id="prog-pct">17%</strong>
+      <span id="prog-label">Paso 1 de 4 — Motivo y Asesor</span>
+      <strong id="prog-pct">25%</strong>
     </div>
-    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:17%"></div></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:25%"></div></div>
   </div>
 
   <!-- ════ S1: MOTIVO + ASESOR ════ -->
   <div class="screen active" id="s1">
     <div class="card">
-      <div class="eyebrow" id="s1-eyebrow">Paso 1 de 6</div>
       <h2 class="card-title" id="s1-title">Motivo de la pre-evaluación</h2>
       <p class="card-sub" id="s1-sub">¿Por qué estás solicitando la pre-evaluación para tu prospecto? Puedes seleccionar más de una opción.</p>
       <div class="motivo-grid">
@@ -271,7 +370,6 @@
   <!-- ════ S2: PROSPECTO + PLAN ════ -->
   <div class="screen" id="s2">
     <div class="card">
-      <div class="eyebrow" id="s2-eyebrow">Paso 2 de 6</div>
       <h2 class="card-title" id="s2-title">Información del prospecto</h2>
       <p class="card-sub" id="s2-sub">Datos personales del prospecto y plan solicitado.</p>
       <div class="section-title" id="datos-section">Datos personales</div>
@@ -350,8 +448,8 @@
 
     <!-- Deportes -->
     <div id="q-deportes" class="card" style="display:none;">
-      <div class="eyebrow" id="dep-eyebrow">Cuestionario</div>
       <h2 class="card-title" id="dep-title">Actividades deportivas</h2>
+      <p class="card-sub" id="dep-sub">Proporciona información sobre las actividades deportivas del prospecto.</p>
       <div class="field-row">
         <div class="field-group field-full"><label class="field-label" for="dep-cual"><span id="dep-cual-label">¿Qué deporte practica el prospecto?</span> <span class="required-star">*</span></label><input class="field-input" type="text" id="dep-cual" placeholder="Ej. Escalada, ciclismo de montaña"><div class="field-error" id="err-dep-cual">Obligatorio.</div></div>
         <div class="field-group"><label class="field-label" for="dep-desde"><span id="dep-desde-label">¿Desde cuándo lo practica?</span> <span class="required-star">*</span></label><input class="field-input" type="text" id="dep-desde" placeholder="Ej. Desde 2015"><div class="field-error" id="err-dep-desde">Obligatorio.</div></div>
@@ -384,8 +482,8 @@
 
     <!-- Historial médico -->
     <div id="q-historial" class="card" style="display:none;">
-      <div class="eyebrow" id="med-eyebrow">Cuestionario</div>
       <h2 class="card-title" id="med-title">Historial médico</h2>
+      <p class="card-sub" id="med-sub">Proporciona información sobre enfermedades, condiciones médicas, diagnósticos o cualquier antecedente de salud del prospecto.</p>
       <div class="field-row">
         <div class="field-group field-full"><label class="field-label" for="med-detalles"><span id="med-det-label">Detalles del historial médico</span> <span class="required-star">*</span></label><textarea class="field-input" id="med-detalles" rows="4" placeholder="Describe diagnósticos, tratamientos, cirugías u otras condiciones relevantes..."></textarea><div class="field-error" id="err-med-detalles">Obligatorio.</div></div>
         <div class="field-group field-full">
@@ -403,8 +501,8 @@
 
     <!-- Ocupación -->
     <div id="q-ocupacion" class="card" style="display:none;">
-      <div class="eyebrow" id="ocu-eyebrow">Cuestionario</div>
       <h2 class="card-title" id="ocu-title">Ocupación</h2>
+      <p class="card-sub" id="ocu-sub">Proporciona información sobre la ocupación de tu prospecto.</p>
       <div class="field-row">
         <div class="field-group field-full"><label class="field-label" for="ocu-tipo"><span id="ocu-tipo-label">¿Cuál describe mejor su ocupación?</span> <span class="required-star">*</span></label><select class="field-input" id="ocu-tipo" onchange="checkPiloto()"><option value="" disabled selected>Selecciona</option><option>Abastecimiento</option><option>Administrativo (en oficina)</option><option>Andamiero</option><option>Buzo comercial</option><option>Capataz</option><option>Científico/técnico</option><option>Electricista</option><option>Gerencia (en oficina)</option><option>Ingeniero</option><option>Mecánico/mantenimiento</option><option>Peón de obra</option><option value="Piloto">Piloto</option><option>Profesional de la salud</option><option>Topógrafo</option><option>Trabajador de producción</option><option>Ninguna de las anteriores</option></select><div class="field-error" id="err-ocu-tipo">Obligatorio.</div></div>
         <div class="field-group field-full"><label class="field-label" for="ocu-funciones"><span id="ocu-funciones-label">Describe tus funciones laborales</span> <span class="required-star">*</span></label><textarea class="field-input" id="ocu-funciones" rows="3" placeholder="Describe brevemente tus tareas y responsabilidades..."></textarea><div class="field-error" id="err-ocu-funciones">Obligatorio.</div></div>
@@ -455,9 +553,8 @@
   <!-- ════ S4: PEP ════ -->
   <div class="screen" id="s4">
     <div class="card">
-      <div class="eyebrow" id="pep-eyebrow">Obligatorio — Paso 4 de 6</div>
       <h2 class="card-title" id="pep-title">Cuestionario PEP</h2>
-      <p class="card-sub" id="pep-sub">Persona Políticamente Expuesta. Obligatorio para todos los prospectos.</p>
+      <p class="card-sub" id="pep-sub">Las Personas Expuestas Políticamente (PEP) son individuos quienes son o han sido, en cierto momento, encargados de desempeñar funciones públicas de un estado, departamento, provincia o país.</p>
       <div class="yn-stack">
         <div class="field-group"><label class="field-label"><span id="pep-label">¿El prospecto es una persona PEP?</span> <span class="required-star">*</span></label><div class="radio-group" id="rg-pep"><label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="si"><span class="radio-dot"></span><span id="pep-si">Sí</span></label><label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="no"><span class="radio-dot"></span><span id="pep-no">No</span></label></div><div class="conditional-block" id="cond-pep"><div class="field-group"><label class="field-label" for="pep-det"><span id="pep-det-label">Cargo o función pública</span> <span class="required-star">*</span></label><textarea class="field-input" id="pep-det" placeholder="Describe cargo, institución y período..."></textarea></div></div><div class="field-error" id="err-pep">Selecciona una opción.</div></div>
         <div class="field-group"><label class="field-label"><span id="pep-nom-label">¿Ha usado otro nombre?</span> <span class="required-star">*</span></label><div class="radio-group" id="rg-pep-nom"><label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="si"><span class="radio-dot"></span><span id="pep-nom-si">Sí</span></label><label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="no"><span class="radio-dot"></span><span id="pep-nom-no">No</span></label></div><div class="conditional-block" id="cond-pep-nom"><div class="field-group"><label class="field-label" for="pep-nom-det"><span id="pep-nom-det-label">Nombre o nombres utilizados</span> <span class="required-star">*</span></label><input class="field-input" type="text" id="pep-nom-det" placeholder="Nombre(s) alternativo(s)"></div></div><div class="field-error" id="err-pep-nom">Selecciona una opción.</div></div>
@@ -472,7 +569,6 @@
   <!-- ════ S5: VIAJES (expanded) ════ -->
   <div class="screen" id="s5">
     <div class="card">
-      <div class="eyebrow" id="v-eyebrow">Obligatorio — Paso 5 de 6</div>
       <h2 class="card-title" id="v-title">Cuestionario de viajes</h2>
       <p class="card-sub" id="v-sub">Información sobre planes de viaje y residencia del prospecto.</p>
       <div class="yn-stack">
@@ -581,7 +677,6 @@
   <!-- ════ S6: ADICIONAL + FIRMA ════ -->
   <div class="screen" id="s6">
     <div class="card">
-      <div class="eyebrow" id="s6-eyebrow">Paso 6 de 6</div>
       <h2 class="card-title" id="s6-title">Información adicional y envío</h2>
       <div class="field-row">
         <div class="field-group field-full">
@@ -638,7 +733,8 @@
     </div>
   </div>
 
-</div>
+</div><!-- /workspace-inner -->
+</div><!-- /workspace -->
 </main>
 
 <script>
@@ -659,6 +755,18 @@ const ro = new ResizeObserver(sendHeight);
 document.addEventListener('DOMContentLoaded', () => ro.observe(document.body));
 const MOTIVO_NAMES = {deportes:'Actividades deportivas',historial:'Historial médico',ocupacion:'Ocupación',otros:'Otros'};
 
+function openInfoModal() {
+  document.getElementById('info-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeInfoModal() {
+  document.getElementById('info-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('info-overlay')) closeInfoModal();
+}
+
 // ─── i18n ─────────────────────────────────────────────────
 let LANG = 'es';
 
@@ -666,13 +774,21 @@ const T = {
   es: {
     // Header / disclaimer
     hdrTitle: 'Formulario de Pre-Evaluación',
-    hdrDesc: 'Completa la información de tu prospecto para recibir una respuesta inicial sobre su elegibilidad y asegurabilidad.',
-    disclaimer: 'Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.',
+    hdrDesc: 'Completa la información de tu prospecto para recibir una evaluación preliminar sobre su asegurabilidad.',
+    disclaimer: 'Recuerda que la aprobación final estará sujeta al análisis formal de la solicitud',
+    infoBtn: '¿Qué es una pre-evaluación?',
+    infoTitle: '¿Qué es una pre-evaluación?',
+    infoBody1: 'La pre-evaluación es una revisión inicial y referencial del perfil de tu prospecto. Con la información proporcionada nuestro equipo puede analizar su asegurabilidad y brindarte una respuesta preliminar.',
+    infoBody2: 'Sin embargo, es importante comprender que la pre-evaluación no garantiza la aprobación de la póliza. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.',
+    infoClose: 'Entendido',
     // Progress labels
     progLabels: {
-      1:'Paso 1 de 6 — Motivo y asesor', 2:'Paso 2 de 6 — Datos del prospecto',
-      3:'Paso 3 de 6 — Cuestionarios dinámicos', 4:'Paso 4 de 6 — Cuestionario PEP',
-      5:'Paso 5 de 6 — Cuestionario de viajes', 6:'Paso 6 de 6 — Información adicional y firma',
+      1:'Paso 1 de 4 — Motivo y Asesor',
+      2:'Paso 2 de 4 — Información del Prospecto',
+      3:'Paso 3 de 4 — Cuestionarios',
+      4:'Paso 3 de 4 — Cuestionarios',
+      5:'Paso 3 de 4 — Cuestionarios',
+      6:'Paso 4 de 4 — Información Adicional y Firma',
       confirm: 'Completado',
     },
     // Step 1
@@ -701,7 +817,8 @@ const T = {
     coberturaLabel: 'Cobertura', coberturaHint: 'Entre USD 100,000 y USD 10,000,000.',
     coberturaPlaceholder: '100,000',
     // Step 3 — Deportes
-    depEyebrow: 'Cuestionario', depTitle: 'Actividades deportivas',
+    depEyebrow: 'Cuestionario', depTitle: 'Cuestionario de Actividades Deportivas',
+    depSub: 'Proporciona información sobre las actividades deportivas del prospecto.',
     depCualLabel: '¿Qué deporte practica el prospecto?', depCualPlaceholder: 'Ej. Escalada, ciclismo de montaña',
     depDesdeLabel: '¿Desde cuándo lo practica?', depDesdePlaceholder: 'Ej. Desde 2015',
     depNaturalezaLabel: 'Naturaleza de participación', depNaturalezaDefault: 'Selecciona',
@@ -714,12 +831,14 @@ const T = {
     depLesionesLabel: '¿Ha tenido lesiones derivadas del deporte?',
     depLesionesDetLabel: 'Proporciona más detalles', depLesionesDetPlaceholder: 'Describe las lesiones...',
     // Step 3 — Historial
-    medEyebrow: 'Cuestionario', medTitle: 'Historial médico',
+    medEyebrow: 'Cuestionario', medTitle: 'Cuestionario de Historial Médico',
+    medSub: 'Proporciona información sobre enfermedades, condiciones médicas, diagnósticos o cualquier antecedente de salud del prospecto.',
     medDetLabel: 'Detalles del historial médico', medDetPlaceholder: 'Describe diagnósticos, tratamientos, cirugías u otras condiciones relevantes...',
     medDocsLabel: 'Adjuntar documentos médicos', medDocsNote: '(mínimo 1 archivo)',
     dropClick: 'Haz clic o arrastra archivos aquí', dropHint: 'PDF, JPG, PNG · Máx. 10 MB por archivo',
     // Step 3 — Ocupación
-    ocuEyebrow: 'Cuestionario', ocuTitle: 'Ocupación',
+    ocuEyebrow: 'Cuestionario', ocuTitle: 'Cuestionario de Ocupación',
+    ocuSub: 'Proporciona información sobre la ocupación de tu prospecto.',
     ocuTipoLabel: '¿Cuál describe mejor su ocupación?', ocuTipoDefault: 'Selecciona',
     ocuFuncionesLabel: 'Describe tus funciones laborales', ocuFuncionesPlaceholder: 'Describe brevemente tus tareas y responsabilidades...',
     ocuMarLabel: '¿Trabaja actualmente en alta mar?', ocuAlturaLabel: '¿Trabaja en altura?',
@@ -737,14 +856,14 @@ const T = {
     pilMotLabel: '¿Vuela por motivos distintos al placer?', pilAcroLabel: '¿Participa en vuelos acrobáticos?',
     pilAccLabel: '¿Ha tenido accidentes o suspensión de licencia?',
     // Step 4 PEP
-    pepEyebrow: 'Obligatorio — Paso 4 de 6', pepTitle: 'Cuestionario PEP',
-    pepSub: 'Persona Políticamente Expuesta. Obligatorio para todos los prospectos.',
+    pepEyebrow: 'Obligatorio — Paso 4 de 6', pepTitle: 'Cuestionario de PEP',
+    pepSub: 'Las Personas Expuestas Políticamente (PEP) son individuos quienes son o han sido, en cierto momento, encargados de desempeñar funciones públicas de un estado, departamento, provincia o país.',
     pepLabel: '¿El prospecto es una persona PEP?',
     pepDetLabel: 'Cargo o función pública', pepDetPlaceholder: 'Describe cargo, institución y período...',
     pepNomLabel: '¿Ha usado otro nombre?',
     pepNomDetLabel: 'Nombre o nombres utilizados', pepNomDetPlaceholder: 'Nombre(s) alternativo(s)',
     // Step 5 Viajes
-    vEyebrow: 'Obligatorio — Paso 5 de 6', vTitle: 'Cuestionario de viajes',
+    vEyebrow: 'Obligatorio — Paso 5 de 6', vTitle: 'Cuestionario de Viajes',
     vSub: 'Información sobre planes de viaje y residencia del prospecto.',
     v1Label: '¿Planea viajar en los próximos 12 meses?',
     v2Label: '¿Ha viajado en los últimos 12 meses?',
@@ -824,12 +943,20 @@ const T = {
   },
   en: {
     hdrTitle: 'Pre-Evaluation Form',
-    hdrDesc: 'Complete your prospect\'s information to receive an initial response about their eligibility and insurability.',
-    disclaimer: 'This pre-evaluation is informational and preliminary in nature. Final risk acceptance is subject to formal review of the application and may require additional information or documentation as declared.',
+    hdrDesc: 'Complete your prospect\'s information to receive a preliminary evaluation of their insurability.',
+    disclaimer: 'Remember that final approval will be subject to formal review of the application',
+    infoBtn: 'What is a pre-evaluation?',
+    infoTitle: 'What is a pre-evaluation?',
+    infoBody1: 'The pre-evaluation is an initial and referential review of your prospect\'s profile. With the information provided, our team can analyze their insurability and give you a preliminary response.',
+    infoBody2: 'However, it is important to understand that the pre-evaluation does not guarantee policy approval. Final risk acceptance is subject to formal review of the application, and additional information or documentation may be required as declared.',
+    infoClose: 'Understood',
     progLabels: {
-      1:'Step 1 of 6 — Reason & advisor', 2:'Step 2 of 6 — Prospect data',
-      3:'Step 3 of 6 — Additional questionnaires', 4:'Step 4 of 6 — PEP questionnaire',
-      5:'Step 5 of 6 — Travel questionnaire', 6:'Step 6 of 6 — Additional info & signature',
+      1:'Step 1 of 4 — Reason & Advisor',
+      2:'Step 2 of 4 — Prospect Information',
+      3:'Step 3 of 4 — Questionnaires',
+      4:'Step 3 of 4 — Questionnaires',
+      5:'Step 3 of 4 — Questionnaires',
+      6:'Step 4 of 4 — Additional Information & Signature',
       confirm: 'Completed',
     },
     s1Eyebrow: 'Step 1 of 6', s1Title: 'Reason for pre-evaluation',
@@ -855,7 +982,8 @@ const T = {
     terminoLabel: 'Term', terminoDefault: 'Select a term',
     coberturaLabel: 'Coverage', coberturaHint: 'Between USD 100,000 and USD 10,000,000.',
     coberturaPlaceholder: '100,000',
-    depEyebrow: 'Questionnaire', depTitle: 'Sports activities',
+    depEyebrow: 'Questionnaire', depTitle: 'Sports Activities Questionnaire',
+    depSub: 'Provide information about the prospect\'s sports activities.',
     depCualLabel: 'What sport does the prospect practice?', depCualPlaceholder: 'e.g. Rock climbing, mountain biking',
     depDesdeLabel: 'Since when?', depDesdePlaceholder: 'e.g. Since 2015',
     depNaturalezaLabel: 'Nature of participation', depNaturalezaDefault: 'Select',
@@ -867,11 +995,13 @@ const T = {
     depClubDetLabel: 'Provide more information', depClubDetPlaceholder: 'Club name, association, category...',
     depLesionesLabel: 'Has the prospect had sport-related injuries?',
     depLesionesDetLabel: 'Provide more details', depLesionesDetPlaceholder: 'Describe the injuries...',
-    medEyebrow: 'Questionnaire', medTitle: 'Medical history',
+    medEyebrow: 'Questionnaire', medTitle: 'Medical History Questionnaire',
+    medSub: 'Provide information about the prospect\'s illnesses, medical conditions, diagnoses, or any health background.',
     medDetLabel: 'Medical history details', medDetPlaceholder: 'Describe diagnoses, treatments, surgeries or other relevant conditions...',
     medDocsLabel: 'Attach medical documents', medDocsNote: '(minimum 1 file)',
     dropClick: 'Click or drag files here', dropHint: 'PDF, JPG, PNG · Max. 10 MB per file',
-    ocuEyebrow: 'Questionnaire', ocuTitle: 'Occupation',
+    ocuEyebrow: 'Questionnaire', ocuTitle: 'Occupation Questionnaire',
+    ocuSub: 'Provide information about your prospect\'s occupation.',
     ocuTipoLabel: 'Which best describes the occupation?', ocuTipoDefault: 'Select',
     ocuFuncionesLabel: 'Describe work duties', ocuFuncionesPlaceholder: 'Briefly describe tasks and responsibilities...',
     ocuMarLabel: 'Currently working offshore?', ocuAlturaLabel: 'Working at heights?',
@@ -888,12 +1018,12 @@ const T = {
     pilMotLabel: 'Flies for reasons other than pleasure?', pilAcroLabel: 'Participates in aerobatic flights?',
     pilAccLabel: 'Had accidents or license suspension?',
     pepEyebrow: 'Required — Step 4 of 6', pepTitle: 'PEP Questionnaire',
-    pepSub: 'Politically Exposed Person. Required for all prospects.',
+    pepSub: 'Politically Exposed Persons (PEPs) are individuals who are or have been, at some point, entrusted with prominent public functions of a state, department, province, or country.',
     pepLabel: 'Is the prospect a PEP?',
     pepDetLabel: 'Public office or function', pepDetPlaceholder: 'Describe position, institution and period...',
     pepNomLabel: 'Has the prospect used another name?',
     pepNomDetLabel: 'Name(s) used', pepNomDetPlaceholder: 'Alternative name(s)',
-    vEyebrow: 'Required — Step 5 of 6', vTitle: 'Travel questionnaire',
+    vEyebrow: 'Required — Step 5 of 6', vTitle: 'Travel Questionnaire',
     vSub: 'Information about the prospect\'s travel plans and residence.',
     v1Label: 'Plans to travel in the next 12 months?',
     v2Label: 'Has traveled in the last 12 months?',
@@ -979,11 +1109,23 @@ function setLang(lang) {
 function applyTranslations() {
   const L = T[LANG];
 
+  // Helper to set text safely (defined here so it's available throughout)
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setPlaceholder = (id, val) => { const el = document.getElementById(id); if (el) el.placeholder = val; };
+  const setHTML = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+
   // Header
   document.getElementById('hdr-title').textContent = L.hdrTitle;
   document.getElementById('hdr-desc').textContent = L.hdrDesc;
-  document.getElementById('disclaimer-text').innerHTML = `<strong>${L.disclaimer}</strong>`;
+  document.getElementById('disclaimer-text').textContent = L.disclaimer;
   document.documentElement.lang = LANG;
+  // Info button + modal
+  const infoLabel = document.getElementById('info-btn-label');
+  if (infoLabel) infoLabel.textContent = L.infoBtn;
+  setText('info-modal-title', L.infoTitle);
+  const body = document.getElementById('info-modal-body');
+  if (body) body.innerHTML = `<p>${L.infoBody1}</p><p>${L.infoBody2}</p>`;
+  setText('info-modal-close-btn', L.infoClose);
   // Sync lang buttons
   document.getElementById('lang-es').classList.toggle('active', LANG==='es');
   document.getElementById('lang-en').classList.toggle('active', LANG==='en');
@@ -993,11 +1135,6 @@ function applyTranslations() {
   if (fillPct === 100) {
     document.getElementById('prog-label').textContent = L.progLabels.confirm;
   }
-
-  // Helper to set text safely
-  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  const setPlaceholder = (id, val) => { const el = document.getElementById(id); if (el) el.placeholder = val; };
-  const setHTML = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
 
   // Step 1
   setText('s1-eyebrow', L.s1Eyebrow); setText('s1-title', L.s1Title); setText('s1-sub', L.s1Sub);
@@ -1030,7 +1167,7 @@ function applyTranslations() {
   setPlaceholder('plan-cobertura', L.coberturaPlaceholder);
 
   // Step 3 — Deportes
-  setText('dep-eyebrow', L.depEyebrow); setText('dep-title', L.depTitle);
+  setText('dep-title', L.depTitle); setText('dep-sub', L.depSub);
   setText('dep-cual-label', L.depCualLabel); setPlaceholder('dep-cual', L.depCualPlaceholder);
   setText('dep-desde-label', L.depDesdeLabel); setPlaceholder('dep-desde', L.depDesdePlaceholder);
   setText('dep-naturaleza-label', L.depNaturalezaLabel);
@@ -1047,13 +1184,13 @@ function applyTranslations() {
   setText('dep-lesiones-det-label', L.depLesionesDetLabel); setPlaceholder('dep-lesiones-det', L.depLesionesDetPlaceholder);
 
   // Step 3 — Historial
-  setText('med-eyebrow', L.medEyebrow); setText('med-title', L.medTitle);
+  setText('med-title', L.medTitle); setText('med-sub', L.medSub);
   setText('med-det-label', L.medDetLabel); setPlaceholder('med-detalles', L.medDetPlaceholder);
   setText('med-docs-label', L.medDocsLabel); setText('med-docs-note', L.medDocsNote);
   setText('drop-med-span', L.dropClick); setText('drop-med-small', L.dropHint);
 
   // Step 3 — Ocupación
-  setText('ocu-eyebrow', L.ocuEyebrow); setText('ocu-title', L.ocuTitle);
+  setText('ocu-title', L.ocuTitle); setText('ocu-sub', L.ocuSub);
   setText('ocu-tipo-label', L.ocuTipoLabel);
   const ocuSel = document.getElementById('ocu-tipo');
   if (ocuSel && ocuSel.options[0]) ocuSel.options[0].text = L.ocuTipoDefault;
@@ -1081,14 +1218,14 @@ function applyTranslations() {
   setText('pil-acc-label', L.pilAccLabel); setText('pil-acc-si', L.si); setText('pil-acc-no', L.no);
 
   // Step 4 PEP
-  setText('pep-eyebrow', L.pepEyebrow); setText('pep-title', L.pepTitle); setText('pep-sub', L.pepSub);
+  setText('pep-title', L.pepTitle); setText('pep-sub', L.pepSub);
   setText('pep-label', L.pepLabel); setText('pep-si', L.si); setText('pep-no', L.no);
   setText('pep-det-label', L.pepDetLabel); setPlaceholder('pep-det', L.pepDetPlaceholder);
   setText('pep-nom-label', L.pepNomLabel); setText('pep-nom-si', L.si); setText('pep-nom-no', L.no);
   setText('pep-nom-det-label', L.pepNomDetLabel); setPlaceholder('pep-nom-det', L.pepNomDetPlaceholder);
 
   // Step 5 Viajes
-  setText('v-eyebrow', L.vEyebrow); setText('v-title', L.vTitle); setText('v-sub', L.vSub);
+  setText('v-title', L.vTitle); setText('v-sub', L.vSub);
   setText('v1-label', L.v1Label); setText('v1-si', L.si); setText('v1-no', L.no);
   setPlaceholder('v1-destinos', L.vDestinosPlaceholder); setText('v1-destinos-label', L.vDestinosLabel);
   setPlaceholder('v1-visa', L.vVisaPlaceholder); setText('v1-visa-label', L.vVisaLabel);
@@ -1202,7 +1339,8 @@ async function saveProgress(currentStep) {
   const email = document.getElementById('asesor-email')?.value?.trim();
   if (!nombre || !email) return;
 
-  const pct = Math.min(100, Math.round((currentStep / 6) * 100));
+  const visualStep = [0,1,2,3,3,3,4][currentStep] || currentStep;
+  const pct = Math.min(100, Math.round((visualStep / 4) * 100));
 
   // Si no tenemos draftId aún, generar uno correlativo
   if (!S.draftId) {
@@ -1231,7 +1369,9 @@ function showScreen(n) {
   document.getElementById(n === 'confirm' ? 's-confirm' : `s${n}`).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   window.parent.postMessage({ scrollToTop: true }, '*');
-  const pct = n === 'confirm' ? 100 : Math.round((n / 6) * 100);
+  // Map internal step (1-6) to visual step (1-4) for progress bar
+  const visualStep = n === 'confirm' ? 4 : [0,1,2,3,3,3,4][n] || n;
+  const pct = n === 'confirm' ? 100 : Math.round((visualStep / 4) * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-pct').textContent = pct + '%';
   const labels = T[LANG].progLabels;
@@ -1326,6 +1466,7 @@ window.clearSig = function() { const c = document.getElementById('sig-canvas'); 
 
 document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
+
   // ── Cobertura: formato de miles en tiempo real ──
   const cobEl = document.getElementById('plan-cobertura');
   if (cobEl) {
@@ -1579,4 +1720,3 @@ function resetAll() {
 </script>
 </body>
 </html>
-
