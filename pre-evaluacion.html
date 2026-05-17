@@ -19,7 +19,7 @@
       --radius-input: 8px; --radius-card: 10px; --radius-button: 20px;
       --font: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
-    body { font-family: var(--font); background: var(--color-shell); color: var(--color-dark-grey); min-height: 100vh; }
+    body { font-family: var(--font); background: var(--color-shell); color: var(--color-dark-grey); min-height: 100vh; position: relative; }
 
     /* ── HEADER BANNER ── */
     .site-header {
@@ -101,7 +101,7 @@
     @media (min-width: 540px) { .info-btn-label { display: inline; } }
 
     /* ── INFO MODAL ── */
-    .info-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(30,37,64,.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
+    .info-overlay { position: absolute; inset: 0; z-index: 200; background: rgba(30,37,64,.6); backdrop-filter: blur(4px); display: none; align-items: flex-start; justify-content: center; padding: 80px 20px 40px; min-height: 100%; }
     .info-overlay.open { display: flex; }
     .info-modal {
       background: var(--color-white); border-radius: 16px;
@@ -758,6 +758,9 @@ const MOTIVO_NAMES = {deportes:'Actividades deportivas',historial:'Historial mé
 function openInfoModal() {
   document.getElementById('info-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Scroll iframe to top so modal is visible regardless of scroll position
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.parent.postMessage({ scrollToTop: true }, '*');
 }
 function closeInfoModal() {
   document.getElementById('info-overlay').classList.remove('open');
