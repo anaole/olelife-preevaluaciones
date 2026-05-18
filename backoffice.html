@@ -61,13 +61,30 @@
     .page-title{font:700 22px/28px var(--font);color:var(--color-dark-blue);}
     .page-subtitle{font:400 13px/18px var(--font);color:var(--color-medium-grey);margin-top:4px;margin-bottom:16px;}
 
-    /* Search row */
-    .search-row{display:flex;align-items:center;gap:10px;}
+    /* Search row & toolbar buttons */
+    .search-row{display:flex;align-items:center;gap:8px;}
     .search-bar{background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-input);display:flex;align-items:center;gap:10px;padding:0 14px;height:40px;flex:1;min-width:0;transition:border-color 150ms,box-shadow 150ms;}
     .search-bar:focus-within{border-color:var(--color-dark-grey);box-shadow:0 0 0 3px rgba(0,187,221,.15);}
     .search-bar svg{stroke:var(--color-medium-grey);flex-shrink:0;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
     .search-bar input{border:none;outline:none;font:400 13px/1 var(--font);color:var(--color-dark-grey);background:transparent;width:100%;}
     .search-bar input::placeholder{color:var(--color-medium-grey);}
+    .toolbar-btn{height:40px;padding:0 14px;border-radius:var(--radius-input);border:1px solid var(--color-light-grey);background:var(--color-white);font:600 13px/1 var(--font);color:var(--color-dark-grey);cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;transition:border-color 150ms,background 150ms;}
+    .toolbar-btn:hover{border-color:var(--color-turquoise);background:var(--color-shell);}
+    .toolbar-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+    .toolbar-btn-dark{background:#373D54;color:#fff;border-color:#373D54;}
+    .toolbar-btn-dark:hover{background:#2A3048;border-color:#2A3048;}
+    .toolbar-btn-dark svg{stroke:#fff;}
+    /* Columns menu */
+    .cols-menu{position:absolute;top:calc(100% + 4px);right:0;z-index:200;background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-card);box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:220px;display:none;padding:8px 0;}
+    .cols-menu.open{display:block;}
+    .cols-menu-title{font:700 11px/1 var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.06em;padding:6px 16px 10px;}
+    .col-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;cursor:pointer;transition:background 150ms;}
+    .col-toggle-row:hover{background:var(--color-shell);}
+    .col-toggle-label{font:400 13px/1 var(--font);color:var(--color-dark-grey);}
+    .col-toggle-switch{width:32px;height:18px;border-radius:999px;background:var(--color-light-grey);position:relative;transition:background 200ms;flex-shrink:0;}
+    .col-toggle-switch.on{background:var(--color-turquoise);}
+    .col-toggle-switch::after{content:'';width:14px;height:14px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:transform 200ms;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+    .col-toggle-switch.on::after{transform:translateX(14px);}
 
     /* Buttons */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 20px;border-radius:var(--radius-button);font:700 13px/1 var(--font);cursor:pointer;border:none;outline:none;transition:background 150ms;white-space:nowrap;}
@@ -122,9 +139,37 @@
     /* Status badge */
     .status-dot{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--font);}
     .status-dot::before{content:"";width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .status-nueva::before{background:#00BBDD;}
     .status-enviado::before{background:var(--color-green);}
     .status-progreso::before{background:var(--color-warning);}
-    .status-pendiente::before{background:var(--color-turquoise);}
+    .status-pendiente::before{background:#F79E1B;}
+    .status-sinresp::before{background:#E07B39;}
+    .status-postergada::before{background:var(--color-danger);}
+    .status-extracargo::before{background:#3B82F6;}
+    .status-aceptada::before{background:var(--color-green);}
+    .status-rechazada::before{background:var(--color-danger);}
+    /* Clickable status cell */
+    .status-cell{display:flex;flex-direction:column;gap:6px;}
+    .status-badge{display:inline-flex;align-items:center;gap:6px;cursor:pointer;border-radius:999px;padding:3px 10px 3px 4px;transition:background 150ms;user-select:none;font:600 12px/1 var(--font);}
+    .status-badge:hover{background:var(--color-bg-grey);}
+    .status-badge::before{content:"";width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .status-badge.s-nueva::before{background:#00BBDD;}
+    .status-badge.s-progreso::before{background:var(--color-warning);}
+    .status-badge.s-pendiente::before{background:#F79E1B;}
+    .status-badge.s-sinresp::before{background:#E07B39;}
+    .status-badge.s-postergada::before{background:var(--color-danger);}
+    .status-badge.s-extracargo::before{background:#3B82F6;}
+    .status-badge.s-aceptada::before{background:var(--color-green);}
+    .status-badge.s-rechazada::before{background:var(--color-danger);}
+    .status-editor{display:none;flex-direction:column;gap:6px;}
+    .status-editor.open{display:flex;}
+    .status-editor select{border:1px solid var(--color-light-grey);background:var(--color-white);border-radius:6px;font:400 11px/1 var(--font);padding:5px 8px;color:var(--color-dark-grey);outline:none;cursor:pointer;transition:border-color 150ms;width:100%;max-width:200px;}
+    .status-editor select:focus{border-color:var(--color-turquoise);}
+    .status-editor-actions{display:flex;gap:6px;}
+    .status-save-btn{height:26px;padding:0 10px;border-radius:6px;background:var(--color-green);color:white;border:none;font:700 11px/1 var(--font);cursor:pointer;transition:background 150ms;}
+    .status-save-btn:hover{background:var(--color-green-hover);}
+    .status-cancel-btn{height:26px;padding:0 8px;border-radius:6px;background:white;color:var(--color-medium-grey);border:1px solid var(--color-light-grey);font:600 11px/1 var(--font);cursor:pointer;transition:background 150ms;}
+    .status-cancel-btn:hover{background:var(--color-shell);}
 
     /* Empty state */
     .empty-state{text-align:center;padding:56px 24px;background:var(--color-white);border-radius:var(--radius-card);border:1px solid var(--color-light-grey);}
@@ -174,9 +219,120 @@
     .file-row-btn svg{width:14px;height:14px;stroke:var(--color-green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
     .drawer-empty{text-align:center;padding:32px 16px;color:var(--color-medium-grey);font:400 13px/20px var(--font);}
 
-    /* Tooltip on icon buttons */
+    /* ── TABS ── */
+    .tabs{display:flex;gap:0;border-bottom:2px solid var(--color-light-grey);margin-bottom:20px;}
+    .tab-btn{padding:10px 20px;font:600 13px/1 var(--font);color:var(--color-medium-grey);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color 150ms,border-color 150ms;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+    .tab-btn:hover{color:var(--color-dark-blue);}
+    .tab-btn.active{color:var(--color-turquoise);border-bottom-color:var(--color-turquoise);}
+    .tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:var(--color-bg-grey);font:700 10px/1 var(--font);color:var(--color-medium-grey);}
+    .tab-btn.active .tab-count{background:rgba(0,187,221,.15);color:var(--color-turquoise);}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+    /* Mobile: hide toolbar labels, show only icons */
+    @media(max-width:639px){
+      .toolbar-label{display:none;}
+      .toolbar-btn{padding:0 10px;min-width:40px;justify-content:center;}
+    }
+
+    /* ── DETAIL VIEW (full page, replaces table) ── */
+    .detail-view{display:none;animation:fadeIn 180ms ease-out;}
+    .detail-view.active{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+    .detail-topbar{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+    .detail-back-btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:var(--radius-button);border:1px solid var(--color-light-grey);background:var(--color-white);font:600 13px/1 var(--font);color:var(--color-dark-grey);cursor:pointer;transition:background 150ms,border-color 150ms;flex-shrink:0;}
+    .detail-back-btn:hover{background:var(--color-shell);border-color:var(--color-turquoise);}
+    .detail-back-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .detail-heading{font:700 20px/1.2 var(--font);color:var(--color-dark-blue);}
+    .detail-id-pill{display:inline-flex;align-items:center;font:600 11px/1 var(--font);color:var(--color-turquoise);background:rgba(0,187,221,.1);border:1px solid rgba(0,187,221,.25);border-radius:999px;padding:4px 10px;}
+    .detail-cols{display:grid;grid-template-columns:1fr;gap:20px;}
+    @media(min-width:768px){.detail-cols{grid-template-columns:1fr 1fr;}}
+    @media(min-width:1024px){.detail-cols{grid-template-columns:2fr 1fr;}}
+    .detail-card{background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-card);padding:20px;}
+    .detail-card-title{font:700 11px/1 var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--color-bg-grey);}
+    .detail-section{margin-bottom:24px;}
+    .detail-section-title{font:700 11px/1 var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--color-bg-grey);}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .detail-field{display:flex;flex-direction:column;gap:3px;}
+    .detail-field-label{font:600 11px/1 var(--font);color:var(--color-medium-grey);}
+    .detail-field-value{font:400 13px/1.4 var(--font);color:var(--color-dark-grey);}
+    .detail-field.full{grid-column:1/-1;}
+    .detail-actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+    .zendesk-row{display:flex;gap:8px;align-items:center;}
+    .zendesk-input{flex:1;height:36px;border:1px solid var(--color-light-grey);border-radius:var(--radius-input);padding:0 12px;font:400 13px/1 var(--font);color:var(--color-dark-grey);outline:none;transition:border-color 150ms;box-sizing:border-box;}
+    .zendesk-input:focus{border-color:var(--color-turquoise);box-shadow:0 0 0 3px rgba(0,187,221,.12);}
+    .zendesk-save-btn{height:36px;padding:0 14px;border-radius:var(--radius-input);background:var(--color-turquoise);color:white;border:none;font:600 12px/1 var(--font);cursor:pointer;flex-shrink:0;transition:background 150ms;}
+    .zendesk-save-btn:hover{background:#00A5C4;}
+    .zendesk-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,187,221,.1);border:1px solid rgba(0,187,221,.25);border-radius:6px;padding:7px 12px;font:600 12px/1 var(--font);color:var(--color-turquoise);}
+    .zendesk-badge svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .note-textarea{width:100%;min-height:80px;border:1px solid var(--color-light-grey);border-radius:var(--radius-input);padding:10px 12px;font:400 13px/1.5 var(--font);color:var(--color-dark-grey);resize:vertical;outline:none;transition:border-color 150ms;box-sizing:border-box;}
+    .note-textarea:focus{border-color:var(--color-turquoise);box-shadow:0 0 0 3px rgba(0,187,221,.12);}
+    .note-add-btn{margin-top:8px;height:36px;padding:0 16px;border-radius:var(--radius-input);background:var(--color-dark-blue);color:white;border:none;font:600 12px/1 var(--font);cursor:pointer;transition:background 150ms;}
+    .note-add-btn:hover{background:#2A3048;}
+    .note-card{background:var(--color-shell);border:1px solid var(--color-light-grey);border-radius:var(--radius-card);padding:12px 14px;margin-top:10px;}
+    .note-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+    .note-card-date{font:600 11px/1 var(--font);color:var(--color-medium-grey);}
+    .note-card-actions{display:flex;gap:4px;}
+    .note-card-btn{width:26px;height:26px;border-radius:6px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-medium-grey);transition:background 150ms,color 150ms;}
+    .note-card-btn:hover{background:var(--color-bg-grey);color:var(--color-dark-grey);}
+    .note-card-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .note-card-text{font:400 13px/1.5 var(--font);color:var(--color-dark-grey);white-space:pre-wrap;}
+    .note-edit-area{width:100%;min-height:60px;border:1px solid var(--color-turquoise);border-radius:6px;padding:8px 10px;font:400 13px/1.5 var(--font);color:var(--color-dark-grey);resize:vertical;outline:none;box-sizing:border-box;}
+    .note-edit-actions{display:flex;gap:6px;margin-top:6px;}
+
+    .filter-overlay{position:fixed;inset:0;z-index:300;background:rgba(55,61,84,.45);opacity:0;pointer-events:none;transition:opacity 250ms;}
+    .filter-overlay.open{opacity:1;pointer-events:all;}
+    .filter-sidebar{position:fixed;top:0;right:0;bottom:0;z-index:301;width:360px;max-width:92vw;background:var(--color-white);box-shadow:-8px 0 32px rgba(0,0,0,.15);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 280ms cubic-bezier(.4,0,.2,1);}
+    .filter-sidebar.open{transform:translateX(0);}
+    .fs-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--color-bg-grey);flex-shrink:0;}
+    .fs-title{font:700 18px/1 var(--font);color:var(--color-dark-blue);}
+    .fs-close{width:32px;height:32px;border-radius:8px;border:none;background:var(--color-shell);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-medium-grey);transition:background 150ms;}
+    .fs-close:hover{background:var(--color-bg-grey);}
+    .fs-close svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .fs-body{flex:1;overflow-y:auto;padding:0 0 16px;}
+    .fs-section{border-bottom:1px solid var(--color-bg-grey);}
+    .fs-section-header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;cursor:pointer;user-select:none;}
+    .fs-section-header:hover{background:var(--color-shell);}
+    .fs-section-title{font:700 14px/1 var(--font);color:var(--color-dark-blue);}
+    .fs-section-chevron{width:16px;height:16px;stroke:var(--color-medium-grey);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 200ms;}
+    .fs-section.open .fs-section-chevron{transform:rotate(180deg);}
+    .fs-section-body{display:none;padding:4px 24px 20px;}
+    .fs-section.open .fs-section-body{display:block;}
+    .fs-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .fs-group{display:flex;flex-direction:column;gap:5px;margin-top:12px;}
+    .fs-label{font:600 11px/1 var(--font);color:var(--color-medium-grey);text-transform:uppercase;letter-spacing:.05em;}
+    .fs-input{height:38px;border-radius:var(--radius-input);border:1px solid var(--color-light-grey);padding:0 12px;font:400 13px/1 var(--font);color:var(--color-dark-grey);background:var(--color-white);outline:none;width:100%;transition:border-color 150ms,box-shadow 150ms;}
+    .fs-input:focus{border-color:var(--color-turquoise);box-shadow:0 0 0 3px rgba(0,187,221,.12);}
+    select.fs-input{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239BACCB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+    .fs-footer{padding:16px 24px;border-top:1px solid var(--color-bg-grey);display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0;}
+    .fs-footer .btn{width:100%;justify-content:center;}
+    /* Filter badge on button */
+    .filter-badge{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:var(--color-turquoise);color:white;font:700 10px/1 var(--font);margin-left:2px;}
     [title]{cursor:pointer;}
     @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* Checkbox lists in sidebar */
+    .fs-checks{display:flex;flex-direction:column;gap:2px;margin-top:4px;}
+    .fs-check-label{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer;font:400 13px/1 var(--font);color:var(--color-dark-grey);transition:background 150ms;user-select:none;}
+    .fs-check-label:hover{background:var(--color-shell);}
+    .fs-check{display:none;}
+    .fs-check-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--color-light-grey);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 150ms,border-color 150ms;}
+    .fs-check:checked ~ .fs-check-box{background:var(--color-turquoise);border-color:var(--color-turquoise);}
+    .fs-check:checked ~ .fs-check-box::after{content:'';width:9px;height:9px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");background-size:contain;background-repeat:no-repeat;}
+
+    /* ── INLINE COLUMN FILTERS (desktop only) ── */
+    .th-inner{display:inline-flex;align-items:center;gap:5px;}
+    .th-filter-btn{width:18px;height:18px;border-radius:4px;border:none;background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:rgba(155,172,203,.7);padding:0;transition:background 150ms,color 150ms;flex-shrink:0;vertical-align:middle;}
+    .th-filter-btn:hover,.th-filter-btn.active{background:rgba(0,187,221,.15);color:var(--color-turquoise);}
+    .th-filter-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    thead th{position:relative;}
+    .col-filter-popup{position:absolute;top:calc(100% + 2px);left:0;z-index:100;background:var(--color-white);border:1px solid var(--color-light-grey);border-radius:var(--radius-card);box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:200px;display:none;padding:6px 0;}
+    .col-filter-popup.open{display:block;}
+    .col-filter-option{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font:400 12px/1 var(--font);color:var(--color-dark-grey);transition:background 150ms;}
+    .col-filter-option:hover{background:var(--color-shell);}
+    .col-filter-option input{width:14px;height:14px;accent-color:var(--color-turquoise);cursor:pointer;flex-shrink:0;}
+    .col-filter-sep{height:1px;background:var(--color-bg-grey);margin:4px 0;}
+    .col-filter-clear{padding:7px 14px;font:600 11px/1 var(--font);color:var(--color-turquoise);cursor:pointer;display:block;text-align:center;transition:background 150ms;}
+    .col-filter-clear:hover{background:var(--color-turquoise-soft);}
   </style>
 </head>
 <body>
@@ -237,17 +393,241 @@
     <div class="page-header">
       <div class="page-title">Pre-evaluaciones recibidas</div>
       <div class="page-subtitle">Busca, descarga el PDF completo, archivos adjuntos o elimina registros.</div>
-      <div class="search-row">
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-enviadas" onclick="switchTab('enviadas')">
+        Recibidas <span class="tab-count" id="tab-count-enviadas">0</span>
+      </button>
+      <button class="tab-btn" id="tab-progreso" onclick="switchTab('progreso')">
+        En progreso <span class="tab-count" id="tab-count-progreso">0</span>
+      </button>
+    </div>
+
+    <!-- Tab: Recibidas -->
+    <div class="tab-panel active" id="panel-enviadas">
+      <div class="search-row" style="margin-bottom:16px;">
         <div class="search-bar">
           <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input" placeholder="Buscar por asesor, prospecto o ID..." oninput="filterTable()">
+          <input type="text" id="search-input" placeholder="Buscar por asesor, prospecto o ID..." oninput="applyFilters()">
         </div>
-        <button class="btn" onclick="loadSubmissions()" style="flex-shrink:0;background:#373D54;color:#fff;border:none;">
+        <div style="position:relative;flex-shrink:0;">
+          <button class="toolbar-btn" id="cols-btn" onclick="toggleColsMenu(event)">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span class="toolbar-label">Columnas</span>
+          </button>
+          <div class="cols-menu" id="cols-menu">
+            <div class="cols-menu-title">Mostrar columnas</div>
+            <div id="cols-menu-list"></div>
+          </div>
+        </div>
+        <button class="toolbar-btn" id="filter-toggle-btn" onclick="toggleFilters()">
+          <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span class="toolbar-label">Filtros</span><span id="filter-badge" class="filter-badge" style="display:none;">0</span>
+        </button>
+        <button class="toolbar-btn toolbar-btn-dark" onclick="loadSubmissions()">
           <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Actualizar
+          <span class="toolbar-label">Actualizar</span>
         </button>
       </div>
+      <div id="table-container"></div>
     </div>
+
+    <!-- Tab: En progreso -->
+    <div class="tab-panel" id="panel-progreso">
+      <div class="search-row" style="margin-bottom:16px;">
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-input-draft" placeholder="Buscar por asesor o prospecto..." oninput="renderDrafts()">
+        </div>
+        <div style="position:relative;flex-shrink:0;">
+          <button class="toolbar-btn" id="cols-btn-draft" onclick="toggleColsMenuDraft(event)">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span class="toolbar-label">Columnas</span>
+          </button>
+          <div class="cols-menu" id="cols-menu-draft">
+            <div class="cols-menu-title">Mostrar columnas</div>
+            <div id="cols-menu-draft-list"></div>
+          </div>
+        </div>
+        <button class="toolbar-btn" id="filter-toggle-btn-draft" onclick="toggleFiltersDraft()">
+          <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span class="toolbar-label">Filtros</span><span id="filter-badge-draft" class="filter-badge" style="display:none;">0</span>
+        </button>
+        <button class="toolbar-btn toolbar-btn-dark" onclick="loadSubmissions()">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          <span class="toolbar-label">Actualizar</span>
+        </button>
+      </div>
+      <div id="draft-table-container"></div>
+    </div>
+
+    <!-- Detail view (full page) -->
+    <div class="detail-view" id="detail-view">
+      <div class="detail-topbar">
+        <button class="detail-back-btn" onclick="closeDetailView()">
+          <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Volver
+        </button>
+        <span class="detail-heading" id="dv-heading">—</span>
+        <span class="detail-id-pill" id="dv-id-pill">—</span>
+      </div>
+      <div class="detail-cols">
+        <!-- Left column: summary + docs -->
+        <div>
+          <div class="detail-card" style="margin-bottom:16px;">
+            <div class="detail-card-title">Resumen del prospecto</div>
+            <div class="detail-grid" id="dv-summary"></div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title">Documentos</div>
+            <div class="detail-actions-row" id="dv-docs"></div>
+          </div>
+        </div>
+        <!-- Right column: zendesk + notes -->
+        <div>
+          <div class="detail-card" style="margin-bottom:16px;">
+            <div class="detail-card-title">Ticket de Zendesk</div>
+            <div id="dv-zendesk"></div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-card-title">Notas</div>
+            <textarea class="note-textarea" id="dv-note-input" placeholder="Escribe una nota sobre esta solicitud..."></textarea>
+            <button class="note-add-btn" onclick="addNoteView()">Agregar nota</button>
+            <div id="dv-notes-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="filter-overlay" id="filter-overlay-draft" onclick="closeFiltersDraft()"></div>
+    <div class="filter-sidebar" id="filter-sidebar-draft">
+      <div class="fs-header">
+        <span class="fs-title">Filtros</span>
+        <button class="fs-close" onclick="closeFiltersDraft()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="fs-body">
+        <div class="fs-section open" id="fss-d-fecha">
+          <div class="fs-section-header" onclick="toggleFsSection('fss-d-fecha')">
+            <span class="fs-section-title">Fecha de última actualización</span>
+            <svg class="fs-section-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fs-section-body">
+            <div class="fs-row">
+              <div class="fs-group"><label class="fs-label">Desde</label><input type="text" class="fs-input" id="fd-fecha-desde" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtFilterDate(this)"></div>
+              <div class="fs-group"><label class="fs-label">Hasta</label><input type="text" class="fs-input" id="fd-fecha-hasta" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtFilterDate(this)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="fs-section open" id="fss-d-paso">
+          <div class="fs-section-header" onclick="toggleFsSection('fss-d-paso')">
+            <span class="fs-section-title">Último paso</span>
+            <svg class="fs-section-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fs-section-body">
+            <div class="fs-checks" id="fs-paso-checks"></div>
+          </div>
+        </div>
+      </div>
+      <div class="fs-footer">
+        <button class="btn btn-secondary" onclick="clearFiltersDraft()">Borrar filtros</button>
+        <button class="btn btn-primary" onclick="applyFiltersDraft();closeFiltersDraft()">Filtrar</button>
+      </div>
+    </div>
+
+    <!-- Filter sidebar -->
+    <div class="filter-overlay" id="filter-overlay" onclick="closeFilters()"></div>
+    <div class="filter-sidebar" id="filter-sidebar">
+      <div class="fs-header">
+        <span class="fs-title">Filtros</span>
+        <button class="fs-close" onclick="closeFilters()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="fs-body">
+
+        <!-- Motivo -->
+        <div class="fs-section open" id="fss-motivo">
+          <div class="fs-section-header" onclick="toggleFsSection('fss-motivo')">
+            <span class="fs-section-title">Motivo</span>
+            <svg class="fs-section-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fs-section-body">
+            <div class="fs-checks" id="fs-motivo-checks"></div>
+          </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="fs-section open" id="fss-estado">
+          <div class="fs-section-header" onclick="toggleFsSection('fss-estado')">
+            <span class="fs-section-title">Estado</span>
+            <svg class="fs-section-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fs-section-body">
+            <div class="fs-checks" id="fs-estado-checks"></div>
+          </div>
+        </div>
+
+        <!-- País -->
+        <div class="fs-section open" id="fss-pais">
+          <div class="fs-section-header" onclick="toggleFsSection('fss-pais')">
+            <span class="fs-section-title">País del prospecto</span>
+            <svg class="fs-section-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fs-section-body">
+            <div class="fs-group" style="margin-top:4px;">
+              <select class="fs-input" id="f-pais">
+                <option value="">Todos los países</option>
+                <option>Antigua y Barbuda</option><option>Argentina</option><option>Aruba</option><option>Bahamas</option><option>Barbados</option><option>Belice</option><option>Bermudas</option><option>Bolivia</option><option>Chile</option><option>Colombia</option><option>Costa Rica</option><option>Curaçao</option><option>Dominica</option><option>Ecuador</option><option>El Salvador</option><option>Granada</option><option>Guatemala</option><option>Honduras</option><option>Islas Caimán</option><option>Islas Turcas y Caicos</option><option>Islas Vírgenes Británicas</option><option>Jamaica</option><option>Martinica</option><option>México</option><option>Nicaragua</option><option>Panamá</option><option>Paraguay</option><option>Perú</option><option>República Dominicana</option><option>San Cristóbal y Nieves</option><option>San Martín</option><option>San Vicente y las Granadinas</option><option>Santa Lucía</option><option>Trinidad y Tobago</option><option>Uruguay</option><option>Venezuela</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fecha de nacimiento -->
+        <div class="fs-section open" id="fss-fnac">
+          <div class="fs-section-header" onclick="toggleFsSection('fss-fnac')">
+            <span class="fs-section-title">Fecha de nacimiento</span>
+            <svg class="fs-section-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fs-section-body">
+            <div class="fs-row">
+              <div class="fs-group">
+                <label class="fs-label">Desde</label>
+                <input type="text" class="fs-input" id="f-fnac-desde" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtFilterDate(this)">
+              </div>
+              <div class="fs-group">
+                <label class="fs-label">Hasta</label>
+                <input type="text" class="fs-input" id="f-fnac-hasta" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtFilterDate(this)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fecha de envío -->
+        <div class="fs-section open" id="fss-fecha">
+          <div class="fs-section-header" onclick="toggleFsSection('fss-fecha')">
+            <span class="fs-section-title">Fecha de envío</span>
+            <svg class="fs-section-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fs-section-body">
+            <div class="fs-row">
+              <div class="fs-group">
+                <label class="fs-label">Desde</label>
+                <input type="text" class="fs-input" id="f-fecha-desde" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtFilterDate(this)">
+              </div>
+              <div class="fs-group">
+                <label class="fs-label">Hasta</label>
+                <input type="text" class="fs-input" id="f-fecha-hasta" placeholder="dd/mm/aaaa" maxlength="10" oninput="fmtFilterDate(this)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="fs-footer">
+        <button class="btn btn-secondary" onclick="clearFilters()">Borrar filtros</button>
+        <button class="btn btn-primary" onclick="applyFilters();closeFilters()">Filtrar</button>
+      </div>
+    </div><!-- /filter-sidebar -->
 
     <div id="table-container"></div>
   </main>
@@ -346,20 +726,19 @@ async function sbDelete(id) {
   if (!res.ok) throw new Error(await res.text());
 }
 
-// ── Load & render ──────────────────────────────────────────
+let allDrafts = [];
+
 async function loadSubmissions() {
   const container = document.getElementById('table-container');
+  const draftContainer = document.getElementById('draft-table-container');
   container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00BBDD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div><div class="empty-title">Cargando...</div></div>`;
+  if (draftContainer) draftContainer.innerHTML = '';
   try {
     const rows = await sbFetch();
-
-    // Fetch all files in one query
     const filesRes = await fetch(`${SB_URL}/rest/v1/pre_evaluaciones_archivos?select=evaluacion_id,nombre,tipo,seccion,data&order=created_at.asc`, {
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
     });
     const allFiles = filesRes.ok ? await filesRes.json() : [];
-
-    // Group files by evaluacion_id
     const filesByEval = {};
     allFiles.forEach(f => {
       if (!filesByEval[f.evaluacion_id]) filesByEval[f.evaluacion_id] = { medicos: [], adicionales: [] };
@@ -367,54 +746,548 @@ async function loadSubmissions() {
       filesByEval[f.evaluacion_id][group].push({ name: f.nombre, type: f.tipo, data: f.data });
     });
 
-    allSubs = rows.map(r => {
+    const mapped = rows.map(r => {
       const archivosData = filesByEval[r.id] || { medicos: [], adicionales: [] };
       return {
-        id: r.id,
-        fechaEnvio: r.fecha_envio,
-        estado: r.estado,
-        avance: r.avance,
-        isDraft: r.is_draft,
+        id: r.id, fechaEnvio: r.fecha_envio, estado: r.estado,
+        avance: r.avance, isDraft: r.is_draft,
         asesor: { nombre: r.asesor_nombre, email: r.asesor_email },
         prospecto: { nombre: r.prospecto_nombre, ...(r.payload?.prospecto || {}) },
-        motivos: r.motivos,
-        plan: r.payload?.plan || {},
-        cuestionario: r.payload?.cuestionario || {},
-        pep: r.payload?.pep || {},
-        viajes: r.payload?.viajes || {},
-        adicional: r.payload?.adicional || '',
+        motivos: r.motivos, plan: r.payload?.plan || {},
+        cuestionario: r.payload?.cuestionario || {}, pep: r.payload?.pep || {},
+        viajes: r.payload?.viajes || {}, adicional: r.payload?.adicional || '',
         otrosDetalle: r.payload?.otrosDetalle || '',
         archivosAdjuntos: {
           medicos: archivosData.medicos.map(f => f.name),
           adicionales: archivosData.adicionales.map(f => f.name),
         },
-        archivosData,
-        firma: r.firma,
-        _raw: r,
+        archivosData, firma: r.firma, _raw: r,
       };
     });
+
+    // Split sent vs drafts
+    allSubs   = mapped.filter(s => !s.isDraft);
+    allDrafts = mapped.filter(s => s.isDraft);
+
   } catch(e) {
-    allSubs = [];
+    allSubs = []; allDrafts = [];
     showToast('Error al cargar datos. Revisa la consola.');
     console.error('Supabase error:', e);
   }
+
+  // Update tab counts
+  document.getElementById('tab-count-enviadas').textContent = allSubs.length;
+  document.getElementById('tab-count-progreso').textContent = allDrafts.length;
   document.getElementById('count-badge').textContent = allSubs.length + (allSubs.length===1?' enviada':' enviadas');
+
   renderTable(allSubs);
+  renderDrafts();
 }
 
-function filterTable() {
-  const q = document.getElementById('search-input').value.toLowerCase().trim();
-  if (!q) { renderTable(allSubs); return; }
-  const filtered = allSubs.filter(s =>
-    (s.id||'').toLowerCase().includes(q) ||
-    (s.asesor?.nombre||'').toLowerCase().includes(q) ||
-    (s.asesor?.email||'').toLowerCase().includes(q) ||
-    (s.prospecto?.nombre||'').toLowerCase().includes(q)
-  );
+function switchTab(tab) {
+  ['enviadas','progreso'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+  });
+}
+
+const PASO_LABELS = {
+  1:'Motivo y Asesor', 2:'Datos del prospecto',
+  3:'Cuestionarios', 4:'Cuestionario PEP',
+  5:'Cuestionario de viajes', 6:'Info adicional y firma'
+};
+
+function renderDrafts(filters) {
+  const container = document.getElementById('draft-table-container');
+  if (!container) return;
+  const q = (document.getElementById('search-input-draft')?.value || '').toLowerCase().trim();
+  const { fechaDesde, fechaHasta, pasos } = filters || {};
+
+  let filtered = allDrafts.filter(s => {
+    if (q && !((s.id||'').toLowerCase().includes(q)||(s.asesor?.nombre||'').toLowerCase().includes(q)||(s.prospecto?.nombre||'').toLowerCase().includes(q))) return false;
+    const fe = parseFechaEnvio(s.fechaEnvio);
+    if (fechaDesde && fe && fe < fechaDesde) return false;
+    if (fechaHasta && fe && fe > fechaHasta+86399999) return false;
+    if (pasos?.length) {
+      const step = Math.round(((s.avance??0)/100)*6)||1;
+      if (!pasos.includes(String(Math.min(step,6)))) return false;
+    }
+    return true;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9BACCB" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-title">Sin borradores</div><div class="empty-sub">No hay formularios en progreso actualmente.</div></div>`;
+    return;
+  }
+
+  const dvis = key => DRAFT_COLUMNS.find(c=>c.key===key)?.visible;
+  const headers = DRAFT_COLUMNS.filter(c=>c.visible).map(c=>`<th>${c.label}</th>`).join('');
+
+  const rows = filtered.map(s => {
+    const realIdx = allDrafts.indexOf(s);
+    const pct = s.avance??0;
+    const step = Math.round((pct/100)*6)||1;
+    const pasoLabel = PASO_LABELS[Math.min(step,6)]||'—';
+    const cells = {
+      id:        `<td class="td-bold" style="font-size:11px;color:var(--color-turquoise);white-space:nowrap;">${s.id||'—'}</td>`,
+      prospecto: `<td class="td-bold">${s.prospecto?.nombre||'—'}</td>`,
+      asesor:    `<td>${s.asesor?.nombre||'—'}</td>`,
+      email:     `<td style="font-size:12px;">${s.asesor?.email||'—'}</td>`,
+      fnac:      `<td style="font-size:12px;">${s.prospecto?.fnac||'—'}</td>`,
+      pais:      `<td style="font-size:12px;">${s.prospecto?.pais||'—'}</td>`,
+      fecha:     `<td style="font-size:12px;color:var(--color-medium-grey);white-space:nowrap;">${s.fechaEnvio||'—'}</td>`,
+      pct:       `<td><div class="prog-bar-wrap"><div class="prog-bar-mini"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="prog-pct">${pct}%</span></div></td>`,
+      paso:      `<td style="font-size:12px;">${pasoLabel}</td>`,
+      acciones:  `<td><button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteDialogDraft(${realIdx})" title="Eliminar"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button></td>`,
+    };
+    return `<tr>${DRAFT_COLUMNS.filter(c=>c.visible).map(c=>cells[c.key]||'').join('')}</tr>`;
+  }).join('');
+
+  const draftCards = filtered.map(s => {
+    const pct = s.avance??0;
+    const step = Math.round((pct/100)*6)||1;
+    return `<div class="sub-mobile-card">
+      <div class="sub-mc-top"><div><div class="sub-mc-name">${s.prospecto?.nombre||'—'}</div><div class="sub-mc-email">${s.asesor?.nombre||'—'} · ${s.asesor?.email||'—'}</div></div><span class="sub-mc-id">${s.id||'—'}</span></div>
+      ${dvis('fnac')?`<div class="sub-mc-row"><span class="sub-mc-label">Fecha nacimiento</span><span style="font:400 12px/1 var(--font);color:var(--color-medium-grey);">${s.prospecto?.fnac||'—'}</span></div>`:''}
+      ${dvis('pais')?`<div class="sub-mc-row"><span class="sub-mc-label">País</span><span style="font:400 12px/1 var(--font);color:var(--color-dark-grey);">${s.prospecto?.pais||'—'}</span></div>`:''}
+      <div class="sub-mc-row"><span class="sub-mc-label">Últ. actualización</span><span style="font:400 12px/1 var(--font);color:var(--color-medium-grey);">${s.fechaEnvio||'—'}</span></div>
+      <div class="sub-mc-row"><span class="sub-mc-label">Progreso</span><div class="prog-bar-wrap"><div class="prog-bar-mini"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="prog-pct">${pct}%</span></div></div>
+      <div class="sub-mc-row"><span class="sub-mc-label">Último paso</span><span style="font:400 12px/1.4 var(--font);color:var(--color-dark-grey);text-align:right;">${PASO_LABELS[Math.min(step,6)]||'—'}</span></div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="table-scroll"><div class="table-wrap"><table>
+      <thead><tr>${headers}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div></div>
+    <div class="sub-cards">${draftCards}</div>`;
+}
+
+function openDeleteDialogDraft(draftIdx) {
+  const s = allDrafts[draftIdx];
+  deleteIndex = -(draftIdx + 1); // negative = draft
+  document.getElementById('delete-msg').textContent = `¿Eliminar el borrador de "${s.prospecto?.nombre||'este prospecto'}" (${s.id||''})? Esta acción no se puede deshacer.`;
+  document.getElementById('delete-overlay').classList.add('open');
+}
+
+async function confirmDelete() {
+  if (deleteIndex === null) return;
+  const isDraftDelete = deleteIndex < 0;
+  const arr = isDraftDelete ? allDrafts : allSubs;
+  const idx = isDraftDelete ? (-(deleteIndex + 1)) : deleteIndex;
+  const id = arr[idx]?.id;
+  try {
+    await sbDelete(id);
+    arr.splice(idx, 1);
+    document.getElementById('tab-count-enviadas').textContent = allSubs.length;
+    document.getElementById('tab-count-progreso').textContent = allDrafts.length;
+  } catch(e) {
+    showToast('Error al eliminar. Intenta de nuevo.');
+    console.error(e);
+  }
+  closeDeleteDialog();
+  if (isDraftDelete) renderDrafts(); else renderTable(allSubs);
+}
+
+// ── Column visibility ──────────────────────────────────────
+const COLUMNS = [
+  { key:'id',       label:'ID',                 visible:true,  required:true },
+  { key:'prospecto',label:'Prospecto',           visible:true,  required:true },
+  { key:'asesor',   label:'Asesor',              visible:true,  required:true },
+  { key:'email',    label:'E-mail del Asesor',   visible:true  },
+  { key:'motivo',   label:'Motivo',              visible:true  },
+  { key:'fnac',     label:'Fecha de nacimiento', visible:false },
+  { key:'pais',     label:'País',                visible:false },
+  { key:'fecha',    label:'Fecha de Envío',      visible:true  },
+  { key:'estado',   label:'Estado',              visible:true  },
+  { key:'acciones', label:'Acciones',            visible:true,  required:true },
+];
+
+function buildColsMenu() {
+  const list = document.getElementById('cols-menu-list');
+  if (!list) return;
+  list.innerHTML = COLUMNS
+    .map((col, i) => ({ col, i }))
+    .filter(({ col }) => !col.required)  // hide required cols from menu
+    .map(({ col, i }) => `
+    <div class="col-toggle-row" onclick="toggleCol(${i})">
+      <span class="col-toggle-label">${col.label}</span>
+      <div class="col-toggle-switch ${col.visible ? 'on' : ''}" id="col-sw-${i}"></div>
+    </div>`).join('');
+}
+
+function toggleCol(i) {
+  if (COLUMNS[i].required) return; // can't hide ID or Acciones
+  COLUMNS[i].visible = !COLUMNS[i].visible;
+  const sw = document.getElementById(`col-sw-${i}`);
+  if (sw) sw.classList.toggle('on', COLUMNS[i].visible);
+  renderTable(lastRendered);
+}
+
+let lastRendered = [];
+
+function toggleColsMenu(e) {
+  e.stopPropagation();
+  document.getElementById('cols-menu').classList.toggle('open');
+}
+// Close cols menu on outside click
+document.addEventListener('click', () => {
+  document.getElementById('cols-menu')?.classList.remove('open');
+  document.getElementById('cols-menu-draft')?.classList.remove('open');
+});
+
+// ── Detail view (full page) ────────────────────────────────
+let detailIdx = null;
+const notesStore = {};
+const zendeskStore = {};
+
+function openDetailView(realIdx) {
+  const s = allSubs[realIdx];
+  if (!s) return;
+  detailIdx = realIdx;
+  const id = s.id || '';
+  if (!notesStore[id]) notesStore[id] = [];
+
+  // Hide tabs + panels, show detail view
+  document.querySelector('.tabs').style.display = 'none';
+  document.getElementById('panel-enviadas').style.display = 'none';
+  document.getElementById('panel-progreso').style.display = 'none';
+  document.getElementById('detail-view').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Header
+  document.getElementById('dv-heading').textContent = s.prospecto?.nombre || '—';
+  document.getElementById('dv-id-pill').textContent = id;
+
+  // Summary grid
+  const ag = s.prospecto?.edad ? s.prospecto.edad + ' años' : '—';
+  document.getElementById('dv-summary').innerHTML = `
+    <div class="detail-field"><span class="detail-field-label">Asesor</span><span class="detail-field-value">${s.asesor?.nombre||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">E-mail del asesor</span><span class="detail-field-value">${s.asesor?.email||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">País</span><span class="detail-field-value">${s.prospecto?.pais||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Fecha de nacimiento</span><span class="detail-field-value">${s.prospecto?.fnac||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Edad</span><span class="detail-field-value">${ag}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Género</span><span class="detail-field-value">${s.prospecto?.genero||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Fumador</span><span class="detail-field-value">${s.prospecto?.fumador==='si'?'Sí':'No'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Ocupación</span><span class="detail-field-value">${s.prospecto?.ocupacion||'—'}</span></div>
+    <div class="detail-field full"><span class="detail-field-label">Motivo(s)</span><span class="detail-field-value">${s.motivos||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Término</span><span class="detail-field-value">${s.plan?.termino||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Cobertura</span><span class="detail-field-value">${s.plan?.cobertura||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Estado</span><span class="detail-field-value">${s.estado||'—'}</span></div>
+    <div class="detail-field"><span class="detail-field-label">Fecha de envío</span><span class="detail-field-value">${s.fechaEnvio||'—'}</span></div>`;
+
+  // Docs
+  const archivos = (s.archivosAdjuntos?.medicos?.length||0)+(s.archivosAdjuntos?.adicionales?.length||0);
+  document.getElementById('dv-docs').innerHTML = `
+    <button class="btn btn-primary btn-sm" onclick="downloadPDF(${realIdx})">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Descargar PDF
+    </button>
+    ${archivos>0?`<button class="btn btn-secondary btn-sm" onclick="openFilesDrawer(${realIdx})">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      Archivos adjuntos (${archivos})
+    </button>`:''}`;
+
+  // Zendesk
+  renderZendeskSection(id, realIdx);
+
+  // Notes
+  document.getElementById('dv-note-input').value = '';
+  document.getElementById('dv-notes-list').innerHTML = renderNotesList(id, realIdx);
+}
+
+function closeDetailView() {
+  document.getElementById('detail-view').classList.remove('active');
+  document.querySelector('.tabs').style.display = '';
+  // Show whichever tab was active
+  const activeTab = document.querySelector('.tab-btn.active');
+  const tabName = activeTab?.id?.replace('tab-','') || 'enviadas';
+  document.getElementById(`panel-${tabName}`).style.display = '';
+  detailIdx = null;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderZendeskSection(subId, realIdx) {
+  const zk = zendeskStore[subId]||'';
+  document.getElementById('dv-zendesk').innerHTML = zk
+    ? `<div class="zendesk-badge"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Ticket #${zk}<button style="margin-left:8px;background:none;border:none;cursor:pointer;font:600 11px/1 var(--font);color:var(--color-turquoise);" onclick="showZendeskInput(${realIdx})">Editar</button></div>`
+    : `<div class="zendesk-row"><input class="zendesk-input" id="zd-input-${realIdx}" type="text" placeholder="Número de ticket (ej. 12345)"><button class="zendesk-save-btn" onclick="saveZendesk(${realIdx})">Guardar</button></div>`;
+}
+
+function showZendeskInput(realIdx) {
+  const id = allSubs[realIdx]?.id;
+  const zk = zendeskStore[id]||'';
+  document.getElementById('dv-zendesk').innerHTML = `<div class="zendesk-row"><input class="zendesk-input" id="zd-input-${realIdx}" type="text" value="${zk}"><button class="zendesk-save-btn" onclick="saveZendesk(${realIdx})">Guardar</button></div>`;
+}
+
+function saveZendesk(realIdx) {
+  const id = allSubs[realIdx]?.id;
+  const val = (document.getElementById(`zd-input-${realIdx}`)?.value||'').trim().replace('#','');
+  if (!val||!id) return;
+  zendeskStore[id] = val;
+  renderZendeskSection(id, realIdx);
+}
+
+function addNoteView() {
+  if (detailIdx===null) return;
+  const s = allSubs[detailIdx]; const id = s?.id;
+  const ta = document.getElementById('dv-note-input');
+  const text = ta?.value?.trim();
+  if (!text||!id) return;
+  if (!notesStore[id]) notesStore[id] = [];
+  notesStore[id].unshift({text, date:new Date().toLocaleString('es-PE'), id:Date.now()});
+  ta.value = '';
+  document.getElementById('dv-notes-list').innerHTML = renderNotesList(id, detailIdx);
+}
+
+// Keep addNote for compatibility — alias to addNoteView
+function addNote(realIdx) { detailIdx = realIdx; addNoteView(); }
+
+function renderNotesList(subId, realIdx) {
+  const notes = notesStore[subId]||[];
+  const listId = `dv-notes-list`; // always the detail view list
+  if (!notes.length) return `<p style="font:400 12px/1.5 var(--font);color:var(--color-medium-grey);margin-top:12px;">Sin notas aún.</p>`;
+  return notes.map((n,ni) => `
+    <div class="note-card" id="note-card-${ni}">
+      <div class="note-card-header">
+        <span class="note-card-date">${n.date}</span>
+        <div class="note-card-actions">
+          <button class="note-card-btn" onclick="editNote('${subId}',${ni})"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="note-card-btn" style="color:#DD0000;" onclick="deleteNote('${subId}',${ni})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+        </div>
+      </div>
+      <div class="note-card-text">${n.text}</div>
+    </div>`).join('');
+}
+
+function editNote(subId, ni) {
+  const n = notesStore[subId][ni];
+  document.getElementById(`note-card-${ni}`).innerHTML = `
+    <textarea class="note-edit-area" id="note-edit-${ni}">${n.text}</textarea>
+    <div class="note-edit-actions">
+      <button class="btn btn-primary btn-sm" onclick="saveNote('${subId}',${ni})">Guardar</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('dv-notes-list').innerHTML=renderNotesList('${subId}',${detailIdx})">Cancelar</button>
+    </div>`;
+}
+
+function saveNote(subId, ni) {
+  const val = document.getElementById(`note-edit-${ni}`)?.value?.trim();
+  if (!val) return;
+  notesStore[subId][ni].text = val;
+  if (!notesStore[subId][ni].date.includes('editada')) notesStore[subId][ni].date += ' (editada)';
+  document.getElementById('dv-notes-list').innerHTML = renderNotesList(subId, detailIdx);
+}
+
+function deleteNote(subId, ni) {
+  notesStore[subId].splice(ni,1);
+  document.getElementById('dv-notes-list').innerHTML = renderNotesList(subId, detailIdx);
+}
+
+// ── Draft columns ──────────────────────────────────────────
+const DRAFT_COLUMNS = [
+  { key:'id',       label:'ID',                  visible:true, required:true },
+  { key:'prospecto',label:'Prospecto',            visible:true, required:true },
+  { key:'asesor',   label:'Asesor',               visible:true, required:true },
+  { key:'email',    label:'E-mail del Asesor',    visible:true  },
+  { key:'fnac',     label:'Fecha de nacimiento',  visible:false },
+  { key:'pais',     label:'País',                 visible:false },
+  { key:'fecha',    label:'Últ. actualización',   visible:true  },
+  { key:'pct',      label:'% Progreso',           visible:true  },
+  { key:'paso',     label:'Último paso',          visible:true  },
+  { key:'acciones', label:'',                     visible:true, required:true },
+];
+
+function buildColsMenuDraft() {
+  const list = document.getElementById('cols-menu-draft-list');
+  if (!list) return;
+  list.innerHTML = DRAFT_COLUMNS
+    .map((col,i) => ({col,i}))
+    .filter(({col}) => !col.required && col.label)
+    .map(({col,i}) => `<div class="col-toggle-row" onclick="toggleDraftCol(${i})"><span class="col-toggle-label">${col.label}</span><div class="col-toggle-switch ${col.visible?'on':''}" id="draftcol-sw-${i}"></div></div>`).join('');
+}
+
+function toggleDraftCol(i) {
+  if (DRAFT_COLUMNS[i].required) return;
+  DRAFT_COLUMNS[i].visible = !DRAFT_COLUMNS[i].visible;
+  const sw = document.getElementById(`draftcol-sw-${i}`);
+  if (sw) sw.classList.toggle('on', DRAFT_COLUMNS[i].visible);
+  renderDrafts();
+}
+
+function toggleColsMenuDraft(e) {
+  e.stopPropagation();
+  document.getElementById('cols-menu-draft').classList.toggle('open');
+}
+
+// ── Draft filters ──────────────────────────────────────────
+function toggleFiltersDraft() {
+  const s = document.getElementById('filter-sidebar-draft');
+  const o = document.getElementById('filter-overlay-draft');
+  const isOpen = s.classList.contains('open');
+  s.classList.toggle('open',!isOpen); o.classList.toggle('open',!isOpen);
+}
+function closeFiltersDraft() {
+  document.getElementById('filter-sidebar-draft').classList.remove('open');
+  document.getElementById('filter-overlay-draft').classList.remove('open');
+}
+function buildPasoChecks() {
+  const el = document.getElementById('fs-paso-checks');
+  if (!el) return;
+  el.innerHTML = Object.entries(PASO_LABELS).map(([k,v]) => `<label class="fs-check-label"><input type="checkbox" class="fs-check" name="f-paso" value="${k}"><span class="fs-check-box"></span><span>${v}</span></label>`).join('');
+}
+function applyFiltersDraft() {
+  const fechaDesde = parseDateFilter(document.getElementById('fd-fecha-desde').value);
+  const fechaHasta = parseDateFilter(document.getElementById('fd-fecha-hasta').value);
+  const pasos = Array.from(document.querySelectorAll('input.fs-check[name="f-paso"]:checked')).map(i=>i.value);
+  let n=0; if(fechaDesde)n++; if(fechaHasta)n++; if(pasos.length)n++;
+  const badge = document.getElementById('filter-badge-draft');
+  badge.style.display = n>0?'inline-flex':'none'; badge.textContent=n;
+  renderDrafts({fechaDesde,fechaHasta,pasos});
+}
+function clearFiltersDraft() {
+  document.getElementById('fd-fecha-desde').value='';
+  document.getElementById('fd-fecha-hasta').value='';
+  document.querySelectorAll('input.fs-check[name="f-paso"]').forEach(cb=>cb.checked=false);
+  document.getElementById('filter-badge-draft').style.display='none';
+  renderDrafts();
+}
+
+function buildSidebarChecks() {
+  const estados = ['Nueva','Pendiente Dr. Mora Review','Pendiente Resp. Asesor','Sin Resp. de Asesor','Postergada','Aceptada con extracargo','Aceptada','Rechazada'];
+  const motivos = ['Actividades deportivas','Historial médico','Ocupación','Otros'];
+  const makeChecks = (opts, name) => opts.map(o =>
+    `<label class="fs-check-label"><input type="checkbox" class="fs-check" name="${name}" value="${o}"><span class="fs-check-box"></span><span>${o}</span></label>`
+  ).join('');
+  const ec = document.getElementById('fs-estado-checks');
+  const mc = document.getElementById('fs-motivo-checks');
+  if (ec) ec.innerHTML = makeChecks(estados, 'f-estado');
+  if (mc) mc.innerHTML = makeChecks(motivos, 'f-motivo');
+}
+
+// ── Filters ────────────────────────────────────────────────
+function toggleFilters() {
+  const sidebar = document.getElementById('filter-sidebar');
+  const overlay = document.getElementById('filter-overlay');
+  const isOpen = sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+}
+function closeFilters() {
+  document.getElementById('filter-sidebar').classList.remove('open');
+  document.getElementById('filter-overlay').classList.remove('open');
+}
+function toggleFsSection(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function fmtFilterDate(el) {
+  let raw = el.value.replace(/\D/g,'').slice(0,8);
+  if (raw.length > 4) raw = raw.slice(0,2)+'/'+raw.slice(2,4)+'/'+raw.slice(4);
+  else if (raw.length > 2) raw = raw.slice(0,2)+'/'+raw.slice(2);
+  el.value = raw;
+}
+
+// Parse dd/mm/aaaa → timestamp for comparison
+function parseDateFilter(s) {
+  if (!s || s.length < 10) return null;
+  const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!m) return null;
+  return new Date(+m[3], +m[2]-1, +m[1]).getTime();
+}
+
+// Parse the stored fechaEnvio (e.g. "15/5/2026, 10:30:00 a.m.") → timestamp
+function parseFechaEnvio(s) {
+  if (!s) return null;
+  // Try dd/mm/yyyy or d/m/yyyy format from toLocaleString
+  const m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!m) return null;
+  return new Date(+m[3], +m[2]-1, +m[1]).getTime();
+}
+
+// Parse stored fnac (dd/mm/aaaa or ISO) → timestamp
+function parseFnacStored(s) {
+  if (!s) return null;
+  const dmy = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (dmy) return new Date(+dmy[3], +dmy[2]-1, +dmy[1]).getTime();
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1], +iso[2]-1, +iso[3]).getTime();
+  return null;
+}
+
+function applyFilters() {
+  const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
+  const fechaDesde = parseDateFilter(document.getElementById('f-fecha-desde').value);
+  const fechaHasta = parseDateFilter(document.getElementById('f-fecha-hasta').value);
+  const fnacDesde  = parseDateFilter(document.getElementById('f-fnac-desde').value);
+  const fnacHasta  = parseDateFilter(document.getElementById('f-fnac-hasta').value);
+  const pais       = document.getElementById('f-pais').value;
+
+  // Multi-select: read checked checkboxes
+  const estados  = Array.from(document.querySelectorAll('input.fs-check[name="f-estado"]:checked')).map(i => i.value);
+  const motivos  = Array.from(document.querySelectorAll('input.fs-check[name="f-motivo"]:checked')).map(i => i.value);
+
+  // Count active filters for sidebar badge
+  let activeCount = 0;
+  if (fechaDesde) activeCount++;
+  if (fechaHasta) activeCount++;
+  if (fnacDesde)  activeCount++;
+  if (fnacHasta)  activeCount++;
+  if (pais)       activeCount++;
+  if (estados.length) activeCount++;
+  if (motivos.length) activeCount++;
+  const badge = document.getElementById('filter-badge');
+  badge.style.display = activeCount > 0 ? 'inline-flex' : 'none';
+  badge.textContent = activeCount;
+
+  const filtered = allSubs.filter(s => {
+    // Text search
+    if (q && !(
+      (s.id||'').toLowerCase().includes(q) ||
+      (s.asesor?.nombre||'').toLowerCase().includes(q) ||
+      (s.asesor?.email||'').toLowerCase().includes(q) ||
+      (s.prospecto?.nombre||'').toLowerCase().includes(q) ||
+      (s.motivos||'').toLowerCase().includes(q)
+    )) return false;
+
+    // Fecha envío range
+    const fe = parseFechaEnvio(s.fechaEnvio);
+    if (fechaDesde && fe && fe < fechaDesde) return false;
+    if (fechaHasta && fe && fe > fechaHasta + 86399999) return false;
+
+    // Fecha nacimiento range
+    const fn = parseFnacStored(s.prospecto?.fnac);
+    if (fnacDesde && fn && fn < fnacDesde) return false;
+    if (fnacHasta && fn && fn > fnacHasta + 86399999) return false;
+
+    // País
+    if (pais && (s.prospecto?.pais||'') !== pais) return false;
+
+    // Estado multi-select
+    if (estados.length && !estados.includes(s.estado||'')) return false;
+
+    // Motivo multi-select (partial match — record can have multiple motivos)
+    if (motivos.length && !motivos.some(m => (s.motivos||'').includes(m))) return false;
+
+    return true;
+  });
+
   renderTable(filtered);
 }
 
+function clearFilters() {
+  ['f-fecha-desde','f-fecha-hasta','f-fnac-desde','f-fnac-hasta'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-pais').selectedIndex = 0;
+  document.querySelectorAll('input.fs-check').forEach(cb => cb.checked = false);
+  document.getElementById('search-input').value = '';
+  document.getElementById('filter-badge').style.display = 'none';
+  renderTable(allSubs);
+}
+
 function renderTable(subs) {
+  lastRendered = subs;
   const container = document.getElementById('table-container');
   if (!subs.length) {
     container.innerHTML = `<div class="empty-state">
@@ -425,51 +1298,54 @@ function renderTable(subs) {
     return;
   }
 
+  const vis = col => COLUMNS.find(c => c.key === col)?.visible;
+
+  // Build thead
+  const headers = COLUMNS.filter(c => c.visible).map(c => `<th>${c.label}</th>`).join('');
+
   const tableRows = subs.map(s => {
     const realIdx = allSubs.indexOf(s);
-    const pct = s.avance ?? 100;
     const isDraft = s.isDraft === true;
-    const estado = s.estado || 'Enviado';
-    const statusClass = estado === 'Enviado' ? 'status-enviado' : estado === 'En progreso' ? 'status-progreso' : 'status-pendiente';
+    const estadoActual = s.estado || 'Nueva';
+    const sc = statusClass(estadoActual);
     const archivos = (s.archivosAdjuntos?.medicos?.length||0) + (s.archivosAdjuntos?.adicionales?.length||0);
     const pdfDisabled = isDraft ? 'style="opacity:.35;cursor:not-allowed;" title="Disponible al completar el formulario"' : `title="Descargar PDF completo" onclick="downloadPDF(${realIdx})"`;
     const filesDisabled = (archivos===0||isDraft) ? 'style="opacity:.35;cursor:not-allowed;" onclick=""' : `onclick="openFilesDrawer(${realIdx})"`;
-    return `<tr>
-      <td class="td-bold" style="font-size:12px;color:var(--color-turquoise);">${s.id||'—'}</td>
-      <td class="td-bold">${s.asesor?.nombre||'—'}</td>
-      <td style="font-size:12px;">${s.asesor?.email||'—'}</td>
-      <td class="td-bold">${s.prospecto?.nombre||'—'}</td>
-      <td><span class="status-dot ${statusClass}">${estado}</span></td>
-      <td>
-        <div class="prog-bar-wrap">
-          <div class="prog-bar-mini"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
-          <span class="prog-pct">${pct}%</span>
-        </div>
-      </td>
-      <td style="font-size:12px;color:var(--color-medium-grey);">${s.fechaEnvio||'—'}</td>
-      <td>
-        <div class="td-actions">
-          <button class="btn btn-primary btn-sm btn-icon" ${pdfDisabled}>
-            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </button>
-          <button class="btn btn-secondary btn-sm btn-icon" title="Ver archivos adjuntos (${archivos})" ${filesDisabled}>
-            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-          </button>
-          <button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteDialog(${realIdx})" title="Eliminar registro">
-            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-          </button>
-        </div>
-      </td>
-    </tr>`;
+    const statusOptions = STATUS_OPTIONS.map(opt =>
+      `<option value="${opt}" ${opt === estadoActual ? 'selected' : ''}>${opt}</option>`
+    ).join('');
+
+    const cells = {
+      id:        `<td class="td-bold" style="font-size:11px;color:var(--color-turquoise);white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;" onclick="openDetailView(${realIdx})" title="Ver detalle">${s.id||'—'}</td>`,
+      prospecto: `<td class="td-bold">${s.prospecto?.nombre||'—'}</td>`,
+      asesor:    `<td>${s.asesor?.nombre||'—'}</td>`,
+      email:     `<td style="font-size:12px;">${s.asesor?.email||'—'}</td>`,
+      motivo:    `<td style="font-size:12px;max-width:160px;">${s.motivos||'—'}</td>`,
+      fnac:      `<td style="font-size:12px;color:var(--color-medium-grey);white-space:nowrap;">${s.prospecto?.fnac||'—'}</td>`,
+      pais:      `<td style="font-size:12px;">${s.prospecto?.pais||'—'}</td>`,
+      fecha:     `<td style="font-size:12px;color:var(--color-medium-grey);white-space:nowrap;">${s.fechaEnvio||'—'}</td>`,
+      estado:    `<td style="min-width:160px;"><div class="status-cell" id="status-cell-${realIdx}"><span class="status-badge ${sc}" id="status-label-${realIdx}" onclick="openStatusEditor(${realIdx})" title="Clic para editar estado">${estadoActual}</span><div class="status-editor" id="status-editor-${realIdx}"><select id="status-select-${realIdx}">${statusOptions}</select><div class="status-editor-actions"><button class="status-save-btn" onclick="saveStatus(${realIdx})">Guardar</button><button class="status-cancel-btn" onclick="closeStatusEditor(${realIdx})">Cancelar</button></div></div></div></td>`,
+      acciones:  `<td><div class="td-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="openDetailView(${realIdx})" title="Ver detalle"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="btn btn-primary btn-sm btn-icon" ${pdfDisabled}><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        <button class="btn btn-secondary btn-sm btn-icon" title="Ver archivos adjuntos (${archivos})" ${filesDisabled}><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="openDeleteDialog(${realIdx})" title="Eliminar registro"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+      </div></td>`,
+    };
+
+    return `<tr>${COLUMNS.filter(c => c.visible).map(c => cells[c.key]||'').join('')}</tr>`;
   }).join('');
 
   const mobileCards = subs.map(s => {
     const realIdx = allSubs.indexOf(s);
-    const pct = s.avance ?? 100;
     const isDraft = s.isDraft === true;
-    const estado = s.estado || 'Enviado';
-    const statusClass = estado === 'Enviado' ? 'status-enviado' : estado === 'En progreso' ? 'status-progreso' : 'status-pendiente';
+    const estado = s.estado || 'Nueva';
+    const sc = statusClass(estado);
     const archivos = (s.archivosAdjuntos?.medicos?.length||0) + (s.archivosAdjuntos?.adicionales?.length||0);
+    const statusOptions = STATUS_OPTIONS.map(opt =>
+      `<option value="${opt}" ${opt === estado ? 'selected' : ''}>${opt}</option>`
+    ).join('');
+    const vis = key => COLUMNS.find(c => c.key === key)?.visible;
     return `<div class="sub-mobile-card">
       <div class="sub-mc-top">
         <div>
@@ -478,22 +1354,25 @@ function renderTable(subs) {
         </div>
         <span class="sub-mc-id">${s.id||'—'}</span>
       </div>
-      <div class="sub-mc-row">
+      ${vis('motivo') ? `<div class="sub-mc-row"><span class="sub-mc-label">Motivo</span><span style="font:400 12px/1.4 var(--font);color:var(--color-dark-grey);text-align:right;max-width:60%;">${s.motivos||'—'}</span></div>` : ''}
+      ${vis('fnac') ? `<div class="sub-mc-row"><span class="sub-mc-label">Fecha nacimiento</span><span style="font:400 12px/1 var(--font);color:var(--color-medium-grey);">${s.prospecto?.fnac||'—'}</span></div>` : ''}
+      ${vis('pais') ? `<div class="sub-mc-row"><span class="sub-mc-label">País</span><span style="font:400 12px/1 var(--font);color:var(--color-dark-grey);">${s.prospecto?.pais||'—'}</span></div>` : ''}
+      ${vis('fecha') ? `<div class="sub-mc-row"><span class="sub-mc-label">Fecha de envío</span><span style="font:400 12px/1 var(--font);color:var(--color-medium-grey);">${s.fechaEnvio||'—'}</span></div>` : ''}
+      ${vis('estado') ? `<div class="sub-mc-row" style="align-items:flex-start;">
         <span class="sub-mc-label">Estado</span>
-        <span class="status-dot ${statusClass}">${estado}</span>
-      </div>
-      <div class="sub-mc-row">
-        <span class="sub-mc-label">Avance</span>
-        <div class="prog-bar-wrap">
-          <div class="prog-bar-mini"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
-          <span class="prog-pct">${pct}%</span>
+        <div class="status-cell" style="align-items:flex-end;">
+          <span class="status-badge ${sc}" id="status-label-mc-${realIdx}" onclick="openStatusEditor('mc-${realIdx}')" title="Clic para editar estado">${estado}</span>
+          <div class="status-editor" id="status-editor-mc-${realIdx}" style="align-items:flex-end;">
+            <select id="status-select-mc-${realIdx}">${statusOptions}</select>
+            <div class="status-editor-actions">
+              <button class="status-save-btn" onclick="saveStatus('mc-${realIdx}', ${realIdx})">Guardar</button>
+              <button class="status-cancel-btn" onclick="closeStatusEditor('mc-${realIdx}')">Cancelar</button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="sub-mc-row">
-        <span class="sub-mc-label">Última actividad</span>
-        <span style="font:400 12px/1 var(--font);color:var(--color-medium-grey);">${s.fechaEnvio||'—'}</span>
-      </div>
+      </div>` : ''}
       <div class="sub-mc-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" onclick="openDetailView(${realIdx})" title="Ver detalle"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
         <button class="btn btn-primary btn-sm" ${isDraft ? 'style="opacity:.35;cursor:not-allowed;"' : `onclick="downloadPDF(${realIdx})"`}>
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           PDF
@@ -511,17 +1390,79 @@ function renderTable(subs) {
 
   container.innerHTML = `
     <div class="table-scroll"><div class="table-wrap"><table>
-      <thead><tr>
-        <th>ID</th><th>Asesor</th><th>E-mail</th><th>Prospecto</th>
-        <th>Estado</th><th>% Avance</th><th>Última actividad</th><th>Acciones</th>
-      </tr></thead>
+      <thead><tr>${headers}</tr></thead>
       <tbody>${tableRows}</tbody>
     </table></div></div>
     <div class="sub-cards">${mobileCards}</div>
   `;
 }
 
-// ── Delete ─────────────────────────────────────────────────
+// ── Status config ──────────────────────────────────────────
+const STATUS_OPTIONS = [
+  'Nueva',
+  'Pendiente Dr. Mora Review',
+  'Pendiente Resp. Asesor',
+  'Sin Resp. de Asesor',
+  'Postergada',
+  'Aceptada con extracargo',
+  'Aceptada',
+  'Rechazada',
+];
+
+function statusClass(estado) {
+  const map = {
+    'Nueva':'s-nueva', 'En progreso':'s-progreso',
+    'Pendiente Dr. Mora Review':'s-pendiente', 'Pendiente Resp. Asesor':'s-pendiente',
+    'Sin Resp. de Asesor':'s-sinresp', 'Postergada':'s-postergada',
+    'Aceptada con extracargo':'s-extracargo', 'Aceptada':'s-aceptada', 'Rechazada':'s-rechazada',
+  };
+  return map[estado] || 's-nueva';
+}
+
+// ── Status editor ──────────────────────────────────────────
+function openStatusEditor(id) {
+  document.getElementById(`status-editor-${id}`).classList.add('open');
+}
+function closeStatusEditor(id) {
+  document.getElementById(`status-editor-${id}`).classList.remove('open');
+}
+async function saveStatus(id, realIdxOverride) {
+  // id can be "42" (desktop) or "mc-42" (mobile)
+  const realIdx = realIdxOverride !== undefined ? realIdxOverride
+    : parseInt(id);
+  const newEstado = document.getElementById(`status-select-${id}`).value;
+  const s = allSubs[realIdx];
+  if (!s) return;
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/pre_evaluaciones?id=eq.${encodeURIComponent(s.id)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({ estado: newEstado }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    allSubs[realIdx].estado = newEstado;
+    const sc = statusClass(newEstado);
+    // Update desktop badge
+    const label = document.getElementById(`status-label-${realIdx}`);
+    if (label) { label.textContent = newEstado; label.className = `status-badge ${sc}`; }
+    // Update mobile badge
+    const labelMc = document.getElementById(`status-label-mc-${realIdx}`);
+    if (labelMc) { labelMc.textContent = newEstado; labelMc.className = `status-badge ${sc}`; }
+    // Sync the other select
+    const otherSelect = document.getElementById(`status-select-${realIdx === parseInt(id) ? 'mc-'+realIdx : realIdx}`);
+    if (otherSelect) otherSelect.value = newEstado;
+    closeStatusEditor(id);
+    showToast(`Estado actualizado: ${newEstado}`);
+  } catch(e) {
+    showToast('Error al actualizar estado. Intenta de nuevo.');
+    console.error(e);
+  }
+}
 function openDeleteDialog(idx) {
   deleteIndex = idx;
   const s = allSubs[idx];
@@ -529,24 +1470,6 @@ function openDeleteDialog(idx) {
   document.getElementById('delete-overlay').classList.add('open');
 }
 function closeDeleteDialog() { document.getElementById('delete-overlay').classList.remove('open'); deleteIndex = null; }
-async function confirmDelete() {
-  if (deleteIndex === null) return;
-  const id = allSubs[deleteIndex].id;
-  try {
-    await sbDelete(id);
-    allSubs.splice(deleteIndex, 1);
-  } catch(e) {
-    showToast('Error al eliminar. Intenta de nuevo.');
-    console.error(e);
-    closeDeleteDialog();
-    return;
-  }
-  closeDeleteDialog();
-  document.getElementById('count-badge').textContent = allSubs.length + (allSubs.length===1?' enviada':' enviadas');
-  filterTable();
-  showToast('Registro eliminado correctamente.');
-}
-
 // ── Files drawer ───────────────────────────────────────────
 function openFilesDrawer(idx) {
   const s = allSubs[idx];
@@ -1066,6 +1989,10 @@ function showToast(msg) {
 
 // ── Init ───────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  buildSidebarChecks();
+  buildColsMenu();
+  buildColsMenuDraft();
+  buildPasoChecks();
   if (sessionStorage.getItem('bo_auth') === '1') {
     document.getElementById('login-screen').classList.add('hidden');
     const app = document.getElementById('app-root');
