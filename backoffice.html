@@ -1665,8 +1665,8 @@ function downloadPDF(idx) {
       pilAccPil:'¿Accidentes o suspensión de licencia?', pilAccPilDet:'Detalle accidente piloto',
       // PEP
       pepTitle:'Cuestionario PEP — Persona Políticamente Expuesta',
-      pepEs:'¿Es una persona PEP?', pepDet:'Cargo o función pública',
-      pepNom:'¿Ha usado otro nombre?', pepNomDet:'Otro(s) nombre(s)',
+      pepEs:'¿El prospecto o familiar directo es PEP?', pepNombre:'Nombre', pepParentesco:'Parentesco con el asegurado', pepDet:'Cargo o función pública',
+      pepNom:'¿Utiliza o ha utilizado otro nombre?', pepNomParentesco:'Parentesco con el asegurado', pepNomDet:'Nombre alternativo',
       // Viajes
       vTitle:'Cuestionario de viajes',
       v1:'¿Planea viajar en los próximos 12 meses?',
@@ -1722,8 +1722,8 @@ function downloadPDF(idx) {
       pilAccPil:'Accidents or license suspension?', pilAccPilDet:'Accident detail',
       // PEP
       pepTitle:'PEP Questionnaire — Politically Exposed Person',
-      pepEs:'Is the prospect a PEP?', pepDet:'Public office or function',
-      pepNom:'Has used another name?', pepNomDet:'Other name(s)',
+      pepEs:'Is the prospect or direct family member a PEP?', pepNombre:'Full name', pepParentesco:'Relationship to insured', pepDet:'Public office or function',
+      pepNom:'Uses or has used another name?', pepNomParentesco:'Relationship to insured', pepNomDet:'Alternative name',
       // Travel
       vTitle:'Travel questionnaire',
       v1:'Plans to travel in the next 12 months?',
@@ -1872,9 +1872,16 @@ function downloadPDF(idx) {
   if (pep) {
     sectionHeader(L.pepTitle);
     row(L.pepEs, pep.esPep === 'si' ? L.si : L.no);
-    if (pep.esPep === 'si') row(L.pepDet, pep.pepDetalle, true);
+    if (pep.esPep === 'si') {
+      row(L.pepNombre, pep.pepNombre, true);
+      row(L.pepParentesco, pep.pepParentesco, true);
+      row(L.pepDet, pep.pepDetalle, true);
+    }
     row(L.pepNom, pep.otroNombre === 'si' ? L.si : L.no);
-    if (pep.otroNombre === 'si') row(L.pepNomDet, pep.otroNombreDet, true);
+    if (pep.otroNombre === 'si') {
+      row(L.pepNomParentesco, pep.otroNombreParentesco, true);
+      row(L.pepNomDet, pep.otroNombreDet, true);
+    }
     y += 3;
   }
 
