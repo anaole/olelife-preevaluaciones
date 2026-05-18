@@ -24,7 +24,7 @@
     /* ── HEADER BANNER ── */
     .site-header {
       position: sticky; top: 0; z-index: 50;
-      background: linear-gradient(180deg, #212840 0%, #212840 2%, #373D54 100%);
+      background: linear-gradient(120deg, #1E2540 0%, #2A3254 40%, #1E3060 100%);
       box-shadow: 0 4px 24px rgba(0,0,0,.35);
       padding: 0 24px;
       display: grid;
@@ -1376,6 +1376,8 @@ function applyTranslations() {
 }
 const SB_URL = 'https://hpjvljotjzzrnkpsewzy.supabase.co';
 const SB_KEY = 'sb_publishable_D658YrHARFo_m-XSYVzgtA_95g2TR2J';
+// ─── WordPress REST endpoint para envío de email ──────────
+const WP_EMAIL_URL = 'https://olelife.com/wp-json/olelife/v1/send-email';
 
 async function sbUpsert(record) {
   try {
@@ -1810,6 +1812,67 @@ async function submitFinal() {
       });
     } catch(e) { console.warn('Error guardando archivo:', f.name, e); }
   }
+
+  // ── Enviar email via WordPress ──────────────────────────
+  try {
+    // Generate PDF as base64
+    let pdfBase64 = null;
+    try {
+      const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4' });
+      // Simple summary PDF for email (full PDF generation happens in backoffice)
+      pdfDoc.setFont('helvetica','bold'); pdfDoc.setFontSize(14); pdfDoc.setTextColor('#1E2540');
+      pdfDoc.text('OléLife — Pre-Evaluación', 16, 18);
+      pdfDoc.setFont('helvetica','normal'); pdfDoc.setFontSize(9); pdfDoc.setTextColor('#9BACCB');
+      pdfDoc.text(`ID: ${payload.id}  ·  ${payload.fechaEnvio}`, 16, 25);
+      pdfDoc.setDrawColor('#E5ECF8'); pdfDoc.setLineWidth(0.3);
+      pdfDoc.line(16, 28, 194, 28);
+      let y = 35;
+      const field = (label, val) => {
+        pdfDoc.setFont('helvetica','bold'); pdfDoc.setFontSize(8); pdfDoc.setTextColor('#9BACCB');
+        pdfDoc.text(label, 16, y);
+        pdfDoc.setFont('helvetica','normal'); pdfDoc.setTextColor('#373D54');
+        pdfDoc.text(String(val||'—'), 80, y);
+        y += 7;
+      };
+      field('Prospecto', payload.prospecto.nombre);
+      field('País', payload.prospecto.pais);
+      field('Fecha de nacimiento', payload.prospecto.fnac);
+      field('Género', payload.prospecto.genero);
+      field('Fumador', payload.prospecto.fumador === 'si' ? 'Sí' : 'No');
+      field('Ocupación', payload.prospecto.ocupacion);
+      field('Asesor', payload.asesor.nombre);
+      field('E-mail del asesor', payload.asesor.email);
+      field('Motivo(s)', payload.motivos);
+      field('Término', payload.plan?.termino);
+      field('Cobertura', payload.plan?.cobertura);
+      pdfBase64 = pdfDoc.output('datauristring');
+    } catch(pdfErr) { console.warn('PDF generation for email failed:', pdfErr); }
+
+    // Build adjuntos array: PDF + all uploaded files
+    const adjuntos = [];
+    const prospSlug = (payload.prospecto.nombre||'prospecto').replace(/\s+/g,'-');
+    if (pdfBase64) {
+      adjuntos.push({ nombre: `${payload.id}-${prospSlug}-SolicitudDePreEvaluacion.pdf`, data: pdfBase64 });
+    }
+    S.fileData.med.forEach(f => adjuntos.push({ nombre: `${payload.id}-${prospSlug}-${f.name}`, data: f.data }));
+    S.fileData.adic.forEach(f => adjuntos.push({ nombre: `${payload.id}-${prospSlug}-${f.name}`, data: f.data }));
+
+    await fetch(WP_EMAIL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: payload.id,
+        prospecto: payload.prospecto.nombre,
+        asesor: payload.asesor.nombre,
+        emailAsesor: payload.asesor.email,
+        motivos: payload.motivos,
+        pais: payload.prospecto.pais,
+        cobertura: payload.plan?.cobertura,
+        termino: payload.plan?.termino,
+        adjuntos,
+      }),
+    });
+  } catch(emailErr) { console.warn('Error enviando email:', emailErr); }
 
   if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = 'Enviar formulario <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>'; }
 
