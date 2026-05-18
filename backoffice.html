@@ -735,37 +735,23 @@ async function loadSubmissions() {
   if (draftContainer) draftContainer.innerHTML = '';
   try {
     const rows = await sbFetch();
-    const filesRes = await fetch(`${SB_URL}/rest/v1/pre_evaluaciones_archivos?select=evaluacion_id,nombre,tipo,seccion,data&order=created_at.asc`, {
-      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
-    });
-    const allFiles = filesRes.ok ? await filesRes.json() : [];
-    const filesByEval = {};
-    allFiles.forEach(f => {
-      if (!filesByEval[f.evaluacion_id]) filesByEval[f.evaluacion_id] = { medicos: [], adicionales: [] };
-      const group = f.seccion === 'medicos' ? 'medicos' : 'adicionales';
-      filesByEval[f.evaluacion_id][group].push({ name: f.nombre, type: f.tipo, data: f.data });
-    });
 
-    const mapped = rows.map(r => {
-      const archivosData = filesByEval[r.id] || { medicos: [], adicionales: [] };
-      return {
-        id: r.id, fechaEnvio: r.fecha_envio, estado: r.estado,
-        avance: r.avance, isDraft: r.is_draft,
-        asesor: { nombre: r.asesor_nombre, email: r.asesor_email },
-        prospecto: { nombre: r.prospecto_nombre, ...(r.payload?.prospecto || {}) },
-        motivos: r.motivos, plan: r.payload?.plan || {},
-        cuestionario: r.payload?.cuestionario || {}, pep: r.payload?.pep || {},
-        viajes: r.payload?.viajes || {}, adicional: r.payload?.adicional || '',
-        otrosDetalle: r.payload?.otrosDetalle || '',
-        archivosAdjuntos: {
-          medicos: archivosData.medicos.map(f => f.name),
-          adicionales: archivosData.adicionales.map(f => f.name),
-        },
-        archivosData, firma: r.firma, _raw: r,
-      };
-    });
+    // ── Archivos NO se cargan aquí — se cargan bajo demanda al abrir drawer/detalle ──
+    const mapped = rows.map(r => ({
+      id: r.id, fechaEnvio: r.fecha_envio, estado: r.estado,
+      avance: r.avance, isDraft: r.is_draft,
+      asesor: { nombre: r.asesor_nombre, email: r.asesor_email },
+      prospecto: { nombre: r.prospecto_nombre, ...(r.payload?.prospecto || {}) },
+      motivos: r.motivos, plan: r.payload?.plan || {},
+      cuestionario: r.payload?.cuestionario || {}, pep: r.payload?.pep || {},
+      viajes: r.payload?.viajes || {}, adicional: r.payload?.adicional || '',
+      otrosDetalle: r.payload?.otrosDetalle || '',
+      archivosAdjuntos: { medicos: [], adicionales: [] },
+      archivosData: null,
+      archivosLoaded: false,
+      firma: r.firma, _raw: r,
+    }));
 
-    // Split sent vs drafts
     allSubs   = mapped.filter(s => !s.isDraft);
     allDrafts = mapped.filter(s => s.isDraft);
 
@@ -775,13 +761,31 @@ async function loadSubmissions() {
     console.error('Supabase error:', e);
   }
 
-  // Update tab counts
   document.getElementById('tab-count-enviadas').textContent = allSubs.length;
   document.getElementById('tab-count-progreso').textContent = allDrafts.length;
   document.getElementById('count-badge').textContent = allSubs.length + (allSubs.length===1?' enviada':' enviadas');
 
   renderTable(allSubs);
   renderDrafts();
+}
+
+// ── Carga lazy de archivos para una solicitud específica ───
+async function loadFilesForSub(realIdx) {
+  const s = allSubs[realIdx];
+  if (!s || s.archivosLoaded) return;
+  try {
+    const res = await fetch(
+      `${SB_URL}/rest/v1/pre_evaluaciones_archivos?evaluacion_id=eq.${encodeURIComponent(s.id)}&select=nombre,tipo,seccion,data&order=created_at.asc`,
+      { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } }
+    );
+    if (!res.ok) return;
+    const files = await res.json();
+    const medicos    = files.filter(f => f.seccion === 'medicos').map(f => ({ name: f.nombre, type: f.tipo, data: f.data }));
+    const adicionales = files.filter(f => f.seccion !== 'medicos').map(f => ({ name: f.nombre, type: f.tipo, data: f.data }));
+    allSubs[realIdx].archivosData      = { medicos, adicionales };
+    allSubs[realIdx].archivosAdjuntos  = { medicos: medicos.map(f=>f.name), adicionales: adicionales.map(f=>f.name) };
+    allSubs[realIdx].archivosLoaded    = true;
+  } catch(e) { console.warn('Error cargando archivos:', e); }
 }
 
 function switchTab(tab) {
@@ -942,7 +946,8 @@ let detailIdx = null;
 const notesStore = {};
 const zendeskStore = {};
 
-function openDetailView(realIdx) {
+async function openDetailView(realIdx) {
+  await loadFilesForSub(realIdx);
   const s = allSubs[realIdx];
   if (!s) return;
   detailIdx = realIdx;
@@ -1471,7 +1476,8 @@ function openDeleteDialog(idx) {
 }
 function closeDeleteDialog() { document.getElementById('delete-overlay').classList.remove('open'); deleteIndex = null; }
 // ── Files drawer ───────────────────────────────────────────
-function openFilesDrawer(idx) {
+async function openFilesDrawer(idx) {
+  await loadFilesForSub(idx);
   const s = allSubs[idx];
   const prospecto = (s.prospecto?.nombre || 'prospecto').trim();
   const idSlug = s.id || 'PREV';
@@ -1538,7 +1544,8 @@ function downloadSingleFile(encodedData, filename) {
 }
 
 // ── Generate PDF ────────────────────────────────────────────
-function downloadPDF(idx) {
+async function downloadPDF(idx) {
+  await loadFilesForSub(idx);
   const s = allSubs[idx];
   if (!s) return;
 
