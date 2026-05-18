@@ -66,11 +66,11 @@
     .header-disclaimer-pill {
       display: none; /* hidden on mobile */
       align-items: center; gap: 7px;
-      border: 1.5px solid #00D090;
+      border: 1.5px solid rgba(0,187,221,.5);
       border-radius: 999px;
       padding: 6px 14px;
       font: 600 11px/1.3 var(--font);
-      color: #00D090;
+      color: var(--color-turquoise);
     }
     @media (min-width: 640px) { .header-disclaimer-pill { display: inline-flex; } }
 
@@ -195,7 +195,8 @@
     .conditional-block.show { display: block; }
     .divider { height: 1px; background: var(--color-bg-grey); margin: 24px 0; }
     .dropzone { min-height: 100px; border-radius: var(--radius-input); border: 2px dashed var(--color-light-grey); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: border-color 150ms, background 150ms; text-align: center; padding: 20px; }
-    .dropzone:hover { border-color: var(--color-turquoise); background: var(--color-turquoise-soft); }
+    .dropzone:hover, .dropzone.drag-over { border-color: var(--color-turquoise); background: var(--color-turquoise-soft); }
+    .dropzone.drag-over { border-style: solid; }
     .dropzone svg { stroke: var(--color-medium-grey); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
     .dropzone:hover svg { stroke: var(--color-turquoise); }
     .dropzone span { font: 600 13px/16px var(--font); color: var(--color-medium-grey); }
@@ -488,7 +489,12 @@
         <div class="field-group field-full"><label class="field-label" for="med-detalles"><span id="med-det-label">Detalles del historial médico</span> <span class="required-star">*</span></label><textarea class="field-input" id="med-detalles" rows="4" placeholder="Describe diagnósticos, tratamientos, cirugías u otras condiciones relevantes..."></textarea><div class="field-error" id="err-med-detalles">Obligatorio.</div></div>
         <div class="field-group field-full">
           <label class="field-label"><span id="med-docs-label">Adjuntar documentos médicos</span> <span class="required-star">*</span> <span style="font-weight:400;color:var(--color-medium-grey)" id="med-docs-note">(mínimo 1 archivo)</span></label>
-          <div class="dropzone" onclick="document.getElementById('fi-med').click()">
+          <div class="dropzone"
+            onclick="document.getElementById('fi-med').click()"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="event.preventDefault();this.classList.remove('drag-over');handleDrop(event,'fi-med','fl-med','med')"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span id="drop-med-span">Haz clic o arrastra archivos aquí</span><small id="drop-med-small">PDF, JPG, PNG · Máx. 10 MB por archivo</small>
             <input type="file" id="fi-med" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="addFiles('fi-med','fl-med','med')">
@@ -556,8 +562,58 @@
       <h2 class="card-title" id="pep-title">Cuestionario PEP</h2>
       <p class="card-sub" id="pep-sub">Las Personas Expuestas Políticamente (PEP) son individuos quienes son o han sido, en cierto momento, encargados de desempeñar funciones públicas de un estado, departamento, provincia o país.</p>
       <div class="yn-stack">
-        <div class="field-group"><label class="field-label"><span id="pep-label">¿El prospecto es una persona PEP?</span> <span class="required-star">*</span></label><div class="radio-group" id="rg-pep"><label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="si"><span class="radio-dot"></span><span id="pep-si">Sí</span></label><label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="no"><span class="radio-dot"></span><span id="pep-no">No</span></label></div><div class="conditional-block" id="cond-pep"><div class="field-group"><label class="field-label" for="pep-det"><span id="pep-det-label">Cargo o función pública</span> <span class="required-star">*</span></label><textarea class="field-input" id="pep-det" placeholder="Describe cargo, institución y período..."></textarea></div></div><div class="field-error" id="err-pep">Selecciona una opción.</div></div>
-        <div class="field-group"><label class="field-label"><span id="pep-nom-label">¿Ha usado otro nombre?</span> <span class="required-star">*</span></label><div class="radio-group" id="rg-pep-nom"><label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="si"><span class="radio-dot"></span><span id="pep-nom-si">Sí</span></label><label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="no"><span class="radio-dot"></span><span id="pep-nom-no">No</span></label></div><div class="conditional-block" id="cond-pep-nom"><div class="field-group"><label class="field-label" for="pep-nom-det"><span id="pep-nom-det-label">Nombre o nombres utilizados</span> <span class="required-star">*</span></label><input class="field-input" type="text" id="pep-nom-det" placeholder="Nombre(s) alternativo(s)"></div></div><div class="field-error" id="err-pep-nom">Selecciona una opción.</div></div>
+        <!-- PEP Q1 -->
+        <div class="field-group field-full">
+          <label class="field-label"><span id="pep-label">¿El prospecto o algún familiar directo es una persona PEP?</span> <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-pep">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="si"><span class="radio-dot"></span><span id="pep-si">Sí</span></label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-pep');toggleCond('rg-pep','cond-pep')"><input type="radio" name="pep" value="no"><span class="radio-dot"></span><span id="pep-no">No</span></label>
+          </div>
+          <div class="conditional-block" id="cond-pep">
+            <div class="field-row">
+              <div class="field-group"><label class="field-label" for="pep-nombre"><span id="pep-nombre-label">Nombre</span> <span class="required-star">*</span></label><input class="field-input" type="text" id="pep-nombre" placeholder="Nombre completo"><div class="field-error" id="err-pep-nombre">Obligatorio.</div></div>
+              <div class="field-group"><label class="field-label" for="pep-parentesco"><span id="pep-parentesco-label">Parentesco con el asegurado</span> <span class="required-star">*</span></label>
+                <select class="field-input" id="pep-parentesco">
+                  <option value="">Selecciona</option>
+                  <option id="pep-par-conyuge">Cónyuge</option>
+                  <option id="pep-par-padre">Padre/Madre</option>
+                  <option id="pep-par-hermano">Hermano/Hermana</option>
+                  <option id="pep-par-hijo">Hijo/Hija</option>
+                  <option id="pep-par-mismo">El mismo asegurado</option>
+                </select>
+                <div class="field-error" id="err-pep-parentesco">Selecciona una opción.</div>
+              </div>
+              <div class="field-group field-full"><label class="field-label" for="pep-det"><span id="pep-det-label">Cargo o función pública</span> <span class="required-star">*</span></label><textarea class="field-input" id="pep-det" placeholder="Describe cargo, institución y período..."></textarea><div class="field-error" id="err-pep-det">Obligatorio.</div></div>
+            </div>
+          </div>
+          <div class="field-error" id="err-pep">Selecciona una opción.</div>
+        </div>
+
+        <!-- PEP Q2 -->
+        <div class="field-group field-full">
+          <label class="field-label"><span id="pep-nom-label">¿El prospecto o algún familiar directo utiliza o ha utilizado algún otro nombre?</span> <span class="required-star">*</span></label>
+          <div class="radio-group" id="rg-pep-nom">
+            <label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="si"><span class="radio-dot"></span><span id="pep-nom-si">Sí</span></label>
+            <label class="radio-pill" onclick="pickRadio(this,'rg-pep-nom');toggleCond('rg-pep-nom','cond-pep-nom')"><input type="radio" name="pep-nom" value="no"><span class="radio-dot"></span><span id="pep-nom-no">No</span></label>
+          </div>
+          <div class="conditional-block" id="cond-pep-nom">
+            <div class="field-row">
+              <div class="field-group"><label class="field-label" for="pep-nom-parentesco"><span id="pep-nom-parentesco-label">Parentesco con el asegurado</span> <span class="required-star">*</span></label>
+                <select class="field-input" id="pep-nom-parentesco">
+                  <option value="">Selecciona</option>
+                  <option id="pep-nom-par-conyuge">Cónyuge</option>
+                  <option id="pep-nom-par-padre">Padre/Madre</option>
+                  <option id="pep-nom-par-hermano">Hermano/Hermana</option>
+                  <option id="pep-nom-par-hijo">Hijo/Hija</option>
+                  <option id="pep-nom-par-mismo">El mismo asegurado</option>
+                </select>
+                <div class="field-error" id="err-pep-nom-parentesco">Selecciona una opción.</div>
+              </div>
+              <div class="field-group"><label class="field-label" for="pep-nom-det"><span id="pep-nom-det-label">Indicar el nombre</span> <span class="required-star">*</span></label><input class="field-input" type="text" id="pep-nom-det" placeholder="Nombre(s) alternativo(s)"><div class="field-error" id="err-pep-nom-det">Obligatorio.</div></div>
+            </div>
+          </div>
+          <div class="field-error" id="err-pep-nom">Selecciona una opción.</div>
+        </div>
       </div>
       <div class="card-footer">
         <button class="btn btn-secondary" type="button" onclick="goPrev(4)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Volver</button>
@@ -681,11 +737,16 @@
       <div class="field-row">
         <div class="field-group field-full">
           <label class="field-label" for="adicional"><span id="adic-label">Información adicional</span> <span style="font-weight:400;color:var(--color-medium-grey)" id="adic-note">(opcional)</span></label>
-          <textarea class="field-input" id="adicional" rows="3" placeholder="Cualquier información adicional relevante para el equipo evaluador..."></textarea>
+          <textarea class="field-input" id="adicional" rows="3" placeholder="Redacta cualquier información adicional relevante relacionada con la causa o motivo por la que solicita esta pre-evaluación"></textarea>
         </div>
         <div class="field-group field-full">
           <label class="field-label"><span id="archivos-adic-label">Adjuntar archivos adicionales</span> <span style="font-weight:400;color:var(--color-medium-grey)">(opcional)</span></label>
-          <div class="dropzone" onclick="document.getElementById('fi-adic').click()">
+          <div class="dropzone"
+            onclick="document.getElementById('fi-adic').click()"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="event.preventDefault();this.classList.remove('drag-over');handleDrop(event,'fi-adic','fl-adic','adic')"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span id="drop-adic-span">Haz clic o arrastra archivos aquí</span><small id="drop-adic-small">PDF, JPG, PNG · Máx. 10 MB por archivo</small>
             <input type="file" id="fi-adic" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="addFiles('fi-adic','fl-adic','adic')">
@@ -861,10 +922,14 @@ const T = {
     // Step 4 PEP
     pepEyebrow: 'Obligatorio — Paso 4 de 6', pepTitle: 'Cuestionario de PEP',
     pepSub: 'Las Personas Expuestas Políticamente (PEP) son individuos quienes son o han sido, en cierto momento, encargados de desempeñar funciones públicas de un estado, departamento, provincia o país.',
-    pepLabel: '¿El prospecto es una persona PEP?',
+    pepLabel: '¿El prospecto o algún familiar directo es una persona PEP?',
+    pepNombreLabel: 'Nombre', pepNombrePlaceholder: 'Nombre completo',
+    pepParentescoLabel: 'Parentesco con el asegurado', pepParentescoDefault: 'Selecciona',
+    pepParOpts: ['Cónyuge','Padre/Madre','Hermano/Hermana','Hijo/Hija','El mismo asegurado'],
     pepDetLabel: 'Cargo o función pública', pepDetPlaceholder: 'Describe cargo, institución y período...',
-    pepNomLabel: '¿Ha usado otro nombre?',
-    pepNomDetLabel: 'Nombre o nombres utilizados', pepNomDetPlaceholder: 'Nombre(s) alternativo(s)',
+    pepNomLabel: '¿El prospecto o algún familiar directo utiliza o ha utilizado algún otro nombre?',
+    pepNomParentescoLabel: 'Parentesco con el asegurado',
+    pepNomDetLabel: 'Indicar el nombre', pepNomDetPlaceholder: 'Nombre(s) alternativo(s)',
     // Step 5 Viajes
     vEyebrow: 'Obligatorio — Paso 5 de 6', vTitle: 'Cuestionario de Viajes',
     vSub: 'Información sobre planes de viaje y residencia del prospecto.',
@@ -897,7 +962,7 @@ const T = {
     v5ContratoLabel: '¿Está contratado bajo los términos de un contrato o acuerdo?', v5ContratoPlaceholder: 'Sí / No — proporciona detalles del contrato',
     // Step 6
     s6Eyebrow: 'Paso 6 de 6', s6Title: 'Información adicional y envío',
-    adicLabel: 'Información adicional', adicNote: '(opcional)', adicPlaceholder: 'Cualquier información adicional relevante para el equipo evaluador...',
+    adicLabel: 'Información adicional', adicNote: '(opcional)', adicPlaceholder: 'Redacta cualquier información adicional relevante relacionada con la causa o motivo por la que solicita esta pre-evaluación',
     archivosAdicLabel: 'Adjuntar archivos adicionales',
     firmaSection: 'Firma del asesor', firmaHint: 'Dibuja tu firma en el recuadro a continuación con el dedo o el cursor.',
     firmaToolbarHint: 'Firma aquí', firmaClear: 'Limpiar firma',
@@ -1022,10 +1087,14 @@ const T = {
     pilAccLabel: 'Had accidents or license suspension?',
     pepEyebrow: 'Required — Step 4 of 6', pepTitle: 'PEP Questionnaire',
     pepSub: 'Politically Exposed Persons (PEPs) are individuals who are or have been, at some point, entrusted with prominent public functions of a state, department, province, or country.',
-    pepLabel: 'Is the prospect a PEP?',
+    pepLabel: 'Is the prospect or any direct family member a PEP?',
+    pepNombreLabel: 'Full name', pepNombrePlaceholder: 'Full name',
+    pepParentescoLabel: 'Relationship to the insured', pepParentescoDefault: 'Select',
+    pepParOpts: ['Spouse','Father/Mother','Brother/Sister','Son/Daughter','The insured themselves'],
     pepDetLabel: 'Public office or function', pepDetPlaceholder: 'Describe position, institution and period...',
-    pepNomLabel: 'Has the prospect used another name?',
-    pepNomDetLabel: 'Name(s) used', pepNomDetPlaceholder: 'Alternative name(s)',
+    pepNomLabel: 'Does the prospect or any direct family member use or have used another name?',
+    pepNomParentescoLabel: 'Relationship to the insured',
+    pepNomDetLabel: 'Indicate the name', pepNomDetPlaceholder: 'Alternative name(s)',
     vEyebrow: 'Required — Step 5 of 6', vTitle: 'Travel Questionnaire',
     vSub: 'Information about the prospect\'s travel plans and residence.',
     v1Label: 'Plans to travel in the next 12 months?',
@@ -1223,8 +1292,15 @@ function applyTranslations() {
   // Step 4 PEP
   setText('pep-title', L.pepTitle); setText('pep-sub', L.pepSub);
   setText('pep-label', L.pepLabel); setText('pep-si', L.si); setText('pep-no', L.no);
+  setText('pep-nombre-label', L.pepNombreLabel); setPlaceholder('pep-nombre', L.pepNombrePlaceholder);
+  setText('pep-parentesco-label', L.pepParentescoLabel);
+  const pepParSel = document.getElementById('pep-parentesco');
+  if (pepParSel) { pepParSel.options[0].text = L.pepParentescoDefault; L.pepParOpts.forEach((o,i)=>{ if(pepParSel.options[i+1]) pepParSel.options[i+1].text=o; }); }
   setText('pep-det-label', L.pepDetLabel); setPlaceholder('pep-det', L.pepDetPlaceholder);
   setText('pep-nom-label', L.pepNomLabel); setText('pep-nom-si', L.si); setText('pep-nom-no', L.no);
+  setText('pep-nom-parentesco-label', L.pepNomParentescoLabel);
+  const pepNomParSel = document.getElementById('pep-nom-parentesco');
+  if (pepNomParSel) { pepNomParSel.options[0].text = L.pepParentescoDefault; L.pepParOpts.forEach((o,i)=>{ if(pepNomParSel.options[i+1]) pepNomParSel.options[i+1].text=o; }); }
   setText('pep-nom-det-label', L.pepNomDetLabel); setPlaceholder('pep-nom-det', L.pepNomDetPlaceholder);
 
   // Step 5 Viajes
@@ -1430,9 +1506,31 @@ function toggleDecl(event) {
   if (S.declChecked) document.getElementById('err-decl').classList.remove('show');
 }
 
+function handleDrop(event, inputId, listId, key) {
+  const files = event.dataTransfer?.files;
+  if (!files || files.length === 0) return;
+  // Feed dropped files through the same addFiles logic
+  const input = document.getElementById(inputId);
+  // Create a DataTransfer to assign files to the input (for consistency)
+  try {
+    const dt = new DataTransfer();
+    Array.from(files).forEach(f => dt.items.add(f));
+    input.files = dt.files;
+  } catch(e) {
+    // Fallback: process files directly without assigning to input
+  }
+  processFiles(Array.from(files), listId, key);
+}
+
 function addFiles(inputId, listId, key) {
-  const files = Array.from(document.getElementById(inputId).files);
-  files.forEach(f => {
+  const input = document.getElementById(inputId);
+  if (!input?.files?.length) return;
+  processFiles(Array.from(input.files), listId, key);
+  input.value = ''; // reset so same file can be added again
+}
+
+function processFiles(fileList, listId, key) {
+  fileList.forEach(f => {
     if (!S.files[key].find(x => x.name === f.name)) {
       S.files[key].push(f);
       const reader = new FileReader();
@@ -1561,7 +1659,19 @@ function validate(n) {
       }
     }
   }
-  if (n===4) { fail('err-pep',!hasR('rg-pep')); fail('err-pep-nom',!hasR('rg-pep-nom')); }
+  if (n===4) {
+    fail('err-pep', !hasR('rg-pep'));
+    if (rVal('rg-pep')==='si') {
+      fail('err-pep-nombre', !v('pep-nombre'));
+      fail('err-pep-parentesco', !v('pep-parentesco'));
+      fail('err-pep-det', !v('pep-det'));
+    }
+    fail('err-pep-nom', !hasR('rg-pep-nom'));
+    if (rVal('rg-pep-nom')==='si') {
+      fail('err-pep-nom-parentesco', !v('pep-nom-parentesco'));
+      fail('err-pep-nom-det', !v('pep-nom-det'));
+    }
+  }
   if (n===5) {
     ['v1','v2','v3','v4','v5'].forEach(id => fail(`err-${id}`,!hasR(`rg-${id}`)));
     if (rVal('rg-v1')==='si') { ['v1-destinos','v1-visa','v1-fechas'].forEach(id=>fail(`err-${id}`,!v(id))); fail('err-v1-motivo',!v('v1-motivo')); }
@@ -1579,7 +1689,7 @@ function buildPayload() {
   return {
     id: S.draftId || (`PREV-${String(Date.now() % 100000).padStart(3, '0')}`),
     fechaEnvio: new Date().toLocaleString('es-PE'),
-    estado: 'Enviado', avance: 100, isDraft: false,
+    estado: 'Nueva', avance: 100, isDraft: false,
     idioma: LANG,
     asesor: { nombre: v('asesor-nombre'), email: v('asesor-email') },
     motivos: [...S.motivos].map(m => MOTIVO_NAMES[m]).join(', '),
@@ -1620,8 +1730,13 @@ function buildPayload() {
       } : null,
     },
     pep: {
-      esPep: rVal('rg-pep'), pepDetalle: v('pep-det'),
-      otroNombre: rVal('rg-pep-nom'), otroNombreDet: v('pep-nom-det'),
+      esPep: rVal('rg-pep'),
+      pepNombre: v('pep-nombre'),
+      pepParentesco: v('pep-parentesco'),
+      pepDetalle: v('pep-det'),
+      otroNombre: rVal('rg-pep-nom'),
+      otroNombreParentesco: v('pep-nom-parentesco'),
+      otroNombreDet: v('pep-nom-det'),
     },
     viajes: {
       proximosViajar: rVal('rg-v1'),
@@ -1659,7 +1774,7 @@ async function submitFinal() {
   await sbUpsert({
     id: payload.id,
     fecha_envio: payload.fechaEnvio,
-    estado: 'Enviado',
+    estado: 'Nueva',
     avance: 100,
     is_draft: false,
     asesor_nombre: payload.asesor.nombre,
