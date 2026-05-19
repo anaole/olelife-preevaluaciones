@@ -410,7 +410,7 @@
       <div class="search-row" style="margin-bottom:16px;">
         <div class="search-bar">
           <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input" placeholder="Buscar por asesor, prospecto o ID..." oninput="applyFilters()">
+          <input type="text" id="search-input" placeholder="Buscar por asesor, prospecto o ID..." oninput="debouncedApplyFilters()">
         </div>
         <div style="position:relative;flex-shrink:0;">
           <button class="toolbar-btn" id="cols-btn" onclick="toggleColsMenu(event)">
@@ -439,7 +439,7 @@
       <div class="search-row" style="margin-bottom:16px;">
         <div class="search-bar">
           <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input-draft" placeholder="Buscar por asesor o prospecto..." oninput="renderDrafts()">
+          <input type="text" id="search-input-draft" placeholder="Buscar por asesor o prospecto..." oninput="debouncedRenderDrafts()">
         </div>
         <div style="position:relative;flex-shrink:0;">
           <button class="toolbar-btn" id="cols-btn-draft" onclick="toggleColsMenuDraft(event)">
@@ -755,6 +755,9 @@ async function loadSubmissions() {
     allSubs   = mapped.filter(s => !s.isDraft);
     allDrafts = mapped.filter(s => s.isDraft);
 
+    // Pre-calcular mapa id→índice para O(1) lookup en renderTable
+    rebuildIndexMap();
+
   } catch(e) {
     allSubs = []; allDrafts = [];
     showToast('Error al cargar datos. Revisa la consola.');
@@ -828,7 +831,7 @@ function renderDrafts(filters) {
   const headers = DRAFT_COLUMNS.filter(c=>c.visible).map(c=>`<th>${c.label}</th>`).join('');
 
   const rows = filtered.map(s => {
-    const realIdx = allDrafts.indexOf(s);
+    const realIdx = draftsIndexMap.get(s.id ?? s);
     const pct = s.avance??0;
     const step = Math.round((pct/100)*6)||1;
     const pasoLabel = PASO_LABELS[Math.min(step,6)]||'—';
@@ -847,7 +850,8 @@ function renderDrafts(filters) {
     return `<tr>${DRAFT_COLUMNS.filter(c=>c.visible).map(c=>cells[c.key]||'').join('')}</tr>`;
   }).join('');
 
-  const draftCards = filtered.map(s => {
+  const isMobileDraft = window.innerWidth < 768;
+  const draftCards = isMobileDraft ? filtered.map(s => {
     const pct = s.avance??0;
     const step = Math.round((pct/100)*6)||1;
     return `<div class="sub-mobile-card">
@@ -858,7 +862,7 @@ function renderDrafts(filters) {
       <div class="sub-mc-row"><span class="sub-mc-label">Progreso</span><div class="prog-bar-wrap"><div class="prog-bar-mini"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="prog-pct">${pct}%</span></div></div>
       <div class="sub-mc-row"><span class="sub-mc-label">Último paso</span><span style="font:400 12px/1.4 var(--font);color:var(--color-dark-grey);text-align:right;">${PASO_LABELS[Math.min(step,6)]||'—'}</span></div>
     </div>`;
-  }).join('');
+  }).join('') : '';
 
   container.innerHTML = `
     <div class="table-scroll"><div class="table-wrap"><table>
@@ -1309,16 +1313,14 @@ function renderTable(subs) {
   const headers = COLUMNS.filter(c => c.visible).map(c => `<th>${c.label}</th>`).join('');
 
   const tableRows = subs.map(s => {
-    const realIdx = allSubs.indexOf(s);
+    const realIdx = subsIndexMap.get(s.id ?? s);
     const isDraft = s.isDraft === true;
     const estadoActual = s.estado || 'Nueva';
     const sc = statusClass(estadoActual);
     const archivos = (s.archivosAdjuntos?.medicos?.length||0) + (s.archivosAdjuntos?.adicionales?.length||0);
     const pdfDisabled = isDraft ? 'style="opacity:.35;cursor:not-allowed;" title="Disponible al completar el formulario"' : `title="Descargar PDF completo" onclick="downloadPDF(${realIdx})"`;
     const filesDisabled = (archivos===0||isDraft) ? 'style="opacity:.35;cursor:not-allowed;" onclick=""' : `onclick="openFilesDrawer(${realIdx})"`;
-    const statusOptions = STATUS_OPTIONS.map(opt =>
-      `<option value="${opt}" ${opt === estadoActual ? 'selected' : ''}>${opt}</option>`
-    ).join('');
+    const statusOptions = buildStatusSelect(estadoActual, realIdx);
 
     const cells = {
       id:        `<td class="td-bold" style="font-size:11px;color:var(--color-turquoise);white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;" onclick="openDetailView(${realIdx})" title="Ver detalle">${s.id||'—'}</td>`,
@@ -1341,15 +1343,14 @@ function renderTable(subs) {
     return `<tr>${COLUMNS.filter(c => c.visible).map(c => cells[c.key]||'').join('')}</tr>`;
   }).join('');
 
-  const mobileCards = subs.map(s => {
-    const realIdx = allSubs.indexOf(s);
+  const isMobile = window.innerWidth < 768;
+  const mobileCards = isMobile ? subs.map(s => {
+    const realIdx = subsIndexMap.get(s.id ?? s);
     const isDraft = s.isDraft === true;
     const estado = s.estado || 'Nueva';
     const sc = statusClass(estado);
     const archivos = (s.archivosAdjuntos?.medicos?.length||0) + (s.archivosAdjuntos?.adicionales?.length||0);
-    const statusOptions = STATUS_OPTIONS.map(opt =>
-      `<option value="${opt}" ${opt === estado ? 'selected' : ''}>${opt}</option>`
-    ).join('');
+    const statusOptions = buildStatusSelect(estado, 'mc-'+realIdx);
     const vis = key => COLUMNS.find(c => c.key === key)?.visible;
     return `<div class="sub-mobile-card">
       <div class="sub-mc-top">
@@ -1391,7 +1392,7 @@ function renderTable(subs) {
         </button>
       </div>
     </div>`;
-  }).join('');
+  }).join('') : '';
 
   container.innerHTML = `
     <div class="table-scroll"><div class="table-wrap"><table>
@@ -1413,6 +1414,32 @@ const STATUS_OPTIONS = [
   'Aceptada',
   'Rechazada',
 ];
+
+// Pre-generate status select options HTML — computed once, reused per row
+const STATUS_OPTIONS_HTML = STATUS_OPTIONS.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+
+function buildStatusSelect(estadoActual, id) {
+  // Inject selected attr only into matching option — avoids full map() per row
+  return STATUS_OPTIONS_HTML.replace(
+    `value="${estadoActual}"`,
+    `value="${estadoActual}" selected`
+  );
+}
+
+// ── O(1) index map ─────────────────────────────────────────
+let subsIndexMap = new Map();
+let draftsIndexMap = new Map();
+function rebuildIndexMap() {
+  subsIndexMap   = new Map(allSubs.map((s, i) => [s.id ?? s, i]));
+  draftsIndexMap = new Map(allDrafts.map((s, i) => [s.id ?? s, i]));
+}
+
+// ── Debounce helpers ───────────────────────────────────────
+function debounce(fn, ms) {
+  let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+const debouncedApplyFilters = debounce(applyFilters, 250);
+const debouncedRenderDrafts = debounce(renderDrafts, 250);
 
 function statusClass(estado) {
   const map = {
@@ -2020,4 +2047,5 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
