@@ -739,6 +739,8 @@ async function loadSubmissions() {
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
     });
     const allFiles = filesRes.ok ? await filesRes.json() : [];
+    if (!filesRes.ok) console.warn('[backoffice] pre_evaluaciones_archivos fetch failed:', filesRes.status, await filesRes.text().catch(()=>''));
+    console.log('[backoffice] archivos table rows:', allFiles.length, allFiles.slice(0,3));
     const filesByEval = {};
     allFiles.forEach(f => {
       if (!filesByEval[f.evaluacion_id]) filesByEval[f.evaluacion_id] = { medicos: [], adicionales: [] };
@@ -748,6 +750,39 @@ async function loadSubmissions() {
 
     const mapped = rows.map(r => {
       const archivosData = filesByEval[r.id] || { medicos: [], adicionales: [] };
+
+      // Debug: log payload structure for records that might have files
+      if (r.payload?.archivosAdjuntos || r.payload?.archivosData) {
+        console.log('[backoffice] payload archivos for', r.id, {
+          adjuntos: r.payload?.archivosAdjuntos,
+          data: r.payload?.archivosData ? '(has data)' : null,
+        });
+      }
+      // Files may also be stored inside payload.archivosAdjuntos (name-only) or
+      // payload.archivosData (with base64 data) depending on the form version.
+      const payloadAdjuntos = r.payload?.archivosAdjuntos || {};
+      const payloadData     = r.payload?.archivosData     || {};
+
+      // Merge: table rows win when present; fall back to payload
+      const mergedData = {
+        medicos: archivosData.medicos.length
+          ? archivosData.medicos
+          : (payloadData.medicos || []).map(f => typeof f === 'string' ? { name: f, data: null } : f),
+        adicionales: archivosData.adicionales.length
+          ? archivosData.adicionales
+          : (payloadData.adicionales || []).map(f => typeof f === 'string' ? { name: f, data: null } : f),
+      };
+
+      // Name-only fallback from payload when nothing else has data
+      const nameMedicos     = mergedData.medicos.length     ? mergedData.medicos.map(f => f.name)     : (payloadAdjuntos.medicos     || []);
+      const nameAdicionales = mergedData.adicionales.length ? mergedData.adicionales.map(f => f.name) : (payloadAdjuntos.adicionales || []);
+
+      // If still empty, synthesize name-only entries so the button activates
+      if (!mergedData.medicos.length && nameMedicos.length)
+        mergedData.medicos = nameMedicos.map(n => ({ name: n, data: null }));
+      if (!mergedData.adicionales.length && nameAdicionales.length)
+        mergedData.adicionales = nameAdicionales.map(n => ({ name: n, data: null }));
+
       return {
         id: r.id, fechaEnvio: r.fecha_envio, estado: r.estado,
         avance: r.avance, isDraft: r.is_draft,
@@ -758,10 +793,10 @@ async function loadSubmissions() {
         viajes: r.payload?.viajes || {}, adicional: r.payload?.adicional || '',
         otrosDetalle: r.payload?.otrosDetalle || '',
         archivosAdjuntos: {
-          medicos: archivosData.medicos.map(f => f.name),
-          adicionales: archivosData.adicionales.map(f => f.name),
+          medicos: nameMedicos,
+          adicionales: nameAdicionales,
         },
-        archivosData, firma: r.firma, _raw: r,
+        archivosData: mergedData, firma: r.firma, _raw: r,
       };
     });
 
@@ -2018,4 +2053,5 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
