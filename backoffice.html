@@ -816,14 +816,24 @@ async function loadSubmissions() {
   document.getElementById('count-badge').textContent = allSubs.length + (allSubs.length===1?' enviada':' enviadas');
 
   renderTable(allSubs);
-  renderDrafts();
+  // Only render drafts if that tab is currently visible
+  if (document.getElementById('tab-progreso')?.classList.contains('active')) {
+    renderDrafts();
+  }
 }
 
 function switchTab(tab) {
+  const current = document.querySelector('.tab-btn.active')?.id?.replace('tab-','');
   ['enviadas','progreso'].forEach(t => {
     document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
-    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    const panel = document.getElementById(`panel-${t}`);
+    panel.style.display = '';   // clear any leftover inline style
+    panel.classList.toggle('active', t === tab);
   });
+  // Only re-render drafts tab if switching to it for the first time or data changed
+  if (tab === 'progreso' && current !== 'progreso') {
+    renderDrafts();
+  }
 }
 
 const PASO_LABELS = {
@@ -986,7 +996,9 @@ function openDetailView(realIdx) {
 
   // Hide tabs + panels, show detail view
   document.querySelector('.tabs').style.display = 'none';
+  document.getElementById('panel-enviadas').classList.remove('active');
   document.getElementById('panel-enviadas').style.display = 'none';
+  document.getElementById('panel-progreso').classList.remove('active');
   document.getElementById('panel-progreso').style.display = 'none';
   document.getElementById('detail-view').classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1035,10 +1047,14 @@ function openDetailView(realIdx) {
 function closeDetailView() {
   document.getElementById('detail-view').classList.remove('active');
   document.querySelector('.tabs').style.display = '';
-  // Show whichever tab was active
+  // Restore panels via class (avoid inline style conflicts with CSS)
+  ['enviadas','progreso'].forEach(t => {
+    const panel = document.getElementById(`panel-${t}`);
+    panel.style.display = '';  // clear any inline style
+  });
   const activeTab = document.querySelector('.tab-btn.active');
   const tabName = activeTab?.id?.replace('tab-','') || 'enviadas';
-  document.getElementById(`panel-${tabName}`).style.display = '';
+  switchTab(tabName);
   detailIdx = null;
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -2053,5 +2069,6 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
