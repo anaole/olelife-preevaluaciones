@@ -208,13 +208,7 @@
     .file-item .fi-icon { stroke: var(--color-green); flex-shrink: 0; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
     .file-remove { margin-left: auto; cursor: pointer; stroke: var(--color-medium-grey); flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .file-remove:hover { stroke: var(--color-danger); }
-    .signature-wrap { border-radius: var(--radius-input); border: 1px solid var(--color-light-grey); overflow: hidden; }
-    .signature-wrap.error { border-color: var(--color-danger); }
-    canvas#sig-canvas { display: block; width: 100%; cursor: crosshair; touch-action: none; background: var(--color-white); }
-    .sig-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--color-shell); border-top: 1px solid var(--color-bg-grey); }
-    .sig-toolbar span { font: 400 11px/14px var(--font); color: var(--color-medium-grey); }
-    .sig-clear { font: 600 12px/14px var(--font); color: var(--color-turquoise); cursor: pointer; background: none; border: none; padding: 4px 8px; border-radius: 4px; }
-    .sig-clear:hover { background: var(--color-turquoise-soft); }
+    /* signature styles removed */
     .checkbox-label { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; padding: 14px 16px; border-radius: var(--radius-input); border: 1px solid var(--color-light-grey); transition: border-color 150ms, background 150ms; }
     .checkbox-label:hover { border-color: var(--color-green); background: var(--color-green-soft); }
     .checkbox-label.checked { border-color: var(--color-green); background: var(--color-green-soft); }
@@ -585,6 +579,14 @@
                 <div class="field-error" id="err-pep-parentesco">Selecciona una opción.</div>
               </div>
               <div class="field-group field-full"><label class="field-label" for="pep-det"><span id="pep-det-label">Cargo o función pública</span> <span class="required-star">*</span></label><textarea class="field-input" id="pep-det" placeholder="Describe cargo, institución y período..."></textarea><div class="field-error" id="err-pep-det">Obligatorio.</div></div>
+              <div class="field-group field-full">
+                <label class="field-label"><span id="pep-activo-label">¿La persona PEP sigue en ese cargo actualmente?</span> <span class="required-star">*</span></label>
+                <div class="radio-group" id="rg-pep-activo">
+                  <label class="radio-pill" onclick="pickRadio(this,'rg-pep-activo')"><input type="radio" name="pep-activo" value="si"><span class="radio-dot"></span><span id="pep-activo-si">Sí</span></label>
+                  <label class="radio-pill" onclick="pickRadio(this,'rg-pep-activo')"><input type="radio" name="pep-activo" value="no"><span class="radio-dot"></span><span id="pep-activo-no">No</span></label>
+                </div>
+                <div class="field-error" id="err-pep-activo">Selecciona una opción.</div>
+              </div>
             </div>
           </div>
           <div class="field-error" id="err-pep">Selecciona una opción.</div>
@@ -756,17 +758,6 @@
         </div>
       </div>
       <div class="divider"></div>
-      <div class="section-title" id="firma-section">Firma del asesor <span class="required-star">*</span></div>
-      <p style="font:400 12px/18px var(--font);color:var(--color-medium-grey);margin-bottom:12px;" id="firma-hint">Dibuja tu firma en el recuadro a continuación con el dedo o el cursor.</p>
-      <div class="signature-wrap" id="sig-wrap">
-        <canvas id="sig-canvas" width="640" height="130"></canvas>
-        <div class="sig-toolbar">
-          <span id="firma-toolbar-hint">Firma aquí</span>
-          <button class="sig-clear" type="button" onclick="clearSig()" id="firma-clear-btn">Limpiar firma</button>
-        </div>
-      </div>
-      <div class="field-error" id="err-firma" style="margin-top:6px;">La firma del asesor es obligatoria.</div>
-      <div class="divider"></div>
       <div class="checkbox-label" id="chk-label" onclick="toggleDecl(event)" style="cursor:pointer;">
         <span class="checkbox-box" id="chk-box">
           <svg width="12" height="12" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -801,7 +792,7 @@
 
 <script>
 const S = {
-  motivos: new Set(), sigDrawn: false, declChecked: false,
+  motivos: new Set(), declChecked: false,
   files: { med: [], adic: [] },
   fileData: { med: [], adic: [] }, // base64 for PDF embedding
   draftId: null,
@@ -1342,8 +1333,6 @@ function applyTranslations() {
   setText('adic-label', L.adicLabel); setText('adic-note', L.adicNote); setPlaceholder('adicional', L.adicPlaceholder);
   setText('archivos-adic-label', L.archivosAdicLabel);
   setText('drop-adic-span', L.dropClick); setText('drop-adic-small', L.dropHint);
-  setText('firma-section', L.firmaSection); setText('firma-hint', L.firmaHint);
-  setText('firma-toolbar-hint', L.firmaToolbarHint); setText('firma-clear-btn', L.firmaClear);
   setText('decl-text', L.declText);
 
   // All Continue/Back/Send buttons
@@ -1364,7 +1353,7 @@ function applyTranslations() {
     'err-prosp-nombre': L.errRequired, 'err-prosp-pais': L.errPais,
     'err-prosp-fnac': L.errFnac, 'err-genero': L.errGenero, 'err-fumador': L.errFumador,
     'err-prosp-ocupacion': L.errRequired, 'err-plan-termino': L.errTermino,
-    'err-plan-cobertura': L.errCobertura, 'err-firma': L.errFirma, 'err-decl': L.errDecl,
+    'err-plan-cobertura': L.errCobertura, 'err-decl': L.errDecl,
     'err-med-detalles': L.oblig, 'err-med-docs': L.errMedDocs,
     'err-ocu-tipo': L.oblig, 'err-ocu-funciones': L.oblig,
     'err-dep-cual': L.oblig, 'err-dep-desde': L.oblig, 'err-dep-naturaleza': L.oblig,
@@ -1553,21 +1542,6 @@ function renderFiles(listId, key) {
 }
 function removeFile(listId, key, i) { S.files[key].splice(i, 1); S.fileData[key].splice(i, 1); renderFiles(listId, key); }
 
-window.addEventListener('load', () => {
-  const canvas = document.getElementById('sig-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  ctx.strokeStyle = '#373D54'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  let drawing = false, lx, ly;
-  const pos = e => { const r = canvas.getBoundingClientRect(), sc = canvas.width / r.width; const src = e.touches ? e.touches[0] : e; return [(src.clientX - r.left) * sc, (src.clientY - r.top) * sc]; };
-  const start = e => { e.preventDefault(); drawing = true; [lx, ly] = pos(e); };
-  const move = e => { if (!drawing) return; e.preventDefault(); const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(x, y); ctx.stroke(); [lx, ly] = [x, y]; S.sigDrawn = true; };
-  const end = () => { drawing = false; };
-  canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', end);
-  canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); canvas.addEventListener('touchend', end);
-});
-window.clearSig = function() { const c = document.getElementById('sig-canvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); S.sigDrawn = false; };
-
 document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
 
@@ -1668,6 +1642,7 @@ function validate(n) {
       fail('err-pep-nombre', !v('pep-nombre'));
       fail('err-pep-parentesco', !v('pep-parentesco'));
       fail('err-pep-det', !v('pep-det'));
+      fail('err-pep-activo', !hasR('rg-pep-activo'));
     }
     fail('err-pep-nom', !hasR('rg-pep-nom'));
     if (rVal('rg-pep-nom')==='si') {
@@ -1737,6 +1712,7 @@ function buildPayload() {
       pepNombre: v('pep-nombre'),
       pepParentesco: v('pep-parentesco'),
       pepDetalle: v('pep-det'),
+      pepActivoActualmente: rVal('rg-pep-activo'),
       otroNombre: rVal('rg-pep-nom'),
       otroNombreParentesco: v('pep-nom-parentesco'),
       otroNombreDet: v('pep-nom-det'),
@@ -1758,13 +1734,12 @@ function buildPayload() {
     adicional: v('adicional'),
     archivosAdjuntos: { medicos: S.files.med.map(f=>f.name), adicionales: S.files.adic.map(f=>f.name) },
     archivosData: { medicos: [...S.fileData.med], adicionales: [...S.fileData.adic] },
-    firma: document.getElementById('sig-canvas').toDataURL('image/png'),
+    firma: null,
   };
 }
 
 async function submitFinal() {
   let bad = false;
-  bad = showErr('err-firma', !S.sigDrawn) || bad;
   bad = showErr('err-decl', !S.declChecked) || bad;
   if (bad) { document.querySelector('.field-error.show')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
 
@@ -1828,7 +1803,6 @@ async function submitFinal() {
         plan: payload.plan, cuestionario: payload.cuestionario,
         pep: payload.pep, viajes: payload.viajes, adicional: payload.adicional,
         archivosAdjuntos: { medicos: S.fileData.med.map(f=>f.name), adicionales: S.fileData.adic.map(f=>f.name) },
-        firma: document.getElementById('sig-canvas').toDataURL('image/png'),
       };
       const W = 210, ML = 16, MR = 16, CW = W - ML - MR;
       let y = 0;
@@ -2112,13 +2086,6 @@ async function submitFinal() {
         y += 3;
       }
 
-      // ── FIRMA ──
-      if (s.firma) {
-        checkY(36); sectionHeader(L.firmaTitle);
-        try { doc.addImage(s.firma, 'PNG', ML, y, 90, 28); y += 32; } catch(e) { row(L.firmaTitle, 'Incluida digitalmente en el envío'); }
-        y += 3;
-      }
-
       // ── DISCLAIMER ──
       checkY(18);
       doc.setFillColor('#FFF8E8'); doc.setDrawColor('#F0D890'); doc.setLineWidth(0.3);
@@ -2136,16 +2103,22 @@ async function submitFinal() {
       }
 
       pdfBase64 = doc.output('datauristring');
-    } catch(pdfErr) { console.warn('PDF generation for email failed:', pdfErr); }
+      console.log('[email] PDF generado, tamaño base64:', Math.round(pdfBase64.length/1024), 'KB');
+    } catch(pdfErr) { console.warn('[email] PDF generation failed:', pdfErr); }
 
-    // Build adjuntos array: PDF completo + todos los archivos subidos
+    // Build adjuntos array: PDF completo primero, luego archivos subidos
     const adjuntos = [];
     const prospSlug = (payload.prospecto.nombre||'prospecto').replace(/\s+/g,'-');
+    const pdfNombre = `[${payload.id}][${prospSlug}]-SolicitudDePreevaluacion.pdf`;
     if (pdfBase64) {
-      adjuntos.push({ nombre: `${payload.id}-${prospSlug}-SolicitudDePreEvaluacion.pdf`, data: pdfBase64 });
+      adjuntos.push({ nombre: pdfNombre, data: pdfBase64 });
+      console.log('[email] PDF adjunto agregado:', pdfNombre);
+    } else {
+      console.warn('[email] pdfBase64 es null — el PDF NO se adjuntará');
     }
     S.fileData.med.forEach(f => adjuntos.push({ nombre: `${payload.id}-${prospSlug}-${f.name}`, data: f.data }));
     S.fileData.adic.forEach(f => adjuntos.push({ nombre: `${payload.id}-${prospSlug}-${f.name}`, data: f.data }));
+    console.log('[email] Total adjuntos a enviar:', adjuntos.length, adjuntos.map(a=>a.nombre));
 
     await fetch(WP_EMAIL_URL, {
       method: 'POST',
@@ -2178,7 +2151,7 @@ async function submitFinal() {
 }
 
 function resetAll() {
-  S.motivos.clear(); S.sigDrawn=false; S.declChecked=false; S.files={med:[],adic:[]}; S.fileData={med:[],adic:[]}; S.draftId=null;
+  S.motivos.clear(); S.declChecked=false; S.files={med:[],adic:[]}; S.fileData={med:[],adic:[]}; S.draftId=null;
   document.querySelectorAll('.motivo-card').forEach(c=>c.classList.remove('selected'));
   document.querySelectorAll('.field-input').forEach(el=>{el.value='';el.classList.remove('error');});
   document.querySelectorAll('.radio-pill').forEach(p=>p.classList.remove('selected'));
@@ -2186,9 +2159,10 @@ function resetAll() {
   document.querySelectorAll('.field-error').forEach(e=>e.classList.remove('show'));
   $('chk-box').classList.remove('checked'); $('chk-label').classList.remove('checked');
   ['fl-med','fl-adic'].forEach(id=>{const el=$(id);if(el)el.innerHTML='';});
-  clearSig(); showScreen(1);
+  showScreen(1);
 }
 </script>
 </body>
 </html>
+
 
