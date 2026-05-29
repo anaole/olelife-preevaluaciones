@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -1815,40 +1816,329 @@ async function submitFinal() {
 
   // ── Enviar email via WordPress ──────────────────────────
   try {
-    // Generate PDF as base64
+    // ── Generar PDF COMPLETO con todas las respuestas (igual al backoffice) ──
     let pdfBase64 = null;
     try {
-      const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4' });
-      // Simple summary PDF for email (full PDF generation happens in backoffice)
-      pdfDoc.setFont('helvetica','bold'); pdfDoc.setFontSize(14); pdfDoc.setTextColor('#1E2540');
-      pdfDoc.text('OléLife — Pre-Evaluación', 16, 18);
-      pdfDoc.setFont('helvetica','normal'); pdfDoc.setFontSize(9); pdfDoc.setTextColor('#9BACCB');
-      pdfDoc.text(`ID: ${payload.id}  ·  ${payload.fechaEnvio}`, 16, 25);
-      pdfDoc.setDrawColor('#E5ECF8'); pdfDoc.setLineWidth(0.3);
-      pdfDoc.line(16, 28, 194, 28);
-      let y = 35;
-      const field = (label, val) => {
-        pdfDoc.setFont('helvetica','bold'); pdfDoc.setFontSize(8); pdfDoc.setTextColor('#9BACCB');
-        pdfDoc.text(label, 16, y);
-        pdfDoc.setFont('helvetica','normal'); pdfDoc.setTextColor('#373D54');
-        pdfDoc.text(String(val||'—'), 80, y);
-        y += 7;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const s = {
+        id: payload.id, fechaEnvio: payload.fechaEnvio, idioma: payload.idioma,
+        asesor: payload.asesor, prospecto: payload.prospecto,
+        motivos: payload.motivos, otrosDetalle: payload.otrosDetalle,
+        plan: payload.plan, cuestionario: payload.cuestionario,
+        pep: payload.pep, viajes: payload.viajes, adicional: payload.adicional,
+        archivosAdjuntos: { medicos: S.fileData.med.map(f=>f.name), adicionales: S.fileData.adic.map(f=>f.name) },
+        firma: document.getElementById('sig-canvas').toDataURL('image/png'),
       };
-      field('Prospecto', payload.prospecto.nombre);
-      field('País', payload.prospecto.pais);
-      field('Fecha de nacimiento', payload.prospecto.fnac);
-      field('Género', payload.prospecto.genero);
-      field('Fumador', payload.prospecto.fumador === 'si' ? 'Sí' : 'No');
-      field('Ocupación', payload.prospecto.ocupacion);
-      field('Asesor', payload.asesor.nombre);
-      field('E-mail del asesor', payload.asesor.email);
-      field('Motivo(s)', payload.motivos);
-      field('Término', payload.plan?.termino);
-      field('Cobertura', payload.plan?.cobertura);
-      pdfBase64 = pdfDoc.output('datauristring');
+      const W = 210, ML = 16, MR = 16, CW = W - ML - MR;
+      let y = 0;
+      const F_REGULAR = 'helvetica', F_BOLD = 'helvetica';
+      const SZ_TITLE = 12, SZ_LABEL = 9, SZ_VALUE = 9, SZ_SUB = 8, SZ_HEADER = 13, SZ_TINY = 7;
+      const C_TITLE = '#00BBDD', C_LABEL = '#9BACCB', C_VALUE = '#373D54', C_HEADER = '#FFFFFF', C_SUBHEAD = '#00BBDD';
+
+      function newPage() { doc.addPage(); y = 20; }
+      function checkY(needed) { if (y + needed > 278) newPage(); }
+
+      function sectionHeader(title) {
+        checkY(13);
+        doc.setFillColor('#E6F8FC');
+        doc.roundedRect(ML, y - 1, CW, 9, 1.5, 1.5, 'F');
+        doc.setFont(F_BOLD, 'bold'); doc.setFontSize(SZ_TITLE); doc.setTextColor(C_TITLE);
+        doc.text(title.toUpperCase(), ML + 4, y + 5.5);
+        y += 13;
+      }
+
+      function row(label, value, indent) {
+        const x0 = ML + (indent ? 8 : 0);
+        const labelW = 72, valW = CW - labelW - (indent ? 8 : 0);
+        doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(SZ_VALUE);
+        const valLines = doc.splitTextToSize(String(value || '—'), valW);
+        const rowH = 5.5 * valLines.length + 2;
+        checkY(rowH);
+        doc.setFont(F_BOLD, 'bold'); doc.setFontSize(SZ_LABEL); doc.setTextColor(C_LABEL);
+        doc.text(String(label), x0, y);
+        doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(SZ_VALUE); doc.setTextColor(C_VALUE);
+        doc.text(valLines, x0 + labelW, y);
+        y += rowH;
+      }
+
+      function subLabel(text) {
+        checkY(9);
+        doc.setFillColor('#F0FBFD'); doc.rect(ML, y - 1, CW, 8, 'F');
+        doc.setFont(F_BOLD, 'bold'); doc.setFontSize(SZ_SUB); doc.setTextColor(C_SUBHEAD);
+        doc.text(text.toUpperCase(), ML + 3, y + 4.5);
+        y += 10;
+      }
+
+      function formatDate(val) {
+        if (!val) return '—';
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(val))) return `${val} (dd/mm/aaaa)`;
+        const m = String(val).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (m) return `${m[3]}/${m[2]}/${m[1]} (dd/mm/aaaa)`;
+        return val;
+      }
+
+      const lang = s.idioma || LANG || 'es';
+      const TL = {
+        es: {
+          title:'Formulario de Pre-Evaluación', sent:'Enviado',
+          asesor:'Información del asesor', nombres:'Nombres y apellidos', email:'Correo electrónico',
+          prospecto:'Datos del prospecto', pais:'País de residencia', fnac:'Fecha de nacimiento',
+          edad:'Edad', genero:'Género', fumador:'Fumador', ocu:'Ocupación',
+          plan:'Plan solicitado', motivos:'Motivo(s) de pre-evaluación', termino:'Término', cobertura:'Cobertura solicitada',
+          otrosDetalle:'Detalle (Otros)',
+          depTitle:'Cuestionario — Actividades deportivas',
+          depDeporte:'Deporte practicado', depDesde:'Desde cuándo', depNaturaleza:'Naturaleza de participación',
+          depFrecuencia:'Frecuencia', depCert:'Certificaciones', depLimites:'Límites máximos alcanzados',
+          depClub:'¿Miembro de club/asociación?', depClubDet:'Detalle club/asociación',
+          depLesiones:'¿Ha tenido lesiones?', depLesionesDet:'Detalle lesiones',
+          histTitle:'Cuestionario — Historial médico', histDet:'Detalles del historial médico', histDocs:'Documentos adjuntos:',
+          ocuTitle:'Cuestionario — Ocupación', ocuTipo:'Tipo de ocupación', ocuFunciones:'Funciones laborales',
+          ocuMar:'¿Trabaja en alta mar?', ocuMarDet:'Detalle alta mar',
+          ocuAltura:'¿Trabaja en altura?', ocuAlturaDet:'Detalle trabajo en altura',
+          ocuExpl:'¿Utiliza explosivos?', ocuExplDet:'Detalle explosivos',
+          ocuAcc:'¿Enfermedad/accidente laboral?', ocuAccDet:'Detalle accidente',
+          ocuHeli:'¿Viaja en helicóptero/avioneta?', ocuHeliDet:'Detalle helicóptero',
+          pilTitle:'Cuestionario de Piloto Privado',
+          pilPast:'Vuelos realizados en los últimos 12 meses', pilFuture:'Vuelos a realizar en los próximos 12 meses',
+          pilVuelos:'Número total de vuelos', pilHoras:'Número de horas de vuelo',
+          pilAeronave:'Tipo de aeronave', pilLugares:'Lugares a donde vuela', pilLicencias:'Licencias / certificaciones',
+          pilPriv:'¿Vuela desde aeropuertos no públicos?', pilPrivDet:'Detalle',
+          pilClub:'¿Pertenece a club/asociación?', pilClubDet:'Detalle club',
+          pilMot:'¿Vuela por motivos distintos al placer?', pilMotDet:'Detalle motivo vuelo',
+          pilAcro:'¿Vuelos acrobáticos?', pilAcroDet:'Detalle acrobático',
+          pilAccPil:'¿Accidentes o suspensión de licencia?', pilAccPilDet:'Detalle accidente piloto',
+          pepTitle:'Cuestionario PEP — Persona Políticamente Expuesta',
+          pepEs:'¿El prospecto o familiar directo es PEP?', pepNombre:'Nombre', pepParentesco:'Parentesco con el asegurado',
+          pepDet:'Cargo o función pública', pepActivo:'¿Sigue en esa posición actualmente?',
+          pepNom:'¿Utiliza o ha utilizado otro nombre?', pepNomParentesco:'Parentesco con el asegurado', pepNomDet:'Nombre alternativo',
+          vTitle:'Cuestionario de viajes',
+          v1:'¿Planea viajar en los próximos 12 meses?',
+          v1Destinos:'Destinos (próximos)', v1Visa:'Tipo de visa', v1Fechas:'Fechas de viaje', v1Motivo:'Motivo de viaje',
+          v2:'¿Ha viajado en los últimos 12 meses?',
+          v2Destinos:'Destinos (últimos 12 meses)', v2Visa:'Tipo de visa', v2Fechas:'Fechas de viaje', v2Motivo:'Motivo de viaje',
+          v3:'¿Reside o piensa residir en otro país?',
+          v3Razon:'Razón principal', v3Nacimiento:'Lugar de nacimiento', v3Nac:'Nacionalidad', v3Activos:'Activos / bienes inmuebles',
+          v4:'¿Residir en el extranjero más de 21 días?',
+          v4Tipo:'Tipo de residencia', v4Dir:'Dirección', v4Instal:'Instalaciones médicas más cercanas',
+          v5:'¿El viaje es por negocios?',
+          v5NomNeg:'Nombre de negocio', v5Nat:'Naturaleza de negocio', v5Deb:'Deberes y responsabilidades',
+          v5Inicio:'Fecha de inicio', v5Rem:'Remuneración anual', v5Salud:'Atención médica / forma de viaje',
+          v5Seg:'Medidas de seguridad del empleador', v5Contrato:'¿Bajo contrato o acuerdo?',
+          adicTitle:'Información adicional', adicComentarios:'Comentarios',
+          archTitle:'Archivos adjuntos adicionales', firmaTitle:'Firma del asesor',
+          si:'Sí', no:'No',
+          disclaimerText:'Esta pre-evaluación tiene carácter informativo y preliminar. La aceptación definitiva del riesgo queda sujeta al análisis formal de la solicitud, pudiendo requerirse información o documentación adicional según lo declarado.',
+        },
+        en: {
+          title:'Pre-Evaluation Form', sent:'Submitted',
+          asesor:'Advisor information', nombres:'Full name', email:'Email address',
+          prospecto:'Prospect data', pais:'Country of residence', fnac:'Date of birth',
+          edad:'Age', genero:'Gender', fumador:'Smoker', ocu:'Occupation',
+          plan:'Requested plan', motivos:'Reason(s) for pre-evaluation', termino:'Term', cobertura:'Requested coverage',
+          otrosDetalle:'Other detail',
+          depTitle:'Questionnaire — Sports activities',
+          depDeporte:'Sport practiced', depDesde:'Since when', depNaturaleza:'Nature of participation',
+          depFrecuencia:'Frequency', depCert:'Certifications', depLimites:'Maximum levels reached',
+          depClub:'Club/association member?', depClubDet:'Club/association detail',
+          depLesiones:'Had sport-related injuries?', depLesionesDet:'Injury detail',
+          histTitle:'Questionnaire — Medical history', histDet:'Medical history details', histDocs:'Attached documents:',
+          ocuTitle:'Questionnaire — Occupation', ocuTipo:'Type of occupation', ocuFunciones:'Work duties',
+          ocuMar:'Working offshore?', ocuMarDet:'Offshore detail',
+          ocuAltura:'Working at heights?', ocuAlturaDet:'Heights detail',
+          ocuExpl:'Working with explosives?', ocuExplDet:'Explosives detail',
+          ocuAcc:'Work-related illness or accident?', ocuAccDet:'Accident detail',
+          ocuHeli:'Travels by helicopter/light aircraft?', ocuHeliDet:'Aircraft travel detail',
+          pilTitle:'Private Pilot Questionnaire',
+          pilPast:'Flights in the last 12 months', pilFuture:'Flights planned in the next 12 months',
+          pilVuelos:'Total number of flights', pilHoras:'Total flight hours',
+          pilAeronave:'Type of aircraft', pilLugares:'Destinations flown to', pilLicencias:'Licenses / certifications',
+          pilPriv:'Flies from non-public airports?', pilPrivDet:'Detail',
+          pilClub:'Member of club/association?', pilClubDet:'Club detail',
+          pilMot:'Flies for reasons other than pleasure?', pilMotDet:'Flight purpose detail',
+          pilAcro:'Aerobatic flights?', pilAcroDet:'Aerobatic detail',
+          pilAccPil:'Accidents or license suspension?', pilAccPilDet:'Accident detail',
+          pepTitle:'PEP Questionnaire — Politically Exposed Person',
+          pepEs:'Is the prospect or direct family member a PEP?', pepNombre:'Full name', pepParentesco:'Relationship to insured',
+          pepDet:'Public office or function', pepActivo:'Still in that position currently?',
+          pepNom:'Uses or has used another name?', pepNomParentesco:'Relationship to insured', pepNomDet:'Alternative name',
+          vTitle:'Travel questionnaire',
+          v1:'Plans to travel in the next 12 months?',
+          v1Destinos:'Destinations (upcoming)', v1Visa:'Type of visa', v1Fechas:'Travel dates', v1Motivo:'Purpose of travel',
+          v2:'Has traveled in the last 12 months?',
+          v2Destinos:'Destinations (last 12 months)', v2Visa:'Type of visa', v2Fechas:'Travel dates', v2Motivo:'Purpose of travel',
+          v3:'Resides or plans to reside in another country?',
+          v3Razon:'Main reason', v3Nacimiento:'Place of birth', v3Nac:'Nationality', v3Activos:'Assets / real estate',
+          v4:'Reside abroad for more than 21 days?',
+          v4Tipo:'Type of residence', v4Dir:'Address', v4Instal:'Nearest medical facilities',
+          v5:'Trip is for business?',
+          v5NomNeg:'Business name', v5Nat:'Nature of business', v5Deb:'Duties and responsibilities',
+          v5Inicio:'Start date', v5Rem:'Annual remuneration', v5Salud:'Medical care / travel method',
+          v5Seg:'Employer security measures', v5Contrato:'Under contract or agreement?',
+          adicTitle:'Additional information', adicComentarios:'Comments',
+          archTitle:'Additional attachments', firmaTitle:'Advisor signature',
+          si:'Yes', no:'No',
+          disclaimerText:'This pre-evaluation is informational and preliminary in nature. Final risk acceptance is subject to formal review of the application and may require additional information or documentation as declared.',
+        }
+      };
+      const L = TL[lang] || TL['es'];
+
+      // ── HEADER ──
+      doc.setFillColor('#373D54'); doc.rect(0, 0, W, 22, 'F');
+      doc.setFillColor('#00BBDD'); doc.rect(0, 22, W, 2, 'F');
+      doc.setFont(F_BOLD, 'bold'); doc.setFontSize(SZ_HEADER); doc.setTextColor(C_HEADER);
+      doc.text('OléLife', ML, 13);
+      doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(10); doc.setTextColor('#9BACCB');
+      doc.text(L.title, ML + 30, 13);
+      doc.setFont(F_BOLD, 'bold'); doc.setFontSize(8); doc.setTextColor('#00BBDD');
+      doc.text(`ID: ${s.id||'—'}`, W - MR, 10, { align:'right' });
+      doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(8); doc.setTextColor('#9BACCB');
+      doc.text(`${L.sent}: ${s.fechaEnvio||'—'}`, W - MR, 17, { align:'right' });
+      y = 30;
+
+      // ── ASESOR ──
+      sectionHeader(L.asesor);
+      row(L.nombres, s.asesor?.nombre); row(L.email, s.asesor?.email); y += 3;
+
+      // ── PROSPECTO ──
+      sectionHeader(L.prospecto);
+      row(L.nombres, s.prospecto?.nombre); row(L.pais, s.prospecto?.pais);
+      row(L.fnac, formatDate(s.prospecto?.fnac)); row(L.edad, s.prospecto?.edad);
+      row(L.genero, s.prospecto?.genero ? (s.prospecto.genero.charAt(0).toUpperCase()+s.prospecto.genero.slice(1)) : '—');
+      row(L.fumador, s.prospecto?.fumador === 'si' ? L.si : L.no);
+      row(L.ocu, s.prospecto?.ocupacion); y += 3;
+
+      // ── PLAN ──
+      sectionHeader(L.plan);
+      row(L.motivos, s.motivos); if (s.otrosDetalle) row(L.otrosDetalle, s.otrosDetalle);
+      row(L.termino, s.plan?.termino); row(L.cobertura, s.plan?.cobertura); y += 3;
+
+      // ── DEPORTES ──
+      const dep = s.cuestionario?.deportes;
+      if (dep) {
+        sectionHeader(L.depTitle);
+        row(L.depDeporte, dep.deporte); row(L.depDesde, dep.desde); row(L.depNaturaleza, dep.naturaleza);
+        row(L.depFrecuencia, dep.frecuencia); row(L.depCert, dep.certificaciones); row(L.depLimites, dep.limites);
+        row(L.depClub, dep.clubMiembro === 'si' ? L.si : L.no);
+        if (dep.clubMiembro === 'si') row(L.depClubDet, dep.clubDetalle, true);
+        row(L.depLesiones, dep.lesiones === 'si' ? L.si : L.no);
+        if (dep.lesiones === 'si') row(L.depLesionesDet, dep.lesionesDetalle, true);
+        y += 3;
+      }
+
+      // ── HISTORIAL MÉDICO ──
+      const hist = s.cuestionario?.historial;
+      if (hist) {
+        sectionHeader(L.histTitle); row(L.histDet, hist.detalles);
+        const archMed = s.archivosAdjuntos?.medicos || [];
+        if (archMed.length) {
+          checkY(6);
+          doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor('#9BACCB');
+          doc.text(L.histDocs, ML, y); y += 4;
+          archMed.forEach(name => { checkY(4); doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#373D54'); doc.text('• ' + name, ML + 5, y); y += 4; });
+        }
+        y += 3;
+      }
+
+      // ── OCUPACIÓN ──
+      const ocu = s.cuestionario?.ocupacion;
+      if (ocu) {
+        sectionHeader(L.ocuTitle);
+        row(L.ocuTipo, ocu.tipo); row(L.ocuFunciones, ocu.funciones);
+        row(L.ocuMar, ocu.altaMar === 'si' ? L.si : L.no); if (ocu.altaMar === 'si') row(L.ocuMarDet, ocu.altaMarDet, true);
+        row(L.ocuAltura, ocu.altura === 'si' ? L.si : L.no); if (ocu.altura === 'si') row(L.ocuAlturaDet, ocu.alturaDet, true);
+        row(L.ocuExpl, ocu.explosivos === 'si' ? L.si : L.no); if (ocu.explosivos === 'si') row(L.ocuExplDet, ocu.explosivosDet, true);
+        row(L.ocuAcc, ocu.accidente === 'si' ? L.si : L.no); if (ocu.accidente === 'si') row(L.ocuAccDet, ocu.accidenteDet, true);
+        row(L.ocuHeli, ocu.helicoptero === 'si' ? L.si : L.no); if (ocu.helicoptero === 'si') row(L.ocuHeliDet, ocu.helicopteroDet, true);
+        const pil = ocu.piloto;
+        if (pil) {
+          y += 2; subLabel(L.pilTitle); subLabel(L.pilPast);
+          row(L.pilVuelos, pil.vuelosPasados); row(L.pilHoras, pil.horasPasadas);
+          subLabel(L.pilFuture); row(L.pilVuelos, pil.vuelosFuturos); row(L.pilHoras, pil.horasFuturas);
+          row(L.pilAeronave, pil.aeronave); row(L.pilLugares, pil.lugares); row(L.pilLicencias, pil.licencias);
+          row(L.pilPriv, pil.aeropuertosPriv === 'si' ? L.si : L.no); if (pil.aeropuertosPriv === 'si') row(L.pilPrivDet, pil.aeropuertosPrivDet, true);
+          row(L.pilClub, pil.club === 'si' ? L.si : L.no); if (pil.club === 'si') row(L.pilClubDet, pil.clubDet, true);
+          row(L.pilMot, pil.motivoVuelo === 'si' ? L.si : L.no); if (pil.motivoVuelo === 'si') row(L.pilMotDet, pil.motivoVueloDet, true);
+          row(L.pilAcro, pil.acrobatico === 'si' ? L.si : L.no); if (pil.acrobatico === 'si') row(L.pilAcroDet, pil.acrobaticoDet, true);
+          row(L.pilAccPil, pil.accidentePil === 'si' ? L.si : L.no); if (pil.accidentePil === 'si') row(L.pilAccPilDet, pil.accidentePilDet, true);
+        }
+        y += 3;
+      }
+
+      // ── PEP ──
+      const pep = s.pep;
+      if (pep) {
+        sectionHeader(L.pepTitle);
+        row(L.pepEs, pep.esPep === 'si' ? L.si : L.no);
+        if (pep.esPep === 'si') {
+          row(L.pepNombre, pep.pepNombre, true); row(L.pepParentesco, pep.pepParentesco, true);
+          row(L.pepDet, pep.pepDetalle, true);
+          if (pep.pepActivoActualmente) row(L.pepActivo, pep.pepActivoActualmente === 'si' ? L.si : L.no, true);
+        }
+        row(L.pepNom, pep.otroNombre === 'si' ? L.si : L.no);
+        if (pep.otroNombre === 'si') { row(L.pepNomParentesco, pep.otroNombreParentesco, true); row(L.pepNomDet, pep.otroNombreDet, true); }
+        y += 3;
+      }
+
+      // ── VIAJES ──
+      const vj = s.viajes;
+      if (vj) {
+        sectionHeader(L.vTitle);
+        row(L.v1, vj.proximosViajar === 'si' ? L.si : L.no);
+        if (vj.proximosViajar === 'si') { row(L.v1Destinos, vj.v1Destinos, true); row(L.v1Visa, vj.v1Visa, true); row(L.v1Fechas, vj.v1Fechas, true); row(L.v1Motivo, vj.v1Motivo, true); }
+        row(L.v2, vj.viajoUltimos === 'si' ? L.si : L.no);
+        if (vj.viajoUltimos === 'si') { row(L.v2Destinos, vj.v2Destinos, true); row(L.v2Visa, vj.v2Visa, true); row(L.v2Fechas, vj.v2Fechas, true); row(L.v2Motivo, vj.v2Motivo, true); }
+        row(L.v3, vj.residirOtroPais === 'si' ? L.si : L.no);
+        if (vj.residirOtroPais === 'si') { row(L.v3Razon, vj.v3Razon, true); row(L.v3Nacimiento, vj.v3Nacimiento, true); row(L.v3Nac, vj.v3Nacionalidad, true); row(L.v3Activos, vj.v3Activos, true); }
+        row(L.v4, vj.mas21Dias === 'si' ? L.si : L.no);
+        if (vj.mas21Dias === 'si') { row(L.v4Tipo, vj.v4TipoResidencia, true); row(L.v4Dir, vj.v4Direccion, true); row(L.v4Instal, vj.v4Instalaciones, true); }
+        row(L.v5, vj.porNegocios === 'si' ? L.si : L.no);
+        if (vj.porNegocios === 'si') {
+          row(L.v5NomNeg, vj.v5NombreNeg, true); row(L.v5Nat, vj.v5Naturaleza, true); row(L.v5Deb, vj.v5Deberes, true);
+          row(L.v5Inicio, formatDate(vj.v5Inicio), true); row(L.v5Rem, vj.v5Remuneracion, true);
+          row(L.v5Salud, vj.v5Salud, true); row(L.v5Seg, vj.v5Seguridad, true); row(L.v5Contrato, vj.v5Contrato, true);
+        }
+        y += 3;
+      }
+
+      // ── INFORMACIÓN ADICIONAL ──
+      if (s.adicional) { sectionHeader(L.adicTitle); row(L.adicComentarios, s.adicional); y += 3; }
+
+      // ── ARCHIVOS ADICIONALES ──
+      const archAdic = s.archivosAdjuntos?.adicionales || [];
+      if (archAdic.length) {
+        sectionHeader(L.archTitle);
+        archAdic.forEach(name => { checkY(4); doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor('#373D54'); doc.text('• ' + name, ML + 2, y); y += 4; });
+        y += 3;
+      }
+
+      // ── FIRMA ──
+      if (s.firma) {
+        checkY(36); sectionHeader(L.firmaTitle);
+        try { doc.addImage(s.firma, 'PNG', ML, y, 90, 28); y += 32; } catch(e) { row(L.firmaTitle, 'Incluida digitalmente en el envío'); }
+        y += 3;
+      }
+
+      // ── DISCLAIMER ──
+      checkY(18);
+      doc.setFillColor('#FFF8E8'); doc.setDrawColor('#F0D890'); doc.setLineWidth(0.3);
+      doc.roundedRect(ML, y - 1, CW, 16, 1.5, 1.5, 'FD');
+      doc.setFont(F_REGULAR, 'italic'); doc.setFontSize(SZ_TINY); doc.setTextColor('#7A6020');
+      const dLines = doc.splitTextToSize(L.disclaimerText, CW - 8);
+      doc.text(dLines, ML + 4, y + 5); y += 19;
+
+      // ── FOOTER EN CADA PÁGINA ──
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let p = 1; p <= pageCount; p++) {
+        doc.setPage(p); doc.setFillColor('#F5F9FC'); doc.rect(0, 285, W, 12, 'F');
+        doc.setFont(F_REGULAR, 'normal'); doc.setFontSize(SZ_TINY); doc.setTextColor('#9BACCB');
+        doc.text(`OléLife · ${L.title} ${s.id||''} · Página ${p} de ${pageCount}`, W/2, 291, { align:'center' });
+      }
+
+      pdfBase64 = doc.output('datauristring');
     } catch(pdfErr) { console.warn('PDF generation for email failed:', pdfErr); }
 
-    // Build adjuntos array: PDF + all uploaded files
+    // Build adjuntos array: PDF completo + todos los archivos subidos
     const adjuntos = [];
     const prospSlug = (payload.prospecto.nombre||'prospecto').replace(/\s+/g,'-');
     if (pdfBase64) {
@@ -1901,3 +2191,4 @@ function resetAll() {
 </script>
 </body>
 </html>
+
