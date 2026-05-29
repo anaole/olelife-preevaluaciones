@@ -266,8 +266,29 @@
     .zendesk-badge svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
     .note-textarea{width:100%;min-height:80px;border:1px solid var(--color-light-grey);border-radius:var(--radius-input);padding:10px 12px;font:400 13px/1.5 var(--font);color:var(--color-dark-grey);resize:vertical;outline:none;transition:border-color 150ms;box-sizing:border-box;}
     .note-textarea:focus{border-color:var(--color-turquoise);box-shadow:0 0 0 3px rgba(0,187,221,.12);}
-    .note-add-btn{margin-top:8px;height:36px;padding:0 16px;border-radius:var(--radius-input);background:var(--color-dark-blue);color:white;border:none;font:600 12px/1 var(--font);cursor:pointer;transition:background 150ms;}
-    .note-add-btn:hover{background:#2A3048;}
+    .note-actions-row{display:flex;gap:8px;margin-top:8px;}
+    .note-add-btn{height:36px;padding:0 14px;border-radius:var(--radius-input);border:none;font:600 12px/1 var(--font);cursor:pointer;transition:background 150ms;display:inline-flex;align-items:center;gap:6px;}
+    .note-add-btn svg{stroke:currentColor;fill:none;flex-shrink:0;}
+    .note-btn-internal{background:var(--color-dark-blue);color:white;}
+    .note-btn-internal:hover{background:#2A3048;}
+    .note-btn-notify{background:var(--color-turquoise);color:white;}
+    .note-btn-notify:hover{background:#009ABB;}
+    .note-type-badge{display:inline-block;font:700 10px/1 var(--font);padding:2px 7px;border-radius:999px;margin-right:6px;text-transform:uppercase;letter-spacing:.04em;}
+    .note-type-internal{background:var(--color-bg-grey);color:var(--color-dark-grey);}
+    .note-type-notif{background:var(--color-turquoise-soft);color:var(--color-turquoise);}
+    .note-attach-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px;}
+    .note-attach-btn{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:var(--radius-input);border:1px dashed var(--color-light-grey);background:var(--color-shell);font:600 11px/1 var(--font);color:var(--color-medium-grey);cursor:pointer;transition:border-color 150ms,color 150ms;flex-shrink:0;outline:none;}
+    .note-attach-btn:hover{border-color:var(--color-turquoise);color:var(--color-turquoise);}
+    .note-attach-btn svg{stroke:currentColor;fill:none;flex-shrink:0;}
+    .note-files-preview{display:flex;flex-wrap:wrap;gap:6px;}
+    .note-file-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px;border-radius:999px;background:var(--color-bg-grey);border:1px solid var(--color-light-grey);font:400 11px/1 var(--font);color:var(--color-dark-grey);max-width:160px;}
+    .note-file-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .note-file-chip button{background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;color:var(--color-medium-grey);flex-shrink:0;}
+    .note-file-chip button:hover{color:var(--color-danger);}
+    .note-card-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+    .note-card-file{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:999px;background:var(--color-shell);border:1px solid var(--color-bg-grey);font:400 10px/1 var(--font);color:var(--color-dark-grey);cursor:pointer;text-decoration:none;}
+    .note-card-file:hover{border-color:var(--color-turquoise);color:var(--color-turquoise);}
+    .note-card-file svg{stroke:currentColor;fill:none;flex-shrink:0;}
     .note-card{background:var(--color-shell);border:1px solid var(--color-light-grey);border-radius:var(--radius-card);padding:12px 14px;margin-top:10px;}
     .note-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
     .note-card-date{font:600 11px/1 var(--font);color:var(--color-medium-grey);}
@@ -493,8 +514,26 @@
           </div>
           <div class="detail-card">
             <div class="detail-card-title">Notas</div>
-            <textarea class="note-textarea" id="dv-note-input" placeholder="Escribe una nota sobre esta solicitud..."></textarea>
-            <button class="note-add-btn" onclick="addNoteView()">Agregar nota</button>
+            <textarea class="note-textarea" id="dv-note-input" placeholder="Escribe una nota interna o un mensaje para el asesor..."></textarea>
+            <!-- Zona de adjuntos -->
+            <div class="note-attach-row">
+              <button class="note-attach-btn" type="button" onclick="document.getElementById('dv-note-files').click()" title="Adjuntar archivos">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                Adjuntar
+              </button>
+              <input type="file" id="dv-note-files" multiple accept="*/*" style="display:none;position:absolute;left:-9999px;" onchange="handleNoteFiles(this)">
+              <div id="dv-note-files-list" class="note-files-preview"></div>
+            </div>
+            <div class="note-actions-row">
+              <button class="note-add-btn note-btn-internal" onclick="addNoteView()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Nota interna
+              </button>
+              <button class="note-add-btn note-btn-notify" onclick="sendNoteNotification()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Notificar al asesor
+              </button>
+            </div>
             <div id="dv-notes-list"></div>
           </div>
         </div>
@@ -708,6 +747,7 @@ function doLogout() {
 // ── Supabase config ────────────────────────────────────────
 const SB_URL = 'https://hpjvljotjzzrnkpsewzy.supabase.co';
 const SB_KEY = 'sb_publishable_D658YrHARFo_m-XSYVzgtA_95g2TR2J';
+const WP_EMAIL_URL = 'https://olelife.com/wp-json/olelife/v1/send-email';
 
 async function sbFetch() {
   const res = await fetch(`${SB_URL}/rest/v1/pre_evaluaciones?order=created_at.desc`, {
@@ -1080,16 +1120,106 @@ function saveZendesk(realIdx) {
   renderZendeskSection(id, realIdx);
 }
 
-function addNoteView() {
+// ── Adjuntos en notas ─────────────────────────────────────
+let noteAttachments = [];
+
+function handleNoteFiles(input) {
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      noteAttachments.push({ name: file.name, data: e.target.result });
+      renderNoteFilesPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = ''; // permitir re-seleccionar el mismo archivo
+}
+
+function renderNoteFilesPreview() {
+  const c = document.getElementById('dv-note-files-list');
+  if (!c) return;
+  c.innerHTML = noteAttachments.map((f,i) => `
+    <div class="note-file-chip">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span title="${f.name}">${f.name}</span>
+      <button type="button" onclick="removeNoteAttachment(${i})">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`).join('');
+}
+
+function removeNoteAttachment(i) {
+  noteAttachments.splice(i,1);
+  renderNoteFilesPreview();
+}
+
+function clearNoteAttachments() {
+  noteAttachments = [];
+  renderNoteFilesPreview();
+}
+
+function addNoteView(type) {
   if (detailIdx===null) return;
   const s = allSubs[detailIdx]; const id = s?.id;
   const ta = document.getElementById('dv-note-input');
   const text = ta?.value?.trim();
   if (!text||!id) return;
   if (!notesStore[id]) notesStore[id] = [];
-  notesStore[id].unshift({text, date:new Date().toLocaleString('es-PE'), id:Date.now()});
+  notesStore[id].unshift({
+    text,
+    date: new Date().toLocaleString('es-PE'),
+    id: Date.now(),
+    type: type || 'interna',
+    adjuntos: noteAttachments.map(f => ({ name: f.name, data: f.data })),
+  });
   ta.value = '';
+  clearNoteAttachments();
   document.getElementById('dv-notes-list').innerHTML = renderNotesList(id, detailIdx);
+}
+
+async function sendNoteNotification() {
+  if (detailIdx===null) return;
+  const s = allSubs[detailIdx]; const id = s?.id;
+  const ta = document.getElementById('dv-note-input');
+  const text = ta?.value?.trim();
+  if (!text) { showToast('Escribe un mensaje antes de notificar.'); return; }
+  if (!id) return;
+  const asesorEmail = s.asesor?.email;
+  if (!asesorEmail) { showToast('No se encontró el email del asesor.'); return; }
+
+  const adjuntos = noteAttachments.map(f => ({ nombre: f.name, data: f.data }));
+
+  if (!notesStore[id]) notesStore[id] = [];
+  notesStore[id].unshift({
+    text,
+    date: new Date().toLocaleString('es-PE'),
+    id: Date.now(),
+    type: 'notificacion',
+    adjuntos: noteAttachments.map(f => ({ name: f.name, data: f.data })),
+  });
+  ta.value = '';
+  clearNoteAttachments();
+  document.getElementById('dv-notes-list').innerHTML = renderNotesList(id, detailIdx);
+
+  try {
+    await fetch(WP_EMAIL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: 'nota_asesor',
+        id,
+        prospecto: s.prospecto?.nombre,
+        asesor: s.asesor?.nombre,
+        emailAsesor: asesorEmail,
+        mensaje: text,
+        adjuntos,
+      }),
+    });
+    showToast('Notificación enviada al asesor.');
+  } catch(e) {
+    showToast('Nota guardada. Error al enviar email.');
+    console.warn('Error enviando notificación:', e);
+  }
 }
 
 // Keep addNote for compatibility — alias to addNoteView
@@ -1099,17 +1229,31 @@ function renderNotesList(subId, realIdx) {
   const notes = notesStore[subId]||[];
   const listId = `dv-notes-list`; // always the detail view list
   if (!notes.length) return `<p style="font:400 12px/1.5 var(--font);color:var(--color-medium-grey);margin-top:12px;">Sin notas aún.</p>`;
-  return notes.map((n,ni) => `
+  return notes.map((n,ni) => {
+    const isNotif = n.type === 'notificacion';
+    const badge = isNotif
+      ? `<span class="note-type-badge note-type-notif">Notificación</span>`
+      : `<span class="note-type-badge note-type-internal">Interna</span>`;
+    return `
     <div class="note-card" id="note-card-${ni}">
       <div class="note-card-header">
-        <span class="note-card-date">${n.date}</span>
+        <div style="display:flex;align-items:center;gap:4px;">${badge}<span class="note-card-date">${n.date}</span></div>
         <div class="note-card-actions">
           <button class="note-card-btn" onclick="editNote('${subId}',${ni})"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
           <button class="note-card-btn" style="color:#DD0000;" onclick="deleteNote('${subId}',${ni})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
         </div>
       </div>
       <div class="note-card-text">${n.text}</div>
-    </div>`).join('');
+      ${n.adjuntos && n.adjuntos.length ? `
+      <div class="note-card-files">
+        ${n.adjuntos.map(a => `
+          <a class="note-card-file" href="${a.data}" download="${a.name}" title="${a.name}">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ${a.name}
+          </a>`).join('')}
+      </div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function editNote(subId, ni) {
@@ -1509,6 +1653,25 @@ async function saveStatus(id, realIdxOverride) {
     if (otherSelect) otherSelect.value = newEstado;
     closeStatusEditor(id);
     showToast(`Estado actualizado: ${newEstado}`);
+
+    // ── Disparo de email al cambiar estado a Aceptada o Rechazada ──
+    if (newEstado === 'Aceptada' || newEstado === 'Rechazada') {
+      try {
+        await fetch(WP_EMAIL_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tipo: newEstado === 'Aceptada' ? 'pre_evaluacion_aprobada' : 'pre_evaluacion_rechazada',
+            id: s.id,
+            prospecto: s.prospecto?.nombre,
+            asesor: s.asesor?.nombre,
+            emailAsesor: s.asesor?.email,
+          }),
+        });
+      } catch(emailErr) {
+        console.warn('Error enviando email de estado:', emailErr);
+      }
+    }
   } catch(e) {
     showToast('Error al actualizar estado. Intenta de nuevo.');
     console.error(e);
@@ -1722,6 +1885,7 @@ function downloadPDF(idx) {
       // PEP
       pepTitle:'Cuestionario PEP — Persona Políticamente Expuesta',
       pepEs:'¿El prospecto o familiar directo es PEP?', pepNombre:'Nombre', pepParentesco:'Parentesco con el asegurado', pepDet:'Cargo o función pública',
+      pepActivo:'¿Sigue en esa posición actualmente?',
       pepNom:'¿Utiliza o ha utilizado otro nombre?', pepNomParentesco:'Parentesco con el asegurado', pepNomDet:'Nombre alternativo',
       // Viajes
       vTitle:'Cuestionario de viajes',
@@ -1779,6 +1943,7 @@ function downloadPDF(idx) {
       // PEP
       pepTitle:'PEP Questionnaire — Politically Exposed Person',
       pepEs:'Is the prospect or direct family member a PEP?', pepNombre:'Full name', pepParentesco:'Relationship to insured', pepDet:'Public office or function',
+      pepActivo:'Still in that position currently?',
       pepNom:'Uses or has used another name?', pepNomParentesco:'Relationship to insured', pepNomDet:'Alternative name',
       // Travel
       vTitle:'Travel questionnaire',
@@ -1932,6 +2097,7 @@ function downloadPDF(idx) {
       row(L.pepNombre, pep.pepNombre, true);
       row(L.pepParentesco, pep.pepParentesco, true);
       row(L.pepDet, pep.pepDetalle, true);
+      if (pep.pepActivoActualmente) row(L.pepActivo, pep.pepActivoActualmente === 'si' ? L.si : L.no, true);
     }
     row(L.pepNom, pep.otroNombre === 'si' ? L.si : L.no);
     if (pep.otroNombre === 'si') {
@@ -2069,6 +2235,9 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
+
+
 
 
 
