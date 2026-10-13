@@ -1,5 +1,6 @@
 export const config = {
-  matcher: '/((?!_vercel).*)',
+  // Solo el backoffice pide contraseña; la pre-evaluación ("/") queda pública
+  matcher: ['/backoffice', '/backoffice.html'],
 };
 
 export default function middleware(req) {
